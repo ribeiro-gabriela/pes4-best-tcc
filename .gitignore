@@ -1,0 +1,5 @@
+.vscode
+
+/firmware/.devcontainer
+/firmware/.vscode
+/firmware/build
