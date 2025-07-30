@@ -3,3 +3,5 @@
 /firmware/.devcontainer
 /firmware/.vscode
 /firmware/build
+/firmware/sdkconfig
+/firmware/sdkconfig.old
