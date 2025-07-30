@@ -9,13 +9,9 @@ void https_event_handler(void* arg, esp_event_base_t event_base,
 
 httpd_handle_t start_webserver();
 
-// static void connect_handler(void* arg, esp_event_base_t event_base, 
-//                             int32_t event_id, void* event_data);
-
 void init_https_server();
 
 esp_err_t get_hello_handler(httpd_req_t* request);
 
-void https_server_user_callback(esp_https_server_user_cb_arg_t *user_cb);
 
 #endif

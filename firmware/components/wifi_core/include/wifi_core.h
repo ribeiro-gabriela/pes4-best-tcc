@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _WIFI_CORE_H
+#define _WIFI_CORE_H
 
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -18,10 +19,10 @@
 #define MAX_STA_CONN       5
 #define EXAMPLE_GTK_REKEY_INTERVAL 0
 
-static const char *TAG = "BC AP";
-
 // WiFi AP
 void wifi_event_handler(void* arg, esp_event_base_t event_base,
-                               int32_t event_id, void* event_data);
+                        int32_t event_id, void* event_data);
 
 void wifi_init_softap(void);
+
+#endif

@@ -12,7 +12,6 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_AP");
     wifi_init_softap();
     init_https_server();
 }
