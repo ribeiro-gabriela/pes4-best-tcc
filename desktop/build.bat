@@ -1,0 +1,1 @@
+pyinstaller --log-level INFO build.spec

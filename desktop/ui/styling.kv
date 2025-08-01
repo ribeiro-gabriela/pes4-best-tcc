@@ -1,0 +1,130 @@
+
+#:kivy 2.0.0
+
+# ----- STYLING CONSTANTS -----
+
+# Color definitions (RGBA values)
+
+#:set PRIMARY_COLOR [0.2, 0.6, 0.8, 1]
+#:set SECONDARY_COLOR [0.3, 0.3, 0.3, 1]
+#:set ACCENT_COLOR [0.9, 0.5, 0.1, 1]
+#:set BACKGROUND_COLOR [0.95, 0.95, 0.95, 1]
+#:set TEXT_COLOR [0.9, 0.9, 0.9, 1]
+#:set SUCCESS_COLOR [0.2, 0.7, 0.3, 1]
+
+# Font sizes
+
+#:set FONT_LARGE 24
+#:set FONT_MEDIUM 18
+#:set FONT_NORMAL 16
+#:set FONT_SMALL 14
+
+# Dimensions
+
+#:set MENU_HEIGHT 50
+#:set BUTTON_HEIGHT 60
+#:set TABLE_ROW_HEIGHT 60
+#:set HEADER_HEIGHT 40
+#:set MENU_BUTTON_WIDTH 100
+#:set NAV_BUTTON_WIDTH 200
+
+# Spacing values
+
+#:set SPACING_LARGE 20
+#:set SPACING_MEDIUM 10
+#:set SPACING_SMALL 5
+#:set PADDING_LARGE 50
+#:set PADDING_MEDIUM 20
+#:set PADDING_SMALL 10
+
+# ----- COMPONENTS -----
+
+<MenuButton@Button>:
+    background_color: PRIMARY_COLOR
+    font_size: FONT_SMALL
+    size_hint_x: None
+    width: MENU_BUTTON_WIDTH
+
+<HelpButton@Button>:
+    background_color: ACCENT_COLOR
+    font_size: FONT_SMALL
+    size_hint_x: None
+    width: MENU_BUTTON_WIDTH
+
+<PrimaryButton@Button>:
+    background_color: PRIMARY_COLOR
+    font_size: FONT_MEDIUM
+    size_hint_y: None
+    height: BUTTON_HEIGHT
+
+<SecondaryButton@Button>:
+    background_color: SECONDARY_COLOR
+    font_size: FONT_MEDIUM
+    size_hint_y: None
+    height: BUTTON_HEIGHT
+
+<NavButton@Button>:
+    background_color: SECONDARY_COLOR
+    font_size: FONT_NORMAL
+    size_hint_x: None
+    width: NAV_BUTTON_WIDTH
+    size_hint_y: None
+    height: BUTTON_HEIGHT
+
+<ConnectButton@Button>:
+    background_color: SUCCESS_COLOR
+    font_size: FONT_NORMAL
+    size_hint_y: None
+    height: TABLE_ROW_HEIGHT
+
+<TitleLabel@Label>:
+    font_size: FONT_LARGE
+    color: TEXT_COLOR
+
+<NormalLabel@Label>:
+    font_size: FONT_NORMAL
+    color: TEXT_COLOR
+
+<HeaderLabel@Label>:
+    font_size: FONT_NORMAL
+    bold: True
+    color: TEXT_COLOR
+    size_hint_y: None
+    height: HEADER_HEIGHT
+
+<WiFiLabel@Label>:
+    font_size: FONT_SMALL
+    color: TEXT_COLOR
+    halign: 'left'
+    valign: 'middle'
+    size_hint_y: None
+    height: TABLE_ROW_HEIGHT
+
+<ScreenLayout@BoxLayout>:
+    orientation: 'vertical'
+    spacing: SPACING_LARGE
+    padding: PADDING_LARGE
+
+<CompactLayout@BoxLayout>:
+    orientation: 'vertical'
+    spacing: SPACING_MEDIUM
+    padding: PADDING_MEDIUM
+
+<HorizontalLayout@BoxLayout>:
+    orientation: 'horizontal'
+    spacing: SPACING_MEDIUM
+
+<VerticalLayout@BoxLayout>:
+    orientation: 'vertical'
+
+<TableLayout@GridLayout>:
+    cols: 2
+    spacing: SPACING_SMALL
+    size_hint_y: None
+
+<TopMenuBar>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: MENU_HEIGHT
+    spacing: SPACING_MEDIUM
+    padding: PADDING_SMALL, SPACING_SMALL, PADDING_SMALL, SPACING_SMALL
