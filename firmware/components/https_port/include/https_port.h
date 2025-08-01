@@ -13,5 +13,8 @@ void init_https_server();
 
 esp_err_t get_hello_handler(httpd_req_t* request);
 
+static void https_server_user_callback(esp_https_server_user_cb_arg_t *user_cb);
+
+static void print_peer_cert_info(const mbedtls_ssl_context *ssl);
 
 #endif
