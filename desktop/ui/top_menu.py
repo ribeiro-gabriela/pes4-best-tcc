@@ -1,44 +1,40 @@
-from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 
+from custom_types.screens import ScreenName
+from ui.actions import action_go_to_screen, action_show_help
 from ui.components import HorizontalLayout, MenuButton, HelpButton
 
-class TopMenuBar(BoxLayout):
-    def __init__(self, screen_manager: ScreenManager, **kwargs):
-        self.screen_manager = screen_manager
 
+class TopMenuBar(BoxLayout):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
-        # Left aligned buttons
+
         left_buttons = HorizontalLayout()
-        
-        btn_screen1 = MenuButton(text='Screen 1')
-        btn_screen1.on_press = lambda: self.go_to_screen('screen1')
-        left_buttons.add_widget(btn_screen1)
-        
-        btn_screen2 = MenuButton(text='Screen 2')
-        btn_screen2.on_press = lambda: self.go_to_screen('screen2')
-        left_buttons.add_widget(btn_screen2)
-        
-        btn_screen3 = MenuButton(text='Screen 3') 
-        btn_screen3.on_press = lambda: self.go_to_screen('screen3')
-        left_buttons.add_widget(btn_screen3)
+
+        button1 = _build_menu_button("Home", ScreenName.MAIN)
+        left_buttons.add_widget(button1)
+
+        button2 = _build_menu_button(ScreenName.IMAGES.name, ScreenName.IMAGES)
+        left_buttons.add_widget(button2)
+
+        button3 = _build_menu_button(ScreenName.CONNECTION.name, ScreenName.CONNECTION)
+        left_buttons.add_widget(button3)
 
         self.add_widget(left_buttons)
 
-        # Spacer
         spacer = Label()
         self.add_widget(spacer)
 
-        # Right aligned help button
-        btn_help = HelpButton(text='Help', size_hint_x=None, width=100)
-        btn_help.on_press = self.show_help
-        self.add_widget(btn_help)
-    
-    def go_to_screen(self, screen_name):
-        if self.screen_manager:
-            self.screen_manager.current = screen_name
-    
-    def show_help(self):
-        print("Help button pressed")
+        button_help = _build_help_button()
+        self.add_widget(button_help)
+        
+def _build_menu_button(button_text: str, target_screen: ScreenName):
+    button = MenuButton(text=button_text)
+    button.on_press = action_go_to_screen(target_screen)
+    return button
+
+def _build_help_button():
+    button = HelpButton(text="Help")
+    button.on_press = action_show_help()
+    return button
