@@ -8,7 +8,7 @@ Listed on `requirements.txt`. Main dependencies are kivy and pywifi
 
 ### Prerequisites
 
-* Python 3.8+
+* Python 3.11+
 * `pip` and `venv`
 
 ### Installation
