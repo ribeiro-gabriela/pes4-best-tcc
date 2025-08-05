@@ -70,6 +70,8 @@ sudo python main.py
 
 Build scripts are provided for convenience. These scripts use PyInstaller to package the application.
 
+IMPORTANT: scripts must be run from the same directory as `main.py`
+
 * Build on Windows:
 
 ```
