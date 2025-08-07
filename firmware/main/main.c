@@ -2,6 +2,7 @@
 #include "storage_core.h"
 #include "https_port.h"
 #include "hashing.h"
+#include "cli.h"
 
 void app_main(void)
 {
@@ -19,7 +20,9 @@ void app_main(void)
     wifi_init_softap();
     init_https_server();
 
-    #ifdef DEBUG
+    init_console();
+
+    #ifndef DEBUG
     func();
     #endif
 }
