@@ -1,12 +1,114 @@
 #include <stdio.h>
 #include "https_port.h"
 
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
 extern const uint8_t server_cert_pem_start[] asm("_binary_server_cert_pem_start");
 extern const uint8_t server_cert_pem_end[] asm("_binary_server_cert_pem_end");
 extern const uint8_t server_key_pem_start[] asm("_binary_server_key_pem_start");
 extern const uint8_t server_key_pem_end[] asm("_binary_server_key_pem_end");
 
 static const char* TAG = "HTTPS";
+
+esp_err_t get_bc_status_handler(httpd_req_t* request) {
+    char* msg = "ready";
+
+    httpd_resp_set_type(request, "text/plain");
+
+    httpd_resp_send(request, msg, HTTPD_RESP_USE_STRLEN);
+
+    return ESP_OK;
+}
+
+esp_err_t post_file_handler(httpd_req_t* request) {
+    const char* filepath = "/spiffs/gabi.txt";
+
+    FILE* file = fopen(filepath, "w");
+
+    if (!file)
+    {
+        perror("fopen");
+        ESP_LOGE(TAG, "could not create file");
+        httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "internal error");
+        return ESP_FAIL;
+    }
+
+    int total_len = request->content_len;
+    int cur_len = 0;
+    int received = 0;
+    char buf[128];
+
+    while (cur_len < total_len)
+    {
+        received = httpd_req_recv(request, buf, MIN(sizeof(buf), total_len - cur_len));
+        if (received <= 0) {
+            fclose(file);
+            ESP_LOGE(TAG, "could not receive file");
+            httpd_resp_send_err(request, HTTPD_500_INTERNAL_SERVER_ERROR, "internal error");
+            return ESP_FAIL;
+        }
+
+        fwrite(buf, 1, received, file);
+        cur_len += received;
+    }
+
+    fclose(file);
+
+    const char* resp = "file received";
+    httpd_resp_send(request, resp, strlen(resp));
+    return ESP_OK;
+}
+
+esp_err_t get_bc_info_handler(httpd_req_t* request)
+{
+    const char* filepath = "/spiffs/EMB-0001-021-045.txt";
+
+    FILE* file = fopen(filepath, "r");
+
+    if(!file)
+    {
+        const char* err = "internal error";
+
+        httpd_resp_send_500(request);
+        return ESP_FAIL;
+    }    
+
+    httpd_resp_set_type(request, "text/plain");
+
+    char line[128];
+    while (fgets(line, sizeof(line), file)) {
+        httpd_resp_send_chunk(request, line, strlen(line));
+    }
+
+    fclose(file);
+    httpd_resp_send_chunk(request, NULL, 0); // Finaliza chunked response
+
+    return ESP_OK;
+}
+
+httpd_uri_t get_bc_status = {
+    .uri = "/status",
+    .method = HTTP_GET,
+    .handler = get_bc_status_handler,
+    .user_ctx = NULL
+};
+
+httpd_uri_t get_bc_info = {
+    .uri = "/info",
+    .method = HTTP_GET,
+    .handler = get_bc_info_handler,
+    .user_ctx = NULL
+};
+
+httpd_uri_t post_file = {
+    .uri = "/file",
+    .method = HTTP_POST,
+    .handler = post_file_handler,
+    .user_ctx = NULL
+};
+
 
 esp_err_t get_hello_handler(httpd_req_t* request)
 {
@@ -57,6 +159,9 @@ httpd_handle_t start_webserver()
     }
 
     httpd_register_uri_handler(server, &get_hello);
+    httpd_register_uri_handler(server, &get_bc_info);
+    httpd_register_uri_handler(server, &get_bc_status);
+    httpd_register_uri_handler(server, &post_file);
 
     ESP_LOGI(TAG, "Server started successfully!");
 

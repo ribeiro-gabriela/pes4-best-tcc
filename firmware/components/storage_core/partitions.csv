@@ -2,4 +2,4 @@
 nvs,data,nvs,0x9000,24K,
 phy_init,data,phy,0xf000,4K,
 factory,app,factory,0x10000,1M,
-storage,data,spiffs,0x200000,4K,
+storage,data,spiffs,0x200000,2M,
