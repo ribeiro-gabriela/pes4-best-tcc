@@ -1,5 +1,7 @@
 #include "wifi_core.h"
+#include "storage_core.h"
 #include "https_port.h"
+#include "hashing.h"
 
 void app_main(void)
 {
@@ -12,6 +14,12 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
+    partition_setup();
+
     wifi_init_softap();
     init_https_server();
+
+    #ifdef DEBUG
+    func();
+    #endif
 }
