@@ -14,9 +14,6 @@ path_to_dat = Path.cwd() / bundle_dir / Path("styling.kv")
 class DesktopAppUi(App):
     navigator: ScreenNavigator
 
-    def __init__(self):
-        super().__init__()
-
     def build(self):
         Builder.load_file(str(path_to_dat))
 
