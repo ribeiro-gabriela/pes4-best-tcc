@@ -3,6 +3,7 @@
 #include "https_port.h"
 #include "hashing.h"
 #include "cli.h"
+#include "tftp.h"
 
 void app_main(void)
 {
@@ -18,9 +19,13 @@ void app_main(void)
     partition_setup();
 
     wifi_init_softap();
-    init_https_server();
+    //init_https_server();
 
     init_console();
+
+    struct tftp_server* server = tftp_server_create("/spiffs", 70);
+    tftp_server_write_set(server, 1);
+    tftp_server_run(server);
 
     #ifndef DEBUG
     func();

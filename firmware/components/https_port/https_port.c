@@ -23,7 +23,7 @@ esp_err_t get_bc_status_handler(httpd_req_t* request) {
 }
 
 esp_err_t post_file_handler(httpd_req_t* request) {
-    const char* filepath = "/spiffs/gabi.txt";
+    const char* filepath = "/spiffs/EMB-0001-021-045.txt";
 
     FILE* file = fopen(filepath, "w");
 
