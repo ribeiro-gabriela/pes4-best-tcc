@@ -16,7 +16,7 @@
 #define ESP_WIFI_SSID      "BC AP"
 #define ESP_WIFI_PASS      "bcappassword"
 #define ESP_WIFI_CHANNEL   1
-#define MAX_STA_CONN       5
+#define MAX_STA_CONN       1
 #define EXAMPLE_GTK_REKEY_INTERVAL 0
 
 // WiFi AP

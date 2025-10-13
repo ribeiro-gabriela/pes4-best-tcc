@@ -18,6 +18,7 @@
 #include <sys/select.h>
 #include "tftp_xfer.h"
 #include "tftp.h"
+#include "tftp_port.h"
 
 #define TFTP_SERVER_EVENT_CONNECT   (0x1 << 0)
 #define TFTP_SERVER_EVENT_DATA      (0x1 << 1)

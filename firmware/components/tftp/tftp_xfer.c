@@ -16,6 +16,7 @@
 #include <sys/select.h>
 #include "tftp_xfer.h"
 #include "tftp.h"
+#include "tftp_port.h"
 
 struct tftp_xfer_private
 {

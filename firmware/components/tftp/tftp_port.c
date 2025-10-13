@@ -5,14 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include "tftp.h"
 
+#include "tftp_port.h"
 #include "argtable3/argtable3.h"
 
 #include "esp_console.h"
