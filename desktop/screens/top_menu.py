@@ -1,14 +1,14 @@
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 
-from custom_types.screens import ScreenName
-from ui.actions import action_go_to_screen, action_show_help
-from ui.components import HorizontalLayout, MenuButton, HelpButton
+from data.enums import ScreenName
+from screens.actions import action_go_to_screen, action_show_help
+from screens.components import HorizontalLayout, MenuButton, HelpButton
 
 
 class TopMenuBar(BoxLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self):
+        super().__init__()
 
         left_buttons = HorizontalLayout()
 

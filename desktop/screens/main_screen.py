@@ -1,10 +1,10 @@
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
 
-from ui.actions import action_go_to_screen
-from ui.components import ScreenLayout, TitleLabel, PrimaryButton
+from screens.actions import action_go_to_screen
+from screens.components import ScreenLayout, TitleLabel, PrimaryButton
 
-from custom_types.screens import ScreenName
+from data.enums import ScreenName
 
 class MainScreen(Screen):
     def __init__(self):
@@ -23,6 +23,10 @@ class MainScreen(Screen):
         btn2 = PrimaryButton(text=f'Go to {ScreenName.CONNECTION.value}')
         btn2.on_press = action_go_to_screen(ScreenName.CONNECTION)
         layout.add_widget(btn2)
+
+        btn3 = PrimaryButton(text=f'ERRO')
+        btn3.on_press = error
+        layout.add_widget(btn3)
         
         self.add_spacer_to_layout(layout)
         
@@ -30,3 +34,6 @@ class MainScreen(Screen):
 
     def add_spacer_to_layout(self, layout: ScreenLayout):
         layout.add_widget(Label())
+
+def error():
+    raise Exception("aaaaaa")

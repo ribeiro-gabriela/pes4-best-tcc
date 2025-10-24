@@ -1,9 +1,9 @@
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
 
-from custom_types.screens import ScreenName
-from ui.actions import action_go_to_screen
-from ui.components import (
+from data.enums import ScreenName
+from screens.actions import action_go_to_screen
+from screens.components import (
     CompactLayout,
     HorizontalLayout,
     TableLayout,
@@ -14,7 +14,6 @@ from ui.components import (
     SecondaryButton,
 )
 from services.service_facade import get_wifi_connections
-
 
 class ConnectionScreen(Screen):
     def __init__(self):

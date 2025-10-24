@@ -1,5 +1,5 @@
-from custom_types.screens import ScreenName
-from services.event_emitter import emit_event
+from data.enums import ScreenName
+from ui.event_router import emit_event
 from utils.events import build_navigate_to_screen_event
 from typing import Callable
 

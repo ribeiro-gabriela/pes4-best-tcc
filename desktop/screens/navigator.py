@@ -1,11 +1,12 @@
 from kivy.uix.screenmanager import ScreenManager
 
-from ui.main_screen import MainScreen
-from ui.images_screen import ImagesScreen
-from ui.connection_screen import ConnectionScreen
+from screens.main_screen import MainScreen
+from screens.images_screen import ImagesScreen
+from screens.connection_screen import ConnectionScreen
 
 class ScreenNavigator():
     def __init__(self) -> None:
+        super().__init__()
         self.screen_manager = ScreenManager()
         self._add_screens()
 

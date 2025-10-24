@@ -1,8 +1,12 @@
+from typing import Any, List
 import pywifi
 from pywifi import const
 import time
 
 import traceback
+
+from data.classes import Connection, Package, Request, Response
+from data.errors import RequestTimeoutError
 
 """
 Scans for and returns a list of available WiFi networks.
@@ -59,3 +63,45 @@ def get_wifi_connections() -> list[dict]:
     networks.sort(key=lambda x: int(x['info']['signal'].split(' ')[0]) if 'dBm' in x['info']['signal'] else -100, reverse=True)
     
     return networks
+
+
+class WifiModule:
+    # [BST-222]
+    def scan(self) -> List[str]:
+        # [BST-223]
+        return ["WIFI_MOCK_1", "WIFI_MOCK_2"]
+
+    # [BST-218]
+    def connect(self, target: str) -> Connection:
+        return Connection(
+            device="MockBC", 
+            hardwarePN="", 
+            address="192.168.1.1", 
+            connectedAt=str(time.time()),
+            pauseHealthCheck=False
+        )
+
+    # [BST-213]
+    def disconnect(self) -> None:
+        pass
+
+    # [BST-226]
+    def sendPackage(self, pkg: Package) -> None:
+        pass
+    
+    # [BST-226]
+    def receivePackage(self) -> Package:
+        return Package()
+    
+    # [BST-211]
+    def sendRequest(self, req: Request, timeout: int) -> Response|Any:
+        if req == "GET_HARDWARE_PN":
+            # [BST-215]
+            return "HW-PN-MOCK-123"
+        if req == "HEALTH_CHECK":
+            # [BST-210]
+            return "STATUS_OK"
+        if req == "TIMEOUT_REQ":
+            time.sleep(timeout + 1)
+            raise RequestTimeoutError("Request timed out")
+        return "DEFAULT_RESPONSE"

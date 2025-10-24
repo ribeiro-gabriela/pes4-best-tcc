@@ -9,15 +9,16 @@ import shutil
 import os
 import platform
 
-from custom_types.screens import ScreenName
-from ui.actions import action_go_to_screen
-from ui.components import ScreenLayout, TitleLabel, PrimaryButton, SecondaryButton
+from data.enums import ScreenName
+from screens.actions import action_go_to_screen
+from screens.components import ScreenLayout, TitleLabel, PrimaryButton, SecondaryButton
 
 UPLOAD_DIR = "uploads"
 
 class ImagesScreen(Screen):
     def __init__(self):
         super().__init__()
+
         self.name = ScreenName.IMAGES.value
 
         if not os.path.exists(UPLOAD_DIR):
@@ -31,12 +32,12 @@ class ImagesScreen(Screen):
         self.layout.add_widget(btn_back)
 
         btn_upload = PrimaryButton(text='Upload')
-        btn_upload.bind(on_press=self.open_file_chooser)
+        btn_upload.bind(on_press=self.open_file_chooser) # pyright: ignore[reportAttributeAccessIssue]
         self.layout.add_widget(btn_upload)
 
         # Lista de arquivos
         self.files_box = BoxLayout(orientation='vertical', size_hint_y=None)
-        self.files_box.bind(minimum_height=self.files_box.setter('height'))
+        self.files_box.bind(minimum_height=self.files_box.setter('height')) # pyright: ignore[reportAttributeAccessIssue]
         scroll = ScrollView()
         scroll.add_widget(self.files_box)
         self.layout.add_widget(scroll)
@@ -55,11 +56,11 @@ class ImagesScreen(Screen):
 
         # Botão Voltar pasta
         btn_back_folder = Button(text="Voltar", size_hint_y=None, height=40)
-        btn_back_folder.bind(on_press=lambda btn: self.go_back_folder(chooser))
+        btn_back_folder.bind(on_press=lambda btn: self.go_back_folder(chooser)) # pyright: ignore[reportAttributeAccessIssue]
 
         # Botão Upload
         btn_upload_file = Button(text="Upload", size_hint_y=None, height=40)
-        btn_upload_file.bind(on_press=lambda btn: self.on_upload_clicked(chooser))
+        btn_upload_file.bind(on_press=lambda btn: self.on_upload_clicked(chooser)) # pyright: ignore[reportAttributeAccessIssue]
 
         # Layout para botões
         btn_row = BoxLayout(size_hint_y=None, height=40)
@@ -101,7 +102,7 @@ class ImagesScreen(Screen):
             file_row = BoxLayout(size_hint_y=None, height=40)
             file_row.add_widget(Label(text=filename))
             btn_delete = Button(text="Delete", size_hint_x=None, width=100)
-            btn_delete.bind(on_press=lambda inst, f=filename: self.delete_file(f))
+            btn_delete.bind(on_press=lambda inst, f=filename: self.delete_file(f)) # pyright: ignore[reportAttributeAccessIssue]
             file_row.add_widget(btn_delete)
             self.files_box.add_widget(file_row)
 

@@ -1,17 +1,17 @@
 from kivy.app import App
 from kivy.lang import Builder
 
-from ui.components import VerticalLayout
-from ui.top_menu import TopMenuBar
-from ui.navigator import ScreenNavigator
+from data.enums import ScreenName
+from screens.components import VerticalLayout
+from screens.top_menu import TopMenuBar
+from screens.navigator import ScreenNavigator
 
 from pathlib import Path
 
 bundle_dir = Path(__file__).parent
 path_to_dat = Path.cwd() / bundle_dir / Path("styling.kv")
 
-
-class DesktopAppUi(App):
+class ScreenManager(App):
     navigator: ScreenNavigator
 
     def build(self):
@@ -28,11 +28,7 @@ class DesktopAppUi(App):
 
         return layout
 
-    def navigate_to(self, screen_name: str):
+    def navigate(self, screen: ScreenName):
         assert self.navigator is not None
         
-        self.navigator.navigate_to(screen_name)
-
-
-if __name__ == "__main__":
-    DesktopAppUi().run()
+        self.navigator.navigate_to(screen.value)
