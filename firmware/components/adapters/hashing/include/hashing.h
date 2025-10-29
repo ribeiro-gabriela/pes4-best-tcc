@@ -1,3 +1,6 @@
+#ifndef HASHING_H
+#define HASHING_H
+
 #include "mbedtls/sha256.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -12,3 +15,5 @@ void func();
 #endif
 
 bool verify_file_integrity(const char* filepath, uint8_t* received_hash);
+
+#endif
