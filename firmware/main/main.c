@@ -23,7 +23,7 @@ void app_main(void)
 
     init_console();
 
-    struct tftp_server* server = tftp_server_create("/spiffs", 70);
+    struct tftp_server* server = tftp_server_create("/spiffs", 69);
     tftp_server_write_set(server, 1);
     tftp_server_run(server);
 
