@@ -12,27 +12,49 @@ bool initializeBCCore() {
     if (stateMutex == NULL) {
         return false;
     }
+
     return true;
 }
 
 bool setBCState(enum BC_STATES newState) {
-    xSemaphoreTake(stateMutex, portMAX_DELAY);
-    currentBCState = newState;
-    xSemaphoreGive(stateMutex);
+    if (xSemaphoreTake(stateMutex, portMAX_DELAY))
+    {
+        currentBCState = newState;
+
+        if (xSemaphoreGive(stateMutex) != pdTRUE)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
 bool setMntState(enum MNT_STATES newState) {
-    xSemaphoreTake(stateMutex, portMAX_DELAY);
-    currentMntState = newState;
-    xSemaphoreGive(stateMutex);
+    if (xSemaphoreTake(stateMutex, portMAX_DELAY))
+    {
+        currentMntState = newState;
+
+        if (xSemaphoreGive(stateMutex) != pdTRUE)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
 bool setConnState(enum CONN_STATES newState) {
-    xSemaphoreTake(stateMutex, portMAX_DELAY);
-    currentConnState = newState;
-    xSemaphoreGive(stateMutex);
+    if (xSemaphoreTake(stateMutex, portMAX_DELAY))
+    {
+        currentConnState = newState;
+
+        if (xSemaphoreGive(stateMutex) != pdTRUE)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 

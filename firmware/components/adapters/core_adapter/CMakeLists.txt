@@ -1,3 +1,3 @@
 idf_component_register(SRCS "core_adapter.c"
-                    REQUIRES bc_core cli hashing
+                    REQUIRES bc_core cli hashing tftp storage_core wifi_core
                     INCLUDE_DIRS "include")

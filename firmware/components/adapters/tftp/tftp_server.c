@@ -19,6 +19,8 @@
 #include "tftp_xfer.h"
 #include "tftp.h"
 #include "tftp_port.h"
+#include "esp_mac.h"
+#include "esp_log.h"
 
 #define TFTP_SERVER_EVENT_CONNECT   (0x1 << 0)
 #define TFTP_SERVER_EVENT_DATA      (0x1 << 1)
@@ -53,8 +55,10 @@ struct tftp_server_private
     struct timeval timeout;
 };
 
-static int tftp_server_select(struct tftp_server *server)
+static int tftp_server_select(void* pvParameters)
 {
+    struct tftp_server *server = (struct tftp_server *)pvParameters;
+
     struct tftp_server_private *_private;
     int max_sock, i;
     int ret;
@@ -449,31 +453,36 @@ void tftp_server_run(struct tftp_server *server)
 
     if (server == NULL)
     {
-        return;
+        vTaskDelete(NULL);
+        //return;
     }
     _private = server->_private;
     /* malloc transport packet */
     packet = malloc(sizeof(struct tftp_packet));
     if (packet == NULL)
     {
-        return;
+        vTaskDelete(NULL);
+        //return;
     }
     /* Create connect */
     xfer = tftp_xfer_create("0.0.0.0", 69);
     if (xfer == NULL)
     {
         free(packet);
-        return;
+        vTaskDelete(NULL);
+        //return;
     }
     /* Set connection type to server */
     if (tftp_xfer_type_set(xfer, TFTP_XFER_TYPE_SERVER) != TFTP_OK)
     {
         free(packet);
         tftp_xfer_destroy(xfer);
-        return;
+        vTaskDelete(NULL);
+        //return;
     }
     _private->server_xfer = xfer;
-    tftp_printf("tftp server start!\n");
+    //tftp_printf("tftp server start!\n");
+    ESP_LOGI("TFTP Server", "TFTP server started!");
     /* run server */
     while (!server->is_stop)
     {
@@ -534,7 +543,9 @@ void tftp_server_run(struct tftp_server *server)
     free(server->root_name);
     free(server);
     free(packet);
-    tftp_printf("tftp server stop!\n");
+    //tftp_printf("tftp server stop!\n");
+    ESP_LOGI("TFTP Server", "TFTP server stopped!");
+    vTaskDelete(NULL);
 }
 
 struct tftp_server *tftp_server_create(const char *root_name, int port)

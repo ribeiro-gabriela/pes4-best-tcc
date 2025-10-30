@@ -3,6 +3,7 @@
 #include "string.h"
 
 #include "cli_commands_handler.h"
+#include "core_adapter.h"
 
 static const char* TAG = "CLI";
 
@@ -59,7 +60,6 @@ int verify_sha_handler(int argc, char **argv)
         uint8_t hash_value[32];
         char hash_str[64] = "";
         strcpy(hash_str, argv[2]);
-        size_t hex_len = 64;
 
         for (size_t i = 0; i < 32; i++)
         {
@@ -100,6 +100,7 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = true;
+                initializeMaintenanceMode();
                 ESP_LOGI(TAG, "Maintenance mode enabled");
             }
 
@@ -114,6 +115,7 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = false;
+                deinitMaintenanceMode();
                 ESP_LOGI(TAG, "Maintenance mode disabled");
             }
 
