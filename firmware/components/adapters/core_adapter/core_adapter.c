@@ -50,9 +50,12 @@ void initializeMaintenanceMode()
         server = tftp_server_create("/spiffs", 69);
         tftp_server_write_set(server, 1);
         
+        // Task para servidor tftp
         xTaskCreate((void*)tftp_server_run, "tftp_server_run", 4096, (void*)server, 5, &tftpTaskHandle);
 
+        // Task para tratar transições de estado e consumir mensagens da fila
         xTaskCreate((void*)stateTransitionHandler, "stateTransitionHandler", 4096, NULL, 5, &stateTransitionHandle);
+        // Removendo a task do watchdog, pois ainda não há tratamento adequado
         esp_task_wdt_delete(stateTransitionHandle);
 
         bool result = setBCState(MNT_MODE);
