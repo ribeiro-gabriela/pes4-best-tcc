@@ -3,3 +3,7 @@ build/
 .clangd
 sdkconfig
 sdkconfig.old
+
+.cache/
+.clang-format
+.clang-tidy
