@@ -1,7 +1,22 @@
-
 from dataclasses import dataclass
 from datetime import datetime
+import uuid
 
+@dataclass
+class User:
+    id: uuid.UUID
+    username: str
+
+@dataclass
+class Session:
+    user: User
+    # [BST-287]
+    createdAt: datetime
+    expiresAt: datetime  # (Definido no login, ex: 8 horas)
+
+    def is_expired(self) -> bool:
+        # [BST-291]
+        return datetime.now() > self.expiresAt
 
 @dataclass
 class File:

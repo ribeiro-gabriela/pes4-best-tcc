@@ -1,5 +1,4 @@
 import hashlib
-from dataclasses import dataclass
 from typing import Dict
 
 from data.classes import File

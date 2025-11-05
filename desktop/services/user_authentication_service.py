@@ -1,49 +1,26 @@
 import uuid
-from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional
 
 # [BST-298]
 from services.logging_service import LoggingService
-
-
-@dataclass
-class User:
-    id: uuid.UUID
-    username: str
-
-
-@dataclass
-class Session:
-    user: User
-    # [BST-287]
-    createdAt: datetime
-    expiresAt: datetime  # (Definido no login, ex: 8 horas)
-
-    def is_expired(self) -> bool:
-        # [BST-291]
-        return datetime.now() > self.expiresAt
+from data.classes import Session
+from services.user_database_module import UserDatabase
 
 
 class UserAuthenticationService:
-    def __init__(self):
-        self.logging_service = LoggingService(UserAuthenticationService.__name__)
+    def __init__(self, user_database: UserDatabase, logging_service = LoggingService('UserAuthenticationService')):
+        self.user_database = user_database
+        self.logging_service = logging_service
         self.currentSession: Optional[Session] = None
         # [BST-288]
         self._last_activity_time: Optional[datetime] = None
         # [BST-288]
         self._INACTIVITY_TIMEOUT_MINUTES = 10
 
-    def _validate_credentials(self, username: str, password: str) -> Optional[User]:
-        # [BST-282]
-        # (Implementação mockada da consulta ao banco de dados)
-        if username == "admin" and password == "valid_password":
-            return User(id=uuid.uuid4(), username=username)
-        return None
-
     def login(self, username: str, password: str) -> None:
         # [BST-282]
-        user = self._validate_credentials(username, password)
+        user = self.user_database.validate_credentials(username, password)
 
         if user:
             now = datetime.now()
