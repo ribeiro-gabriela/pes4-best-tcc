@@ -18,6 +18,8 @@
 #include "tftp.h"
 #include "tftp_port.h"
 
+#include "esp_log.h"
+
 struct tftp_xfer_private
 {
     struct sockaddr_in server;
@@ -299,7 +301,7 @@ int tftp_xfer_type_set(struct tftp_xfer *xfer, int type)
             /* Binding port */
             if (bind(xfer->sock, (struct sockaddr *)&_private->server, sizeof(struct sockaddr_in)) < 0)
             {
-                tftp_printf("tftp server bind failed!! exit\n");
+                ESP_LOGE("TFTP", "tftp server bind failed!! exit");
                 return -TFTP_ESYS;
             }
             xfer->type = TFTP_XFER_TYPE_SERVER;

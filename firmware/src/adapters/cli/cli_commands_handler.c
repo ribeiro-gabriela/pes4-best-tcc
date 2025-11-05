@@ -3,8 +3,11 @@
 #include "string.h"
 
 #include "cli_commands_handler.h"
+#include "core_adapter.h"
 
 static const char* TAG = "CLI";
+
+extern QueueHandle_t BCQueue;
 
 bool mnt_mode = false;
 
@@ -59,7 +62,6 @@ int verify_sha_handler(int argc, char **argv)
         uint8_t hash_value[32];
         char hash_str[64] = "";
         strcpy(hash_str, argv[2]);
-        size_t hex_len = 64;
 
         for (size_t i = 0; i < 32; i++)
         {
@@ -91,6 +93,8 @@ int maintenance_mode_handler(int argc, char **argv)
     }
     else if (argc == 2)
     {
+        QueueMessage_t msg;
+
         if (strcmp(argv[1], "enable") == 0)
         {
             if (mnt_mode)
@@ -100,6 +104,25 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = true;
+                
+                initializeQueue();
+                
+                msg.eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                // Arrumar mensagem de log
+                sprintf((char*)msg.logMessage, "%lu: Maintenance mode enabled via CLI command", esp_log_early_timestamp());
+
+                if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
+                {
+                    ESP_LOGE(TAG, "Failed to send message to BCQueue");
+                }
+
+                vTaskDelay(500 / portTICK_PERIOD_MS);
+
+                if (getBCState() != MNT_MODE)
+                {
+                    ESP_LOGE(TAG, "Failed to set BC state to MNT_MODE");
+                    return 1;
+                }
                 ESP_LOGI(TAG, "Maintenance mode enabled");
             }
 
@@ -114,6 +137,22 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = false;
+                
+                msg.eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
+                sprintf((char*)msg.logMessage, "%lu: Maintenance mode disabled via CLI command", esp_log_early_timestamp());
+
+                if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
+                {
+                    ESP_LOGE(TAG, "Failed to send message to BCQueue");
+                }
+
+                vTaskDelay(5000 / portTICK_PERIOD_MS);
+
+                if (getBCState() != OP_MODE)
+                {
+                    ESP_LOGE(TAG, "Failed to set BC state to OP_MODE");
+                    return 1;
+                }
                 ESP_LOGI(TAG, "Maintenance mode disabled");
             }
 

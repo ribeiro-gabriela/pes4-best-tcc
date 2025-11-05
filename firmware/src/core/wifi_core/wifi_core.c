@@ -2,6 +2,8 @@
 
 static const char *TAG = "BC AP";
 
+esp_netif_t* netif = NULL;
+
 void wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t event_id, 
                         void* event_data)
 {
@@ -20,7 +22,7 @@ void wifi_init_softap(void)
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_ap();
+    netif = esp_netif_create_default_wifi_ap();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -58,4 +60,15 @@ void wifi_init_softap(void)
 
     ESP_LOGI(TAG, "wifi_init_softap finished. SSID: %s password: %s channel: %d",
              ESP_WIFI_SSID, ESP_WIFI_PASS, ESP_WIFI_CHANNEL);
+}
+
+void wifi_deinit_softap()
+{
+    esp_wifi_stop();
+    esp_event_loop_delete_default();
+    esp_netif_deinit();
+    esp_netif_destroy(netif);
+    esp_wifi_deinit();
+
+    return;
 }
