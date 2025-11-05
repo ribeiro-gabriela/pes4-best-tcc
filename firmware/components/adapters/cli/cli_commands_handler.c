@@ -7,6 +7,8 @@
 
 static const char* TAG = "CLI";
 
+extern QueueHandle_t BCQueue;
+
 bool mnt_mode = false;
 
 int restart_handler(int argc, char **argv)
@@ -91,6 +93,8 @@ int maintenance_mode_handler(int argc, char **argv)
     }
     else if (argc == 2)
     {
+        QueueMessage_t msg;
+
         if (strcmp(argv[1], "enable") == 0)
         {
             if (mnt_mode)
@@ -100,7 +104,25 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = true;
-                initializeMaintenanceMode();
+                
+                initializeQueue();
+                
+                msg.eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                // Arrumar mensagem de log
+                sprintf((char*)msg.logMessage, "%lu: Maintenance mode enabled via CLI command", esp_log_early_timestamp());
+
+                if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
+                {
+                    ESP_LOGE(TAG, "Failed to send message to BCQueue");
+                }
+
+                vTaskDelay(500 / portTICK_PERIOD_MS);
+
+                if (getBCState() != MNT_MODE)
+                {
+                    ESP_LOGE(TAG, "Failed to set BC state to MNT_MODE");
+                    return 1;
+                }
                 ESP_LOGI(TAG, "Maintenance mode enabled");
             }
 
@@ -115,7 +137,22 @@ int maintenance_mode_handler(int argc, char **argv)
             else
             {
                 mnt_mode = false;
-                deinitMaintenanceMode();
+                
+                msg.eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
+                sprintf((char*)msg.logMessage, "%lu: Maintenance mode disabled via CLI command", esp_log_early_timestamp());
+
+                if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
+                {
+                    ESP_LOGE(TAG, "Failed to send message to BCQueue");
+                }
+
+                vTaskDelay(5000 / portTICK_PERIOD_MS);
+
+                if (getBCState() != OP_MODE)
+                {
+                    ESP_LOGE(TAG, "Failed to set BC state to OP_MODE");
+                    return 1;
+                }
                 ESP_LOGI(TAG, "Maintenance mode disabled");
             }
 

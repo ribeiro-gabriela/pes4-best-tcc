@@ -64,10 +64,10 @@ void wifi_init_softap(void)
 
 void wifi_deinit_softap()
 {
+    esp_wifi_stop();
     esp_event_loop_delete_default();
     esp_netif_deinit();
     esp_netif_destroy(netif);
-    esp_wifi_stop();
     esp_wifi_deinit();
 
     return;

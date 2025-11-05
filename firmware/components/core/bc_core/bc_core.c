@@ -4,8 +4,8 @@
 SemaphoreHandle_t stateMutex = NULL;
 
 enum BC_STATES currentBCState = OP_MODE;
-enum MNT_STATES currentMntState = WAITING;
-enum CONN_STATES currentConnState = WAITING_REQUEST;
+enum MNT_STATES currentMntState = NOT_SET_MNT;
+enum CONN_STATES currentConnState = NOT_SET_CONN;
 
 bool initializeBCCore() {
     stateMutex = xSemaphoreCreateMutex();
