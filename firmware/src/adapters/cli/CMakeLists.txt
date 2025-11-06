@@ -1,3 +1,3 @@
 idf_component_register(SRCS "cli_commands_handler.c" "cli.c"
-                    REQUIRES console spiffs hashing core_adapter
+                    REQUIRES console spiffs hashing main_core
                     INCLUDE_DIRS "include" "../")

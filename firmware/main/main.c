@@ -1,4 +1,4 @@
-#include "core_adapter.h"
+#include "main_core.h"
 
 void app_main(void)
 {

@@ -1,9 +1,9 @@
-#ifndef CORE_ADAPTER_H
-#define CORE_ADAPTER_H
+#ifndef MAIN_CORE_H
+#define MAIN_CORE_H
 
 #include <string.h>
 
-#include "bc_core.h"
+#include "fsm_core.h"
 #include "wifi_core.h"
 #include "cli.h"
 #include "hashing.h"
@@ -11,7 +11,7 @@
 #include "storage_core.h"
 #include "esp_mac.h"
 
-#include "FreeRTOS/queue.h"
+#include "freertos/queue.h"
 
 
 enum eventIDs { 

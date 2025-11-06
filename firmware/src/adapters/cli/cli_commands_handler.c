@@ -3,7 +3,7 @@
 #include "string.h"
 
 #include "cli_commands_handler.h"
-#include "core_adapter.h"
+#include "main_core.h"
 
 static const char* TAG = "CLI";
 
