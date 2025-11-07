@@ -45,9 +45,6 @@ class ConnectionService:
             # [BST-207]
             self.currentConnection = None
             
-            # [BST-206]
-            self.ui_manager.emitEvent("Reconnection")
-            
             retry_attempts = 3
             success = False
 
@@ -62,8 +59,6 @@ class ConnectionService:
                     time.sleep(5) 
 
             if success:
-                # [BST-205]
-                self.ui_manager.emitEvent("ReconnectionSuccess")
                 self.logging_service.log("Reconnection successful.")
             else:
                 # [BST-207]
@@ -197,7 +192,7 @@ class ConnectionService:
             raise ConnectionError("SendPackage failed, connection lost.") from e
 
     # [BST-226]
-    def receivePackage(self) -> Package:
+    def receivePackage(self, file_name: str) -> Package:
         # [BST-224]
         self.logging_service.log("Receiving package...")
         if not self.isConnected():
@@ -206,7 +201,7 @@ class ConnectionService:
             raise err
 
         try:
-            data = self.wifi_module.receivePackage()
+            data = self.wifi_module.receivePackage(file_name)
             # [BST-224]
             self.logging_service.log("ReceivePackage successful.")
             return data

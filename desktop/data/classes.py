@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import uuid
 
+from data.enums import ArincTransferStep
+
 @dataclass
 class User:
     id: uuid.UUID
@@ -38,7 +40,7 @@ class Connection:
     device: str
     hardwarePN: str
     address: str
-    connectedAt: str
+    connectedAt: int
     # [BST-208]
     # [BST-209]
     # [BST-210]
@@ -46,7 +48,8 @@ class Connection:
 
 @dataclass
 class Package:
-    pass
+    name: str
+    path: str
 
 @dataclass
 class Request:
@@ -55,3 +58,12 @@ class Request:
 @dataclass
 class Response:
     pass
+
+@dataclass
+class TransferStatus:
+    inTransfer: bool
+    canceled: bool
+    progressPercent: int
+    currentTarget: str | None
+    transferStep: ArincTransferStep
+    file: File | None
