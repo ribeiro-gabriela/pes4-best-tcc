@@ -11,6 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
     format=log_format,
     handlers=[logging.FileHandler("service.log"), logging.StreamHandler(sys.stdout)],
+    force=True
 )
 
 class LoggingService:
