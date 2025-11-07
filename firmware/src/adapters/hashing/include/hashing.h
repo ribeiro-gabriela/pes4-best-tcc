@@ -14,6 +14,6 @@
 void func();
 #endif
 
-bool verify_file_integrity(const char* filepath, uint8_t* received_hash);
+bool verifyFileIntegrity(const char* filepath, uint8_t* received_hash);
 
 #endif

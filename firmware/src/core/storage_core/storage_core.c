@@ -3,7 +3,7 @@
 
 const char* TAG = "STORAGE";
 
-void partition_setup()
+void partitionSetup()
 {
     esp_vfs_spiffs_conf_t conf = {
       .base_path = "/spiffs",

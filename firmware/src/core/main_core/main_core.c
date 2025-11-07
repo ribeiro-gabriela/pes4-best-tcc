@@ -21,23 +21,23 @@ void initializeCore()
     }
     ESP_ERROR_CHECK(ret);
 
-    partition_setup();
+    partitionSetup();
 
-    init_console();
+    initConsole();
 
     bool result;
 
     result = initializeBCCore();
     if (!result)
     {
-        ESP_LOGE("Core Adapter", "Failed to initialize BC Core");
+        ESP_LOGE("Main Core", "Failed to initialize BC Core");
         return;
     }
 
     result = setBCState(OP_MODE);
     if (!result)
     {
-        ESP_LOGE("Core Adapter", "Failed to set BC state to OP_MODE");
+        ESP_LOGE("Main Core", "Failed to set BC state to OP_MODE");
         return;
     }
 }
@@ -56,7 +56,7 @@ void initializeMaintenanceMode()
 {
     if (getBCState() == MNT_MODE)
     {
-        wifi_init_softap();
+        wifiInitSoftAP();
 
         server = tftp_server_create("/spiffs", 69);
         tftp_server_write_set(server, 1);
@@ -70,7 +70,7 @@ void deinitMaintenanceMode()
 {
     if (getBCState() == OP_MODE)
     {
-        wifi_deinit_softap();
+        wifiDeinitSoftAP();
         tftp_server_destroy(server);
 
         vTaskSuspend(stateTransitionHandle);
@@ -82,7 +82,7 @@ void* stateTransitionHandler()
     BCQueue = xQueueCreate(10, sizeof(QueueMessage_t));
     if (BCQueue == NULL)
     {
-        ESP_LOGE("Core Adapter", "Failed to create BCQueue");
+        ESP_LOGE("Main Core", "Failed to create BCQueue");
         vTaskDelete(NULL);
     }
 
@@ -104,8 +104,9 @@ void* stateTransitionHandler()
                 if (getBCState() != MNT_MODE)
                 {
                     setBCState(MNT_MODE);
+                    setMntState(WAITING);
                     printf("Log Message: %s\n", receivedMessage.logMessage);
-                    ESP_LOGI("Core Adapter", "BC State changed to MNT_MODE");
+                    ESP_LOGI("Main Core", "BC State changed to MNT_MODE");
                     initializeMaintenanceMode();
                 }
             }
@@ -114,9 +115,32 @@ void* stateTransitionHandler()
                 if (getBCState() != OP_MODE)
                 {
                     setBCState(OP_MODE);
+                    setMntState(NOT_SET_MNT);
+                    setConnState(NOT_SET_CONN);
                     printf("Log Message: %s\n", receivedMessage.logMessage);
-                    ESP_LOGI("Core Adapter", "BC State changed to OP_MODE");
+                    ESP_LOGI("Main Core", "BC State changed to OP_MODE");
                     deinitMaintenanceMode();
+                }
+            }
+            else if (receivedMessage.eventID == WIFI_CLIENT_CONNECTED)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == WAITING)
+                {
+                    setMntState(CONNECTED);
+                    setConnState(WAITING_REQUEST);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "MNT State changed to CONNECTED");
+                }
+            }
+            else if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED ||
+                     receivedMessage.eventID == COMM_AUTH_FAILURE)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED)
+                {
+                    setMntState(WAITING);
+                    setConnState(NOT_SET_CONN);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "MNT State changed to WAITING");
                 }
             }
         }

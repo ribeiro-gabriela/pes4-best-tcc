@@ -8,7 +8,7 @@
 
 esp_console_repl_t *repl = NULL;
 
-esp_err_t init_console()
+esp_err_t initConsole()
 {
     esp_console_repl_config_t repl_config = ESP_CONSOLE_REPL_CONFIG_DEFAULT();
     esp_console_dev_uart_config_t hw_config = ESP_CONSOLE_DEV_UART_CONFIG_DEFAULT();

@@ -6,7 +6,7 @@
 
 #include "hashing.h"
 
-int restart_handler(int argc, char **argv);
-int ls_handler(int argc, char **argv);
-int verify_sha_handler(int argc, char **argv);
-int maintenance_mode_handler(int argc, char **argv);
+int restartHandler(int argc, char **argv);
+int lsHandler(int argc, char **argv);
+int verifySHAHandler(int argc, char **argv);
+int maintenanceModeHandler(int argc, char **argv);

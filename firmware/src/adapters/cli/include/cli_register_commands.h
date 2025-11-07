@@ -7,7 +7,7 @@ void register_restart(void)
         .command = "restart",
         .help = "Soft restart BC system",
         .hint = NULL,
-        .func = &restart_handler
+        .func = &restartHandler
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
@@ -18,7 +18,7 @@ void register_ls(void)
         .command = "ls",
         .help = "List directories and files in the current partition",
         .hint = NULL,
-        .func = &ls_handler
+        .func = &lsHandler
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
@@ -29,7 +29,7 @@ void register_verify_sha(void)
         .command = "versha",
         .help = "Verify given file location against given hash value",
         .hint = NULL,
-        .func = &verify_sha_handler
+        .func = &verifySHAHandler
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
@@ -40,7 +40,7 @@ void register_maintenance_mode(void)
         .command = "mnt",
         .help = "Enable or disable aircraft maintenance mode",
         .hint = NULL,
-        .func = &maintenance_mode_handler
+        .func = &maintenanceModeHandler
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }

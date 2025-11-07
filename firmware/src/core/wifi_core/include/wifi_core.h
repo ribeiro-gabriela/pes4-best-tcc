@@ -13,17 +13,17 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#define ESP_WIFI_SSID      "BC AP"
+#define ESP_WIFI_SSID      "BC_MODULE_EMB-HW-002-021-003"
 #define ESP_WIFI_PASS      "bcappassword"
 #define ESP_WIFI_CHANNEL   1
 #define MAX_STA_CONN       1
 #define EXAMPLE_GTK_REKEY_INTERVAL 0
 
 // WiFi AP
-void wifi_event_handler(void* arg, esp_event_base_t event_base,
+void wifiEventHandler(void* arg, esp_event_base_t event_base,
                         int32_t event_id, void* event_data);
 
-void wifi_init_softap(void);
-void wifi_deinit_softap(void);
+void wifiInitSoftAP(void);
+void wifiDeinitSoftAP(void);
 
 #endif

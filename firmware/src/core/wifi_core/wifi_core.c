@@ -4,7 +4,7 @@ static const char *TAG = "BC AP";
 
 esp_netif_t* netif = NULL;
 
-void wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t event_id, 
+void wifiEventHandler(void* arg, esp_event_base_t event_base,int32_t event_id, 
                         void* event_data)
 {
     if (event_id == WIFI_EVENT_AP_STACONNECTED) {
@@ -18,7 +18,7 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t event_id,
     }
 }
 
-void wifi_init_softap(void)
+void wifiInitSoftAP(void)
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -29,7 +29,7 @@ void wifi_init_softap(void)
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
                                                         ESP_EVENT_ANY_ID,
-                                                        &wifi_event_handler,
+                                                        &wifiEventHandler,
                                                         NULL,
                                                         NULL));
 
@@ -58,11 +58,11 @@ void wifi_init_softap(void)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
-    ESP_LOGI(TAG, "wifi_init_softap finished. SSID: %s password: %s channel: %d",
+    ESP_LOGI(TAG, "wifiInitSoftAP finished. SSID: %s password: %s channel: %d",
              ESP_WIFI_SSID, ESP_WIFI_PASS, ESP_WIFI_CHANNEL);
 }
 
-void wifi_deinit_softap()
+void wifiDeinitSoftAP()
 {
     esp_wifi_stop();
     esp_event_loop_delete_default();

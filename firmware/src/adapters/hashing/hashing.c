@@ -3,7 +3,7 @@
 
 static const char* TAG = "SHA-256";
 
-bool verify_file_integrity(const char* filepath, uint8_t* received_hash)
+bool verifyFileIntegrity(const char* filepath, uint8_t* received_hash)
 {
     FILE* rec_file = fopen(filepath, "rb");
     if (rec_file == NULL)
@@ -99,7 +99,7 @@ void func()
     0x94, 0x7c, 0x31, 0x88, 0xde, 0xdb, 0xa6, 0xe3
     };
 
-    if (verify_file_integrity(filepath, hash))
+    if (verifyFileIntegrity(filepath, hash))
     {
         ESP_LOGW("TESTE", "Hash ok");
     }

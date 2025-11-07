@@ -9,16 +9,16 @@ static const char* TAG = "CLI";
 
 extern QueueHandle_t BCQueue;
 
-bool mnt_mode = false;
+bool mntSignal = false;
 
-int restart_handler(int argc, char **argv)
+int restartHandler(int argc, char **argv)
 {
     ESP_LOGI(TAG, "Rebooting system");
     fflush(stdout);
     esp_restart();
 }
 
-int ls_handler(int argc, char **argv)
+int lsHandler(int argc, char **argv)
 {
     DIR* dir = opendir("/spiffs");
     if (dir == NULL)
@@ -36,7 +36,7 @@ int ls_handler(int argc, char **argv)
     return 0;
 }
 
-int verify_sha_handler(int argc, char **argv)
+int verifySHAHandler(int argc, char **argv)
 {
     if (argc < 3)
     {
@@ -78,13 +78,13 @@ int verify_sha_handler(int argc, char **argv)
             hash_value[i] = (uint8_t)value;
         }
 
-        verify_file_integrity(filepath, hash_value);
+        verifyFileIntegrity(filepath, hash_value);
     }
 
     return 0;
 }
 
-int maintenance_mode_handler(int argc, char **argv)
+int maintenanceModeHandler(int argc, char **argv)
 {
     if (argc < 2)
     {
@@ -97,13 +97,13 @@ int maintenance_mode_handler(int argc, char **argv)
 
         if (strcmp(argv[1], "enable") == 0)
         {
-            if (mnt_mode)
+            if (mntSignal)
             {
                 ESP_LOGW(TAG, "Maintenance mode already enabled");
             }
             else
             {
-                mnt_mode = true;
+                mntSignal = true;
                 
                 initializeQueue();
                 
@@ -130,13 +130,13 @@ int maintenance_mode_handler(int argc, char **argv)
         }
         else if (strcmp(argv[1], "disable") == 0)
         {
-            if (!mnt_mode)
+            if (!mntSignal)
             {
                 ESP_LOGW(TAG, "Maintenance mode already disabled");
             }
             else
             {
-                mnt_mode = false;
+                mntSignal = false;
                 
                 msg.eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
                 sprintf((char*)msg.logMessage, "%lu: Maintenance mode disabled via CLI command", esp_log_early_timestamp());
