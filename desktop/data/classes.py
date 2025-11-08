@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import uuid
 
-from data.enums import ArincTransferStep
+from data.enums import ArincTransferResult, ArincTransferStep
 
 @dataclass
 class User:
@@ -61,9 +61,9 @@ class Response:
 
 @dataclass
 class TransferStatus:
-    inTransfer: bool
     canceled: bool
-    progressPercent: int
-    currentTarget: str | None
+    currentTarget: str
     transferStep: ArincTransferStep
-    file: File | None
+    fileRecord: FileRecord
+    progressPercent: int
+    transferResult: ArincTransferResult | None

@@ -20,3 +20,7 @@ class ArincTransferStep(Enum):
     INIT='initialization'
     LIST='list_trasnfer'
     TRANFER='transfer'
+
+class ArincTransferResult(Enum):
+    SUCCESS='success'
+    FAILED='failed'
