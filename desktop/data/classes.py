@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import uuid
 
-from data.enums import ArincTransferResult, ArincTransferStep
+from data.enums import ArincFileType, ArincTransferResult, ArincTransferStep, LoadProtocolStatusCode
 
 @dataclass
 class User:
@@ -67,3 +67,46 @@ class TransferStatus:
     fileRecord: FileRecord
     progressPercent: int
     transferResult: ArincTransferResult | None
+
+@dataclass
+class ArincLUI:
+    FileType = ArincFileType.LUI
+    StatusCode: LoadProtocolStatusCode
+    StatusDescription: str | None
+
+@dataclass
+class ArincLUSHeaderFile:
+    FileName: str
+    PartNumberName: str
+    LoadRatio: int
+    LoadStatus: LoadProtocolStatusCode
+    LoadDescription: str | None
+
+@dataclass
+class ArincLUS:
+    FileType = ArincFileType.LUS
+    StatusCode: LoadProtocolStatusCode
+    StatusDescription: str | None
+    Counter: int
+    ExceptionTimer: int
+    EstimatedTime: int
+    LoadListRatio: int
+    HeaderFiles: list[ArincLUSHeaderFile]
+
+@dataclass
+class ArincLURHeaderFile:
+    FileName: str
+    PartNumberName: str
+
+@dataclass
+class ArincLUR:
+    FileType = ArincFileType.LUR
+    HeaderFiles: list[ArincLURHeaderFile]
+
+@dataclass
+class ArincLUH:
+    FileType = ArincFileType.LUH
+    DataHash: str
+    SoftwarePartNumber: str
+    HardwarePartNumber: str
+    Size: int
