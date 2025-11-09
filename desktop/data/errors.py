@@ -8,7 +8,6 @@ class IdentificationError(Exception):
 class DuplicateFileError(Exception):
     pass
 
-
 class ConnectionAuthenticationError(Exception):
     pass
 
@@ -17,7 +16,6 @@ class ConnectionError(Exception):
 
 class RequestTimeoutError(Exception):
     pass
-
 
 class DisconnectedError(Exception):
     pass

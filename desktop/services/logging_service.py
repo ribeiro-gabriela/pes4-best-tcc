@@ -1,9 +1,7 @@
 import logging
 import sys
 
-# [BST-298]
-# [BST-296]
-# [BST-297]
+# [BST-296, BST-297, BST-298]
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # [BST-298]
@@ -19,12 +17,10 @@ class LoggingService:
         # [BST-297]
         self.logger = logging.getLogger(service_name)
 
-    # [BST-294]
     def log(self, message: str) -> None:
         # [BST-294]
         self.logger.info(message)
 
-    # [BST-295]
     def error(self, message: str, context: Exception) -> None:
         # [BST-295]
         self.logger.error(message, exc_info=context)
