@@ -80,10 +80,14 @@
 <TitleLabel@Label>:
     font_size: FONT_LARGE
     color: TEXT_COLOR
+    text_size: self.size
+    halign: 'left'
 
 <NormalLabel@Label>:
     font_size: FONT_NORMAL
     color: TEXT_COLOR
+    text_size: self.size
+    halign: 'left'
 
 <HeaderLabel@Label>:
     font_size: FONT_NORMAL
@@ -91,6 +95,8 @@
     color: TEXT_COLOR
     size_hint_y: None
     height: HEADER_HEIGHT
+    text_size: self.size
+    halign: 'left'
 
 <WiFiLabel@Label>:
     font_size: FONT_SMALL
@@ -99,6 +105,7 @@
     valign: 'middle'
     size_hint_y: None
     height: TABLE_ROW_HEIGHT
+    text_size: self.size
 
 <ScreenLayout@BoxLayout>:
     orientation: 'vertical'
@@ -128,3 +135,181 @@
     height: MENU_HEIGHT
     spacing: SPACING_MEDIUM
     padding: PADDING_SMALL, SPACING_SMALL, PADDING_SMALL, SPACING_SMALL
+
+<WiFiNetworkItem@BoxLayout>:
+    orientation: 'vertical'
+    padding: PADDING_MEDIUM
+    spacing: SPACING_MEDIUM
+    size_hint_y: None
+    height: self.minimum_height
+    canvas.before:
+        Color: 
+            rgba: SECONDARY_COLOR 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(30)
+        WiFiLabel:
+            text: root.ssid 
+            font_size: FONT_MEDIUM
+            bold: True
+            size_hint_x: 0.7
+            halign: 'left'
+            valign: 'middle'
+        WiFiLabel: 
+            text: f'({root.signal} dBm)' 
+            halign: 'right'
+            size_hint_x: 0.3
+            color: [0.7, 0.7, 0.7, 1] 
+            valign: 'middle'
+            font_size: FONT_SMALL
+    WiFiLabel:
+        text: f'Segurança: {root.security_type}' 
+        color: [0.8, 0.8, 0.8, 1]
+        size_hint_y: None
+        height: dp(25)
+        halign: 'left' 
+        valign: 'middle'
+        font_size: FONT_SMALL
+    ConnectButton:
+        text: 'Connect'
+        on_press: root.connect_action()
+        size_hint_y: None
+        height: dp(40)
+
+<ConnectionScreen>:
+    FloatLayout: 
+        CompactLayout:
+            id: main_content
+            size_hint: 0.8, 0.8
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            HorizontalLayout:
+                size_hint_y: None
+                height: dp(60)
+                TitleLabel:
+                    text: 'WiFi Connections'
+                    font_size: FONT_MEDIUM
+                    color: SECONDARY_COLOR
+                SecondaryButton:
+                    text: 'Back to main'
+                    on_press: root.emit_navigate_back()
+            ScrollView:
+                id: scroll_view_for_table
+                bar_width: dp(10)
+                do_scroll_x: False
+                BoxLayout:
+                    id: network_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_MEDIUM
+                    padding: PADDING_MEDIUM
+                    size_hint_y: None
+                    height: self.minimum_height
+        
+        HelpButton:
+            text: "Ajuda"
+            size_hint: None, None
+            size: dp(100), dp(50)
+            pos_hint: {'right': 0.98, 'bottom': 0.02}
+            on_press: root.show_help()
+
+<SystemImageItem>:
+    font_size: FONT_NORMAL
+    halign: 'left'
+    valign: 'middle'
+    padding: PADDING_SMALL
+    canvas.before:
+        Color:
+            rgba: SECONDARY_COLOR if self.state == 'normal' else PRIMARY_COLOR 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: dp(5)
+        
+        Label: 
+            text: root.image_name
+            font_size: FONT_NORMAL
+            color: TEXT_COLOR
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.size
+            size_hint_x: 0.7 
+
+        Label: 
+            text: 'Compatible' if root.is_compatible else 'Imcompatible'
+            font_size: FONT_SMALL
+            color: SUCCESS_COLOR if root.is_compatible else ACCENT_COLOR
+            halign: 'right'
+            valign: 'middle'
+            text_size: self.size
+            size_hint_x: 0.3 
+
+<PostConnectionScreen>:
+    FloatLayout:
+        id: main_content
+        size_hint: 0.9, 0.9
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        
+        CompactLayout: 
+            orientation: 'vertical'
+            spacing: SPACING_MEDIUM
+            padding: PADDING_MEDIUM
+
+            HorizontalLayout: 
+                size_hint_y: None
+                height: dp(60)
+                TitleLabel:
+                    text: 'BC Module Connected'
+                    font_size: FONT_MEDIUM
+                    color: PRIMARY_COLOR
+                SecondaryButton:
+                    text: 'Disconnect BC Module'
+                    on_press: root.request_disconnect_confirmation()
+
+            HorizontalLayout: 
+                size_hint_y: None
+                height: dp(40)
+                NormalLabel:
+                    text: f'Hardware PN: {root.hardware_pn}'
+                    halign: 'left'
+
+            NormalLabel:
+                text: 'System Image Compatible:'
+                size_hint_y: None
+                height: dp(30)
+                halign: 'left'
+
+            ScrollView: 
+                bar_width: dp(10)
+                do_scroll_x: False
+                BoxLayout:
+                    id: image_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_SMALL
+                    size_hint_y: None
+                    height: self.minimum_height
+
+            BoxLayout: 
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(60)
+                spacing: SPACING_MEDIUM
+
+                PrimaryButton:
+                    text: 'Load selected image'
+                    on_press: root.load_selected_image()
+                    disabled: not root.selected_image_item or not root.selected_image_item.is_compatible
+        
+        HelpButton:
+            text: "Ajuda"
+            size_hint: None, None
+            size: dp(100), dp(50)
+            pos_hint: {'right': 0.98, 'bottom': 0.02}
+            on_press: root.show_help()

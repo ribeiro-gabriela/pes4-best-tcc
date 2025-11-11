@@ -4,9 +4,12 @@ from typing import Optional
 
 # [BST-298]
 from services.logging_service import LoggingService
-from data.classes import Session
+from data.classes import Session, User
 from services.user_database_module import UserDatabase
+from data.errors import IdentificationError
 
+from ui.event_router import emit_event
+from data.events import Event
 
 class UserAuthenticationService:
     def __init__(self, user_database: UserDatabase, logging_service = LoggingService('UserAuthenticationService')):
@@ -43,6 +46,7 @@ class UserAuthenticationService:
             self.logging_service.log(
                 f"Failed authentication attempt for user {username}."
             )
+            raise IdentificationError("Invalid username or password. Please try again.")
 
     def _check_inactivity(self) -> None:
         # [BST-288]
@@ -59,6 +63,7 @@ class UserAuthenticationService:
                 # [BST-288]
                 self.currentSession = None
                 self._last_activity_time = None
+                emit_event(Event(Event.EventType.SESSION_INVALIDATED))
 
     def isAuthenticated(self) -> bool:
         # [BST-288]
@@ -70,8 +75,12 @@ class UserAuthenticationService:
 
         # [BST-291]
         if self.currentSession.is_expired():
+            self.logging_service.log(
+                f"Session for user {self.currentSession.user.username} expired."
+            )
             self.currentSession = None
             self._last_activity_time = None
+            emit_event(Event(Event.EventType.SESSION_INVALIDATED))
             return False
 
         # [BST-290]

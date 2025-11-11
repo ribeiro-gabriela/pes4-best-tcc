@@ -73,7 +73,7 @@ class ImportedFilesService:
         search_pattern = os.path.join(self.storage_path, f"{softwarePN}-*.txt")
         found_files = glob.glob(search_pattern)
         
-        if found_files:
+        if not found_files:
             raise FileAccessError("File not found")
         
         try:

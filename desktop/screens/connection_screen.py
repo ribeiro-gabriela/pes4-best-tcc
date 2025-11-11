@@ -1,8 +1,16 @@
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
 
-from data.enums import ScreenName
-from screens.actions import action_go_to_screen
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.metrics import dp 
+from kivy.uix.floatlayout import FloatLayout
+
+from data.enums import ScreenName, AppState
+from screens.actions import action_go_to_screen, action_show_help
 from screens.components import (
     CompactLayout,
     HorizontalLayout,
@@ -12,65 +20,151 @@ from screens.components import (
     WifiLabel,
     ConnectButton,
     SecondaryButton,
+    NormalLabel,
+    WifiNetworkItem,
+    HelpButton,
 )
-from services.service_facade import get_wifi_connections
+from services.service_facade import ServiceFacade
+from ui.event_router import emit_event, event_router 
+from data.events import Event
+from typing import Optional, Dict, Any
 
 class ConnectionScreen(Screen):
-    def __init__(self):
-        super().__init__()
+    _service_facade: ServiceFacade = None
+    network_list_container: Optional[BoxLayout] = None
+    root_ids: Dict[str, Any] = {}
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        event_router.register_callback(self._handle_event)
 
-        self.name = ScreenName.CONNECTION.value
+        if 'network_list_container' in self.ids and self.ids.network_list_container:
+            self.network_list_container = self.ids.network_list_container
+        else:
+            print("ERROR: BoxLayout with id 'network_list_container' not found in loaded KV content.")
+    
+    def emit_navigate_back(self):
+        emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
 
-        main_layout = CompactLayout()
+    def _handle_event(self, event: Event) -> None:
+        if event.type == Event.EventType.CONNECTION_FAILURE:
+            if self.manager and self.manager.current == self.name:
+                message = event.properties.get('message', 'WiFi connection failure.')
+                self._show_error_popup(message)
+        elif event.type == Event.EventType.CONNECTION_SUCCESS:
+            pass 
 
-        first_row = HorizontalLayout(size_hint_y=None, height=60)
+    def on_enter(self, *args):
+        if self._service_facade:
+            self.load_wifi_connections()
+        else:
+            print("WARNING: ServiceFacade not injected into ConnectionScreen on_enter.")
 
-        title_label = TitleLabel(text="WiFi Connections", font_size=20)
-        first_row.add_widget(title_label)
+    def load_wifi_connections(self):   
+        if self.network_list_container:
+            self.network_list_container.clear_widgets()
 
-        btn_back = SecondaryButton(
-            text=f"Back to {ScreenName.MAIN.value}", font_size=16
-        )
-        btn_back.on_press = action_go_to_screen(ScreenName.MAIN)
-        first_row.add_widget(btn_back)
-        
-        main_layout.add_widget(first_row)
+            header_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(40), padding=[dp(10), 0, dp(10), 0], spacing=dp(10))
+            header_layout.add_widget(HeaderLabel(text="SSID", size_hint_x=0.7)) 
+            header_layout.add_widget(HeaderLabel(text="Security (Signal)", size_hint_x=0.3)) 
+            self.network_list_container.add_widget(header_layout)
 
-        second_row = ScrollView()
+            if self._service_facade:
 
-        self.wifi_table = TableLayout()
-        second_row.add_widget(self.wifi_table)
+                self.available_networks = self._service_facade.getWifiConnections()
 
-        main_layout.add_widget(second_row)
+                if not self.available_networks:
+                    self.available_networks = [
+                        {"ssid": "TestData1", "info": {"security": "WPA2", "signal": -50}},
+                        {"ssid": "DataTest2", "info": {"security": "Open", "signal": -70}},
+                        {"ssid": "3_TestData", "info": {"security": "WPA", "signal": -65}},
+                    ]
+                    self.network_list_container.add_widget(NormalLabel(text="No real networks found. Displaying test data.."))
+                    self.network_list_container.add_widget(Label(size_hint_y=None, height=dp(1)))
 
-        self.add_widget(main_layout)
+                    self.available_networks.sort(key=lambda x: x["info"]["signal"], reverse=True)
 
-        self.load_wifi_connections()
+                for conn_data in self.available_networks:
+                    ssid = conn_data["ssid"]
+                    info = conn_data["info"]
+                    security_type = info["security"]
+                    signal_raw = info["signal"]
 
-    def load_wifi_connections(self):
-        wifi_table = self.wifi_table
-        wifi_table.clear_widgets()
+                    numeric_signal = 0
+                    if isinstance(signal_raw, str):
+                        try:
+                            numeric_signal = int(signal_raw.replace(' dBm', '').strip())
+                        except ValueError:
+                            print(f"WARNING: Could not parse signal '{signal_raw}'. Using 0.")
+                            numeric_signal = 0
+                    elif isinstance(signal_raw, (int, float)):
+                        numeric_signal = signal_raw
 
-        wifi_connections = get_wifi_connections()
+                    network_item = WifiNetworkItem(
+                        ssid=ssid,
+                        signal=numeric_signal,
+                        security_type=security_type,
+                        connect_action=lambda s=ssid, st=security_type: self._prompt_for_password_if_needed(s, st)
+                    )
+                    self.network_list_container.add_widget(network_item)
+                
+            else:
+                self.network_list_container.add_widget(NormalLabel(text="WiFi services unavailable."))
+        else:
+            print("ERROR: wifi_table_widget not initialized.")
 
-        header_ssid = HeaderLabel(text="SSID")
-        wifi_table.add_widget(header_ssid)
+    
 
-        header_action = HeaderLabel(text="Action")
-        wifi_table.add_widget(header_action)
+    def _prompt_for_password_if_needed(self, network_name: str, security_type: str):
+        if security_type == "Open" or security_type == "Unknown":
+            self.connectToWifi(network_name, None)
+        else:
+            content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
+            content.add_widget(Label(text=f"Senha para {network_name}:", size_hint_y=None, height='40dp'))
 
-        for conn in wifi_connections:
-            ssid, info = conn["ssid"], conn["info"]
+            def on_enter_pressed(instance):
+                self._connect_with_password(network_name, instance.text, popup)
 
-            ssid_text = (
-                f"{ssid}\nSignal: {info['signal']} | Security: {info['security']}"
-            )
-            ssid_label = WifiLabel(text=ssid_text)
-            wifi_table.add_widget(ssid_label)
+            password_input = TextInput(password=True, multiline=False, size_hint_y=None, height='40dp', on_text_validate=on_enter_pressed)
+            content.add_widget(password_input)
+            
+            buttons = BoxLayout(size_hint_y=None, height='40dp', spacing='10dp')
+            btn_connect = Button(text="Connect")
+            btn_connect.bind(on_release=lambda x: self._connect_with_password(network_name, password_input.text, popup))
+            buttons.add_widget(btn_connect)
+            
+            btn_cancel = Button(text="Cancel")
+            btn_cancel.bind(on_release=lambda x: popup.dismiss())
+            buttons.add_widget(btn_cancel)
+            
+            content.add_widget(buttons)
 
-            connect_btn = ConnectButton(text="Connect")
-            connect_btn.on_press = lambda: self.connect_to_wifi(ssid)
-            wifi_table.add_widget(connect_btn)
+            popup = Popup(title="Connect to the Secure Network", content=content, size_hint=(0.7, 0.5))
+            popup.open()
 
-    def connect_to_wifi(self, network_name):
+    def _connect_with_password(self, network_name: str, password: str, popup: Popup):
+        popup.dismiss()
+        self.connectToWifi(network_name, password)
+
+    def connectToWifi(self, network_name, password=None):
         print(f"Attempting to connect to: {network_name}")
+        if self._service_facade:
+            try:
+                self._service_facade.connectToWifi(network_name, password)
+            except Exception as e:
+                print(f"Connection failed: {e}")
+                emit_event(Event(Event.EventType.ERROR, error=e, properties={"message": f"Failed to connect to {network_name}: {e}"}))
+        else:
+            print(f"WARNING: ServiceFacade not injected. Could not connect to {network_name}.")
+
+    def _show_error_popup(self, message: str):
+        popup_content = BoxLayout(orientation='vertical', padding='10dp', spacing='10dp')
+        popup_content.add_widget(Label(text=message, halign='center', valign='middle'))
+        close_button = Button(text='Close', size_hint_y=None, height='40dp')
+        popup_content.add_widget(close_button)
+        popup = Popup(title='Connection Error', content=popup_content, size_hint=(0.7, 0.4))
+        close_button.bind(on_release=popup.dismiss)
+        popup.open()
+
+    def show_help(self):
+        action_show_help()()

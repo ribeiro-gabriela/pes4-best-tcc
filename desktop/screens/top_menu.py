@@ -1,40 +1,44 @@
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
+from kivy.metrics import dp
 
 from data.enums import ScreenName
-from screens.actions import action_go_to_screen, action_show_help
 from screens.components import HorizontalLayout, MenuButton, HelpButton
+from ui.event_router import emit_event
+from data.events import Event
 
 
 class TopMenuBar(BoxLayout):
-    def __init__(self):
-        super().__init__()
-
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'horizontal'
+        self.size_hint_y = None
+        self.height = 0    
+        self.opacity = 0  
+        self.disabled = True 
+        
+        self.spacing = dp(10)
+        self.padding = [dp(10), dp(10), dp(10), dp(10)]
+        
         left_buttons = HorizontalLayout()
 
-        button1 = _build_menu_button("Home", ScreenName.MAIN)
-        left_buttons.add_widget(button1)
+        button_home = MenuButton(text="Home")
+        button_home.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
+        left_buttons.add_widget(button_home)
 
-        button2 = _build_menu_button(ScreenName.IMAGES.name, ScreenName.IMAGES)
-        left_buttons.add_widget(button2)
+        button_images = MenuButton(text=ScreenName.IMAGES.name)
+        button_images.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.IMAGES.value}))
+        left_buttons.add_widget(button_images)
 
-        button3 = _build_menu_button(ScreenName.CONNECTION.name, ScreenName.CONNECTION)
-        left_buttons.add_widget(button3)
+        button_connection = MenuButton(text=ScreenName.CONNECTION.name)
+        button_connection.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
+        left_buttons.add_widget(button_connection)
 
         self.add_widget(left_buttons)
 
         spacer = Label()
         self.add_widget(spacer)
 
-        button_help = _build_help_button()
-        self.add_widget(button_help)
-        
-def _build_menu_button(button_text: str, target_screen: ScreenName):
-    button = MenuButton(text=button_text)
-    button.on_press = action_go_to_screen(target_screen)
-    return button
-
-def _build_help_button():
-    button = HelpButton(text="Help")
-    button.on_press = action_show_help()
-    return button
+        logout_button = MenuButton(text="Logout") 
+        logout_button.on_press = lambda: emit_event(Event(Event.EventType.LOGOUT)) 
+        self.add_widget(logout_button)

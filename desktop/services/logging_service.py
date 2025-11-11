@@ -24,6 +24,8 @@ class LoggingService:
         self.logger.info(message)
 
     # [BST-295]
-    def error(self, message: str, context: Exception) -> None:
-        # [BST-295]
-        self.logger.error(message, exc_info=context)
+    def error(self, message: str, context: Exception | None = None) -> None:
+        if context:
+            self.logger.error(message, exc_info=context)
+        else:
+            self.logger.error(message)

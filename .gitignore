@@ -1,5 +1,5 @@
 .vscode
-
+*.venv
 /firmware/.devcontainer
-/firmware/.vscode
+*.vscode
 /firmware/build

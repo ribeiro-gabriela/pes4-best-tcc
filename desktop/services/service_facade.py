@@ -3,9 +3,10 @@ from services.connection_service import ConnectionService
 from services.file_tranfer_service import FileTransferService
 from services.imported_files_service import ImportedFilesService
 from services.user_authentication_service import UserAuthenticationService
-from services.wifi_module import get_wifi_connections
+from services.wifi_module import WifiModule
 
-from typing import List, Any
+from typing import List, Any, Tuple
+from data.errors import IdentificationError
 
 
 class ServiceFacade:
@@ -21,9 +22,15 @@ class ServiceFacade:
         self.file_transfer_service = file_transfer_service
         self.imported_files_service = imported_files_service
 
-    def login(self, username: str, password: str) -> None:
+    def login(self, username: str, password: str) -> Tuple[bool, str]:
         # [BST-331]
-        return self.authentication_service.login(username, password)
+        try:
+            self.authentication_service.login(username, password)
+            return True, "Login successfully!"
+        except IdentificationError as e:
+            return False, str(e) 
+        except Exception as e:
+            return False, f"An unexpected error occurred during login: {e}"
 
     def isAuthenticated(self) -> bool:
         # [BST-332]
@@ -75,3 +82,9 @@ class ServiceFacade:
 
     def getFileMetadata(self, file_id: str) -> FileRecord:
         return self.imported_files_service.get(file_id)
+    
+    def getWifiConnections(self) -> List[dict]: 
+        return self.connection_service.scan() 
+    
+    def connectToWifi(self, target: str, password: str = None) -> None: 
+        self.connection_service.connect(target, password)
