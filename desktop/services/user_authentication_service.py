@@ -1,22 +1,18 @@
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional
-
-# [BST-298]
 from services.logging_service import LoggingService
 from data.classes import Session
 from services.user_database_module import UserDatabase
 
+# [BST-288]
+INACTIVITY_TIMEOUT_MINUTES = 10
 
 class UserAuthenticationService:
     def __init__(self, user_database: UserDatabase, logging_service = LoggingService('UserAuthenticationService')):
         self.user_database = user_database
         self.logging_service = logging_service
         self.currentSession: Optional[Session] = None
-        # [BST-288]
-        self._last_activity_time: Optional[datetime] = None
-        # [BST-288]
-        self._INACTIVITY_TIMEOUT_MINUTES = 10
 
     def login(self, username: str, password: str) -> None:
         # [BST-282]
@@ -24,33 +20,26 @@ class UserAuthenticationService:
 
         if user:
             now = datetime.now()
-            # [BST-283]
-            # [BST-287]
+            # [BST-283, BST-287, BST-288]
             self.currentSession = Session(
                 user=user,
-                createdAt=now,
-                expiresAt=now + timedelta(hours=8),  # (Expirar em 8 horas)
-            )
-            # [BST-288]
-            self._last_activity_time = now
+                lastActivityAt=now)
             # [BST-285]
             self.logging_service.log(f"User {username} authenticated successfully.")
         else:
             # [BST-284]
             self.currentSession = None
-            self._last_activity_time = None
             # [BST-286]
             self.logging_service.log(
                 f"Failed authentication attempt for user {username}."
             )
 
     def _check_inactivity(self) -> None:
-        # [BST-288]
-        if self._last_activity_time and self.currentSession:
-            time_since_last_activity = datetime.now() - self._last_activity_time
+        if self.currentSession:
+            time_since_last_activity = datetime.now() - self.currentSession.lastActivityAt
             # [BST-288]
             if time_since_last_activity > timedelta(
-                minutes=self._INACTIVITY_TIMEOUT_MINUTES
+                minutes=INACTIVITY_TIMEOUT_MINUTES
             ):
                 # [BST-289]
                 self.logging_service.log(
@@ -58,7 +47,6 @@ class UserAuthenticationService:
                 )
                 # [BST-288]
                 self.currentSession = None
-                self._last_activity_time = None
 
     def isAuthenticated(self) -> bool:
         # [BST-288]
@@ -67,17 +55,10 @@ class UserAuthenticationService:
         # [BST-291]
         if self.currentSession is None:
             return False
-
-        # [BST-291]
-        if self.currentSession.is_expired():
-            self.currentSession = None
-            self._last_activity_time = None
-            return False
-
-        # [BST-290]
-        # [BST-288]
-        self._last_activity_time = datetime.now()
-        return True
+        else:
+            # [BST-290]
+            self.currentSession.lastActivityAt = datetime.now()
+            return True
 
     def logout(self) -> None:
         if self.currentSession:
@@ -88,5 +69,3 @@ class UserAuthenticationService:
 
         # [BST-292]
         self.currentSession = None
-        # [BST-288]
-        self._last_activity_time = None

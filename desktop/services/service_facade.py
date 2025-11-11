@@ -3,10 +3,9 @@ from services.connection_service import ConnectionService
 from services.file_tranfer_service import FileTransferService
 from services.imported_files_service import ImportedFilesService
 from services.user_authentication_service import UserAuthenticationService
+from services.file_validator_service import FileValidatorService
 from services.wifi_module import get_wifi_connections
-
 from typing import List, Any
-
 
 class ServiceFacade:
     def __init__(
@@ -15,11 +14,13 @@ class ServiceFacade:
         connection_service: ConnectionService,
         file_transfer_service: FileTransferService,
         imported_files_service: ImportedFilesService,
+        file_validator_service: FileValidatorService,
     ):
         self.authentication_service = authentication_service
         self.connection_service = connection_service
         self.file_transfer_service = file_transfer_service
         self.imported_files_service = imported_files_service
+        self.file_validator_service = file_validator_service
 
     def login(self, username: str, password: str) -> None:
         # [BST-331]
@@ -51,12 +52,10 @@ class ServiceFacade:
         return self.file_transfer_service.startTransfer(file)
 
     def getProgress(self) -> Any:
-        # [BST-320]
-        # [BST-321]
-        # [BST-324]
+        # [BST-320, BST-321, BST-324]
         return self.file_transfer_service.getProgress()
 
-    def cancel(self) -> None:
+    def cancelTransfer(self) -> None:
         return self.file_transfer_service.cancel()
 
     def listImportedFiles(self) -> List[FileRecord]:
@@ -75,3 +74,13 @@ class ServiceFacade:
 
     def getFileMetadata(self, file_id: str) -> FileRecord:
         return self.imported_files_service.get(file_id)
+
+    # File Validator Service methods
+    def checkFileIdentification(self, file: File):
+        return self.file_validator_service.checkIdentification(file)
+
+    def checkFileIntegrity(self, file: File):
+        return self.file_validator_service.checkIntegrity(file)
+
+    def checkFileCompatibility(self, file: File, hardwarePN: str) -> bool:
+        return self.file_validator_service.checkCompatibility(file, hardwarePN)

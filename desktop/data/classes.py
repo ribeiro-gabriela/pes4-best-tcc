@@ -10,13 +10,7 @@ class User:
 @dataclass
 class Session:
     user: User
-    # [BST-287]
-    createdAt: datetime
-    expiresAt: datetime  # (Definido no login, ex: 8 horas)
-
-    def is_expired(self) -> bool:
-        # [BST-291]
-        return datetime.now() > self.expiresAt
+    lastActivityAt: datetime
 
 @dataclass
 class File:

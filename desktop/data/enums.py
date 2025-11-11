@@ -8,3 +8,7 @@ class ScreenName(Enum):
     POST_CONNECTION = "post_connection"
     FILE_TRANSFER = "file_transfer"
     ERROR = "error"
+
+class ArincTransferResult(Enum):
+    SUCCESS='success'
+    FAILED='failed'

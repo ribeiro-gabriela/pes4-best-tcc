@@ -1,5 +1,4 @@
 from typing import Any
-
 from data.classes import File
 from data.errors import (
     CompatibilityError,
@@ -7,15 +6,11 @@ from data.errors import (
     IdentificationError,
     IntegrityError,
 )
+from data.enums import ArincTransferResult
 from services.arinc_module import ArincModule
 from services.connection_service import ConnectionService
 from services.file_validator_service import FileValidatorService
 from services.logging_service import LoggingService
-
-# Status outputs from ArincModule
-STATUS_FINISHED = "TransferFinished"
-STATUS_FAILED = "TransferFailed"
-STATUS_CANCELLED = "TransferCancelled"
 
 class FileTransferService:
     def __init__(
@@ -94,19 +89,19 @@ class FileTransferService:
         status = self.arinc_module.getProgress()
 
         # [BST-239]
-        if status == STATUS_FINISHED:
+        if status.transferResult == ArincTransferResult.SUCCESS:
             # [BST-239]
             self.connection_service.resumeHealthCheck()
             # [BST-242]
             self.logging_service.log("Transfer operation finished successfully.")
 
-        elif status == STATUS_FAILED:
+        elif status.transferResult == ArincTransferResult.FAILED:
             # [BST-239]
             self.connection_service.resumeHealthCheck()
             # [BST-242]
             self.logging_service.log("Transfer operation failed.")
 
-        elif status == STATUS_CANCELLED:
+        elif status.cancelled:
             # [BST-242]
             self.logging_service.log("Transfer operation was cancelled.")
 

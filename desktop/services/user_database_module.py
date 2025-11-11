@@ -1,6 +1,5 @@
 from typing import Optional
 import uuid
-
 from data.classes import User
 
 class UserDatabase:
