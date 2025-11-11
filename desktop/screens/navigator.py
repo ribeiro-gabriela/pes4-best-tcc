@@ -12,6 +12,7 @@ from data.enums import ScreenName
 
 class ScreenNavigator():
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.screen_manager = KivyScreenManager()
         self._add_screens()
 

@@ -1,11 +1,10 @@
-
 #:kivy 2.0.0
 
 # ----- STYLING CONSTANTS -----
 
 # Color definitions (RGBA values)
 
-#:set PRIMARY_COLOR [0.2, 0.6, 0.8, 1]
+#:set PRIMARY_COLOR [0.12, 0.45, 0.82, 1]
 #:set SECONDARY_COLOR [0.3, 0.3, 0.3, 1]
 #:set ACCENT_COLOR [0.9, 0.5, 0.1, 1]
 #:set BACKGROUND_COLOR [0.95, 0.95, 0.95, 1]
@@ -36,6 +35,7 @@
 #:set PADDING_LARGE 50
 #:set PADDING_MEDIUM 20
 #:set PADDING_SMALL 10
+#:set PADDING_XLARGE 70 
 
 # ----- COMPONENTS -----
 
@@ -45,17 +45,41 @@
     size_hint_x: None
     width: MENU_BUTTON_WIDTH
 
-<HelpButton@Button>:
-    background_color: ACCENT_COLOR
-    font_size: FONT_SMALL
-    size_hint_x: None
-    width: MENU_BUTTON_WIDTH
+<HelpIconButton>:
+    orientation: 'vertical'
+    spacing: dp(2) 
+    padding: dp(5)
+    background_color: [0,0,0,0] 
+    
+    Image:
+        source: root.source
+        size_hint_y: 0.7 
+        pos_hint: {'center_x': 0.5} 
+        fit_mode: 'contain' 
+    Label:
+        text: root.label_text
+        font_size: FONT_SMALL
+        color: [1,1,1,1]
+        halign: 'center'
+        valign: 'middle'
+        size_hint_y: 0.3 
+        text_size: self.size
 
-<PrimaryButton@Button>:
+<PrimaryButton>:
     background_color: PRIMARY_COLOR
     font_size: FONT_MEDIUM
     size_hint_y: None
     height: BUTTON_HEIGHT
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),] 
 
 <SecondaryButton@Button>:
     background_color: SECONDARY_COLOR
@@ -85,7 +109,7 @@
 
 <NormalLabel@Label>:
     font_size: FONT_NORMAL
-    color: TEXT_COLOR
+    color: [0.2,0.2,0.2,1]
     text_size: self.size
     halign: 'left'
 
@@ -164,7 +188,7 @@
             text: f'({root.signal} dBm)' 
             halign: 'right'
             size_hint_x: 0.3
-            color: [0.7, 0.7, 0.7, 1] 
+            color: [0.7, 0.7, 0.7, 1]
             valign: 'middle'
             font_size: FONT_SMALL
     WiFiLabel:
@@ -208,13 +232,6 @@
                     padding: PADDING_MEDIUM
                     size_hint_y: None
                     height: self.minimum_height
-        
-        HelpButton:
-            text: "Ajuda"
-            size_hint: None, None
-            size: dp(100), dp(50)
-            pos_hint: {'right': 0.98, 'bottom': 0.02}
-            on_press: root.show_help()
 
 <SystemImageItem>:
     font_size: FONT_NORMAL
@@ -257,7 +274,8 @@
         size_hint: 0.9, 0.9
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         
-        CompactLayout: 
+        
+        CompactLayout:
             orientation: 'vertical'
             spacing: SPACING_MEDIUM
             padding: PADDING_MEDIUM
@@ -269,9 +287,9 @@
                     text: 'BC Module Connected'
                     font_size: FONT_MEDIUM
                     color: PRIMARY_COLOR
-                SecondaryButton:
-                    text: 'Disconnect BC Module'
-                    on_press: root.request_disconnect_confirmation()
+                SecondaryButton: 
+                    text: 'Logout'
+                    on_press: root.emit_logout_event()
 
             HorizontalLayout: 
                 size_hint_y: None
@@ -306,10 +324,106 @@
                     text: 'Load selected image'
                     on_press: root.load_selected_image()
                     disabled: not root.selected_image_item or not root.selected_image_item.is_compatible
-        
-        HelpButton:
-            text: "Ajuda"
-            size_hint: None, None
-            size: dp(100), dp(50)
-            pos_hint: {'right': 0.98, 'bottom': 0.02}
-            on_press: root.show_help()
+
+                SecondaryButton:
+                    text: 'Disconnect BC Module'
+                    on_press: root.request_disconnect_confirmation()
+
+<LoginCard>:
+    orientation: 'vertical'
+    spacing: SPACING_MEDIUM 
+    padding: PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM
+    minimum_width: dp(400)
+    # minimum_height: dp(500)
+    
+    canvas.before:
+        Color:
+            rgba: [1, 1, 1, 1] 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(15),]
+
+<LoginTextInput>:
+    multiline: False
+    font_size: FONT_MEDIUM
+    size_hint_y: None
+    height: dp(50) 
+    padding: dp(5), dp(5)
+    background_color: [1, 1, 1, 0] 
+    foreground_color: [0.2, 0.2, 0.2, 1] 
+    hint_text_color: [0.4, 0.4, 0.4, 1] 
+    write_tab: False
+    cursor_color: (1, 0, 0, 1)
+    cursor_width: dp(2) 
+    cursor_blink: True 
+    
+    canvas.before:
+        Color:
+            rgba: ([0.95, 0.95, 0.95, 1] if self.focus else [1, 1, 1, 1])
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+            
+        Color:
+            rgba: ([0.4, 0.4, 0.4, 1] if self.focus else [0.6, 0.6, 0.6, 1]) 
+        Line:
+            width: (dp(1.5) if self.focus else dp(1)) 
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(5))
+
+<LoginScreen>:
+    FloatLayout: 
+        Image:
+            source: './uploads/background_image.png'
+            allow_stretch: True
+            keep_ratio: False
+            size_hint: (1, 1)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+        LoginCard:
+            size_hint: (0.4, 0.6)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            padding: PADDING_SMALL
+            
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: SPACING_LARGE
+                padding: PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM
+                
+                BoxLayout:
+                    size_hint_y: 0.30 
+                    padding: SPACING_MEDIUM, SPACING_MEDIUM 
+
+                    Image:
+                        source: './uploads/EMB_Logo_RGB_1.png'
+                        size_hint: (1, 1)
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+                        fit_mode: 'contain'
+                
+                LoginTextInput:
+                    id: username_input 
+                    hint_text: 'Username'
+                    on_text_validate: root.focus_password_input(self) 
+                    size_hint_y: 0.15 
+                    
+                LoginTextInput:
+                    id: password_input 
+                    hint_text: 'Password'
+                    password: True
+                    on_text_validate: root.attempt_login(root.username_input.text, self.text)
+                    size_hint_y: 0.15 
+
+                NormalLabel:
+                    text: root.login_message
+                    color: [0.9, 0.2, 0.2, 1]
+                    size_hint_y: 0.10 
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.size[0] * 0.9, None
+
+                PrimaryButton:
+                    text: 'Login'
+                    size_hint_y: 0.20 
+                    # Removida: height: min(self.height, dp(50))
+                    on_release: root.attempt_login(root.username_input.text, root.password_input.text)

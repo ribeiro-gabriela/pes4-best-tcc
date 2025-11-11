@@ -2,12 +2,14 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.metrics import dp
+from kivy.uix.floatlayout import FloatLayout
 import sys 
 
 from data.enums import ScreenName
-from screens.components import VerticalLayout
+from screens.components import VerticalLayout, HelpIconButton
 from screens.top_menu import TopMenuBar
 from screens.navigator import ScreenNavigator
+from screens.actions import action_show_help
 
 from pathlib import Path
 
@@ -18,6 +20,7 @@ class ScreenManager(App):
     navigator: ScreenNavigator = ObjectProperty(None)
     service_facade = ObjectProperty(None)
     menu_bar_widget: TopMenuBar = ObjectProperty(None)
+    help_button_widget: HelpIconButton = ObjectProperty(None)
 
     def build(self):
         if path_to_dat.exists():
@@ -26,24 +29,48 @@ class ScreenManager(App):
             print(f"FATAL ERROR: styling.kv not found in {path_to_dat}. The application cannot start.")
             sys.exit(1)
 
-        root_layout = VerticalLayout() 
+        root_float_layout = FloatLayout() 
 
         self.menu_bar_widget = TopMenuBar()
-        root_layout.add_widget(self.menu_bar_widget)
+        self.menu_bar_widget.size_hint = (1, None) 
+        self.menu_bar_widget.height = dp(50)
+        self.menu_bar_widget.pos_hint = {'top': 1}
+        root_float_layout.add_widget(self.menu_bar_widget)
+
+        navigator_container = FloatLayout()
+        navigator_container.size_hint = (1, 1)
+        navigator_container.pos_hint = {'top': 1 - (self.menu_bar_widget.height / self.root_window.height if self.root_window else 0.05)}
 
         self.navigator = ScreenNavigator()
-        root_layout.add_widget(self.navigator.screen_manager)
+        self.navigator.screen_manager.size_hint = (1, 1)
+        navigator_container.add_widget(self.navigator.screen_manager)
+        root_float_layout.add_widget(navigator_container)
+
+        self.help_button_widget = HelpIconButton(
+            source='./uploads/help.png', 
+            label_text='Help'
+        )
+        self.help_button_widget.size_hint = (None, None)
+        self.help_button_widget.size = (dp(60), dp(80))
+        self.help_button_widget.pos_hint = {'right': 0.98, 'bottom': 0.02}
+        self.help_button_widget.bind(on_release=lambda x: action_show_help())
+        root_float_layout.add_widget(self.help_button_widget)
 
         for screen in self.navigator.screen_manager.screens:
             if hasattr(screen, '_service_facade'): 
                 screen._service_facade = self.service_facade
 
         self.toggle_menu_bar_visibility(False)
+        self.help_button_widget.opacity = 1
+        self.help_button_widget.disabled = False
 
-        return root_layout
+        return root_float_layout
 
     def navigate(self, screen_name: str):
         assert self.navigator is not None
+
+        is_login_screen = (screen_name == ScreenName.LOGIN.value)
+        self.toggle_menu_bar_visibility(not is_login_screen)
         
         self.navigator.navigate_to(screen_name)
 

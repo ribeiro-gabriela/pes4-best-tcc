@@ -1,4 +1,3 @@
-# desktop/main.py
 from pathlib import Path
 import sys
 from kivy.resources import resource_add_path, resource_find
