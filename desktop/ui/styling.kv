@@ -13,6 +13,7 @@
 #:set SUCCESS_COLOR [0.2, 0.7, 0.3, 1]
 #:set MENU_BACKGROUND_COLOR [0.03, 0.12, 0.22, 1]
 #:set MENU_BUTTON_COLOR [0.05, 0.2, 0.33, 1]
+#:set ACCENT_COLOR_DELETE [0.8, 0.2, 0.2, 1]
 
 # Font sizes
 
@@ -470,3 +471,95 @@
                     size_hint_y: None
                     height: BUTTON_HEIGHT * 0.8
                     on_release: root.emit_navigate_to_connections()
+
+<DeleteButton@Button>:
+    background_color: ACCENT_COLOR_DELETE
+    font_size: FONT_SMALL
+    size_hint_x: None
+    width: dp(80) 
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),] 
+
+<ImageListItem@BoxLayout>: 
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: dp(50) 
+    padding: SPACING_MEDIUM
+    spacing: SPACING_SMALL
+    canvas.before:
+        Color:
+            rgba: BACKGROUND_COLOR 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    
+    Label:
+        text: root.file_name
+        font_size: FONT_NORMAL
+        color: TEXT_COLOR_DARK
+        halign: 'left'
+        valign: 'middle'
+        text_size: self.size
+        size_hint_x: 1 
+    
+    DeleteButton: 
+        text: 'Delete'
+        on_release: root.delete_action(root.file_name) # Chama a ação de exclusão
+
+# --- ESTRUTURA DA IMAGES SCREEN ---
+<ImagesScreen>:
+    FloatLayout:
+        ScreenLayout: # Este é o card branco centralizado
+            size_hint: (0.6, 0.8) # Ajuste o tamanho conforme necessário
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+            TitleLabel:
+                text: 'Image Management'
+                size_hint_y: None
+                height: dp(60)
+
+            ScrollView: # Para a lista de arquivos
+                bar_width: dp(10)
+                do_scroll_x: False
+                size_hint_y: 1 # Ocupa o espaço restante verticalmente
+                
+                BoxLayout:
+                    id: image_list_container # ID para referência em Python
+                    orientation: 'vertical'
+                    spacing: SPACING_SMALL
+                    padding: SPACING_SMALL
+                    size_hint_y: None # Importante para que a altura do BoxLayout seja a soma dos filhos
+                    height: self.minimum_height
+                    
+                    # Os ImageListItem serão adicionados/removidos programaticamente em images_screen.py
+                    # Não colocamos um for-loop aqui no KV para ListProperty simples diretamente no BoxLayout
+                    # porque o BoxLayout não é um RecycleView.
+                    # A populção dinâmica é feita no Python.
+
+            Label: # Mensagem de lista vazia
+                id: empty_message_label
+                text: root.empty_list_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] # Cor de texto para indicação
+                size_hint_y: None
+                # A altura e opacidade são controladas pela propriedade show_empty_message
+                height: dp(40) if root.show_empty_message else 0 
+                opacity: 1 if root.show_empty_message else 0 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.size
+            
+            PrimaryButton: # Botão de Upload, AGORA ABAIXO da lista
+                text: 'Upload New File'
+                size_hint_y: None
+                height: BUTTON_HEIGHT
+                on_release: root.open_file_chooser()

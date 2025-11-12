@@ -89,3 +89,10 @@ class LoginTextInput(TextInput):
 class HelpIconButton(ButtonBehavior, BoxLayout):
     source = StringProperty('')
     label_text = StringProperty('')
+
+class ImageListItem(BoxLayout): 
+    file_name = StringProperty('') 
+    delete_action = ObjectProperty(None) 
+
+class DeleteButton(Button): 
+    pass
