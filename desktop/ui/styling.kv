@@ -9,7 +9,10 @@
 #:set ACCENT_COLOR [0.9, 0.5, 0.1, 1]
 #:set BACKGROUND_COLOR [0.95, 0.95, 0.95, 1]
 #:set TEXT_COLOR [0.9, 0.9, 0.9, 1]
+#:set TEXT_COLOR_DARK [0.2, 0.2, 0.2, 1]
 #:set SUCCESS_COLOR [0.2, 0.7, 0.3, 1]
+#:set MENU_BACKGROUND_COLOR [0.03, 0.12, 0.22, 1]
+#:set MENU_BUTTON_COLOR [0.05, 0.2, 0.33, 1]
 
 # Font sizes
 
@@ -20,7 +23,7 @@
 
 # Dimensions
 
-#:set MENU_HEIGHT 50
+#:set MENU_HEIGHT 65
 #:set BUTTON_HEIGHT 60
 #:set TABLE_ROW_HEIGHT 60
 #:set HEADER_HEIGHT 40
@@ -40,7 +43,8 @@
 # ----- COMPONENTS -----
 
 <MenuButton@Button>:
-    background_color: PRIMARY_COLOR
+    background_color: MENU_BUTTON_COLOR
+    background_normal: ''
     font_size: FONT_SMALL
     size_hint_x: None
     width: MENU_BUTTON_WIDTH
@@ -103,9 +107,9 @@
 
 <TitleLabel@Label>:
     font_size: FONT_LARGE
-    color: TEXT_COLOR
+    color: TEXT_COLOR_DARK
     text_size: self.size
-    halign: 'left'
+    halign: 'center'
 
 <NormalLabel@Label>:
     font_size: FONT_NORMAL
@@ -131,10 +135,18 @@
     height: TABLE_ROW_HEIGHT
     text_size: self.size
 
-<ScreenLayout@BoxLayout>:
+<ScreenLayout@BoxLayout>: 
     orientation: 'vertical'
     spacing: SPACING_LARGE
-    padding: PADDING_LARGE
+    padding: PADDING_XLARGE, PADDING_LARGE, PADDING_XLARGE, PADDING_LARGE
+    
+    canvas.before: 
+        Color:
+            rgba: [1, 1, 1, 1] # Fundo branco
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(15),] 
 
 <CompactLayout@BoxLayout>:
     orientation: 'vertical'
@@ -159,6 +171,12 @@
     height: MENU_HEIGHT
     spacing: SPACING_MEDIUM
     padding: PADDING_SMALL, SPACING_SMALL, PADDING_SMALL, SPACING_SMALL
+    canvas.before:
+        Color:
+            rgba: MENU_BACKGROUND_COLOR 
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
 <WiFiNetworkItem@BoxLayout>:
     orientation: 'vertical'
@@ -334,7 +352,6 @@
     spacing: SPACING_MEDIUM 
     padding: PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM
     minimum_width: dp(400)
-    # minimum_height: dp(500)
     
     canvas.before:
         Color:
@@ -374,13 +391,6 @@
 
 <LoginScreen>:
     FloatLayout: 
-        Image:
-            source: './uploads/background_image.png'
-            allow_stretch: True
-            keep_ratio: False
-            size_hint: (1, 1)
-            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-
         LoginCard:
             size_hint: (0.4, 0.6)
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
@@ -425,5 +435,38 @@
                 PrimaryButton:
                     text: 'Login'
                     size_hint_y: 0.20 
-                    # Removida: height: min(self.height, dp(50))
                     on_release: root.attempt_login(root.username_input.text, root.password_input.text)
+
+<MainScreen>: 
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.5, 0.6) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            
+            BoxLayout:
+                size_hint_y: 0.30 
+                padding: SPACING_SMALL, SPACING_SMALL
+
+                Image:
+                    source: './uploads/GSE.png'
+                    size_hint: (1, 1)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+                    fit_mode: 'contain'
+            
+            BoxLayout: 
+                orientation: 'vertical'
+                spacing: SPACING_LARGE
+                size_hint_y: None
+                height: self.minimum_height 
+
+                PrimaryButton:
+                    text: 'Go to Images'
+                    size_hint_y: None
+                    height: BUTTON_HEIGHT * 0.8 
+                    on_release: root.emit_navigate_to_images() 
+
+                PrimaryButton:
+                    text: 'Go to Connections'
+                    size_hint_y: None
+                    height: BUTTON_HEIGHT * 0.8
+                    on_release: root.emit_navigate_to_connections()

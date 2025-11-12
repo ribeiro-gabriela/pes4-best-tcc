@@ -1,9 +1,10 @@
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.metrics import dp
+from kivy.uix.image import Image
 
 from data.enums import ScreenName
-from screens.components import HorizontalLayout, MenuButton, HelpButton
+from screens.components import HorizontalLayout, MenuButton
 from ui.event_router import emit_event
 from data.events import Event
 
@@ -19,10 +20,20 @@ class TopMenuBar(BoxLayout):
         
         self.spacing = dp(10)
         self.padding = [dp(10), dp(10), dp(10), dp(10)]
+
+        embraer_logo = Image(
+            source='./uploads/EMB_Logo_white_RGB_1.png', 
+            allow_stretch=False,
+            keep_ratio=True, 
+            size_hint_x=None,
+            width=dp(100), 
+            pos_hint={'center_y': 0.5} 
+        )
+        self.add_widget(embraer_logo)
         
         left_buttons = HorizontalLayout()
 
-        button_home = MenuButton(text="Home")
+        button_home = MenuButton(text="HOME")
         button_home.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
         left_buttons.add_widget(button_home)
 

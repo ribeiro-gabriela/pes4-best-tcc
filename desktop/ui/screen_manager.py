@@ -3,6 +3,7 @@ from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.metrics import dp
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
 import sys 
 
 from data.enums import ScreenName
@@ -30,6 +31,15 @@ class ScreenManager(App):
             sys.exit(1)
 
         root_float_layout = FloatLayout() 
+
+        background_image = Image(
+            source='./uploads/background_image.png', 
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        )
+        root_float_layout.add_widget(background_image)
 
         self.menu_bar_widget = TopMenuBar()
         self.menu_bar_widget.size_hint = (1, None) 
@@ -71,7 +81,7 @@ class ScreenManager(App):
 
         is_login_screen = (screen_name == ScreenName.LOGIN.value)
         self.toggle_menu_bar_visibility(not is_login_screen)
-        
+
         self.navigator.navigate_to(screen_name)
 
     def toggle_menu_bar_visibility(self, visible: bool):
