@@ -8,22 +8,11 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.metrics import dp 
 from kivy.uix.floatlayout import FloatLayout
+from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty 
 
-from data.enums import ScreenName, AppState
-from screens.actions import action_go_to_screen, action_show_help
-from screens.components import (
-    CompactLayout,
-    HorizontalLayout,
-    TableLayout,
-    TitleLabel,
-    HeaderLabel,
-    WifiLabel,
-    ConnectButton,
-    SecondaryButton,
-    NormalLabel,
-    WifiNetworkItem,
-    HelpButton,
-)
+from data.enums import ScreenName
+from screens.components import WifiNetworkItem
+
 from services.service_facade import ServiceFacade
 from ui.event_router import emit_event, event_router 
 from data.events import Event
@@ -31,20 +20,15 @@ from typing import Optional, Dict, Any
 
 class ConnectionScreen(Screen):
     _service_facade: ServiceFacade = None
-    network_list_container: Optional[BoxLayout] = None
-    root_ids: Dict[str, Any] = {}
     
+    available_networks_data = ListProperty([]) 
+    empty_list_message = StringProperty("No WiFi networks found.")
+    show_empty_message = BooleanProperty(False)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.name = ScreenName.CONNECTION.value
         event_router.register_callback(self._handle_event)
-
-        if 'network_list_container' in self.ids and self.ids.network_list_container:
-            self.network_list_container = self.ids.network_list_container
-        else:
-            print("ERROR: BoxLayout with id 'network_list_container' not found in loaded KV content.")
-    
-    def emit_navigate_back(self):
-        emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
 
     def _handle_event(self, event: Event) -> None:
         if event.type == Event.EventType.CONNECTION_FAILURE:
@@ -61,59 +45,51 @@ class ConnectionScreen(Screen):
             print("WARNING: ServiceFacade not injected into ConnectionScreen on_enter.")
 
     def load_wifi_connections(self):   
-        if self.network_list_container:
-            self.network_list_container.clear_widgets()
+        list_container = self.ids.network_list_container 
+        list_container.clear_widgets()
 
-            header_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=dp(40), padding=[dp(10), 0, dp(10), 0], spacing=dp(10))
-            header_layout.add_widget(HeaderLabel(text="SSID", size_hint_x=0.7)) 
-            header_layout.add_widget(HeaderLabel(text="Security (Signal)", size_hint_x=0.3)) 
-            self.network_list_container.add_widget(header_layout)
+        if self._service_facade:
+            real_networks = self._service_facade.getWifiConnections()
 
-            if self._service_facade:
-
-                self.available_networks = self._service_facade.getWifiConnections()
-
-                if not self.available_networks:
-                    self.available_networks = [
-                        {"ssid": "TestData1", "info": {"security": "WPA2", "signal": -50}},
-                        {"ssid": "DataTest2", "info": {"security": "Open", "signal": -70}},
-                        {"ssid": "3_TestData", "info": {"security": "WPA", "signal": -65}},
-                    ]
-                    self.network_list_container.add_widget(NormalLabel(text="No real networks found. Displaying test data.."))
-                    self.network_list_container.add_widget(Label(size_hint_y=None, height=dp(1)))
-
-                    self.available_networks.sort(key=lambda x: x["info"]["signal"], reverse=True)
-
-                for conn_data in self.available_networks:
-                    ssid = conn_data["ssid"]
-                    info = conn_data["info"]
-                    security_type = info["security"]
-                    signal_raw = info["signal"]
-
-                    numeric_signal = 0
-                    if isinstance(signal_raw, str):
-                        try:
-                            numeric_signal = int(signal_raw.replace(' dBm', '').strip())
-                        except ValueError:
-                            print(f"WARNING: Could not parse signal '{signal_raw}'. Using 0.")
-                            numeric_signal = 0
-                    elif isinstance(signal_raw, (int, float)):
-                        numeric_signal = signal_raw
-
-                    network_item = WifiNetworkItem(
-                        ssid=ssid,
-                        signal=numeric_signal,
-                        security_type=security_type,
-                        connect_action=lambda s=ssid, st=security_type: self._prompt_for_password_if_needed(s, st)
-                    )
-                    self.network_list_container.add_widget(network_item)
-                
+            if not real_networks:
+                self.available_networks_data = [
+                    {"ssid": "RM_2G_TestData", "info": {"security": "WPA2", "signal": -50}},
+                    {"ssid": "RM_5G_TestData", "info": {"security": "Open", "signal": -70}},
+                    {"ssid": "WIFI_TEST_3", "info": {"security": "WPA", "signal": -65}},
+                ]
             else:
-                self.network_list_container.add_widget(NormalLabel(text="WiFi services unavailable."))
-        else:
-            print("ERROR: wifi_table_widget not initialized.")
+                self.available_networks_data = real_networks
+            
+            self.available_networks_data.sort(key=lambda x: x["info"]["signal"], reverse=False)
 
-    
+            for conn_data in self.available_networks_data:
+                ssid = conn_data["ssid"]
+                info = conn_data["info"]
+                security_type = info["security"]
+                signal_raw = info["signal"]
+
+                numeric_signal = 0
+                if isinstance(signal_raw, str):
+                    try:
+                        numeric_signal = int(signal_raw.replace(' dBm', '').strip())
+                    except ValueError:
+                        print(f"WARNING: Could not parse signal '{signal_raw}'. Using 0.")
+                        numeric_signal = 0
+                elif isinstance(signal_raw, (int, float)):
+                    numeric_signal = signal_raw
+
+                network_item = WifiNetworkItem(
+                    ssid=ssid,
+                    signal=numeric_signal,
+                    security_type=security_type,
+                    connect_action=lambda s=ssid, st=security_type: self._prompt_for_password_if_needed(s, st)
+                )
+                list_container.add_widget(network_item)
+            
+            self.show_empty_message = not bool(self.available_networks_data) 
+                
+        else:
+            self.show_empty_message = True
 
     def _prompt_for_password_if_needed(self, network_name: str, security_type: str):
         if security_type == "Open" or security_type == "Unknown":
@@ -165,6 +141,3 @@ class ConnectionScreen(Screen):
         popup = Popup(title='Connection Error', content=popup_content, size_hint=(0.7, 0.4))
         close_button.bind(on_release=popup.dismiss)
         popup.open()
-
-    def show_help(self):
-        action_show_help()()

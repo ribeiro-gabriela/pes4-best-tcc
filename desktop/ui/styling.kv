@@ -105,6 +105,16 @@
     font_size: FONT_NORMAL
     size_hint_y: None
     height: TABLE_ROW_HEIGHT
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
 
 <TitleLabel@Label>:
     font_size: FONT_LARGE
@@ -114,14 +124,14 @@
 
 <NormalLabel@Label>:
     font_size: FONT_NORMAL
-    color: [0.2,0.2,0.2,1]
+    color: TEXT_COLOR_DARK
     text_size: self.size
     halign: 'left'
 
 <HeaderLabel@Label>:
     font_size: FONT_NORMAL
     bold: True
-    color: TEXT_COLOR
+    color: TEXT_COLOR_DARK
     size_hint_y: None
     height: HEADER_HEIGHT
     text_size: self.size
@@ -129,7 +139,7 @@
 
 <WiFiLabel@Label>:
     font_size: FONT_SMALL
-    color: TEXT_COLOR
+    color: TEXT_COLOR_DARK
     halign: 'left'
     valign: 'middle'
     size_hint_y: None
@@ -182,12 +192,12 @@
 <WiFiNetworkItem@BoxLayout>:
     orientation: 'vertical'
     padding: PADDING_MEDIUM
-    spacing: SPACING_MEDIUM
+    spacing: SPACING_SMALL
     size_hint_y: None
     height: self.minimum_height
     canvas.before:
         Color: 
-            rgba: SECONDARY_COLOR 
+            rgba: [0.95, 0.95, 0.95, 1] 
         RoundedRectangle:
             pos: self.pos
             size: self.size
@@ -195,7 +205,7 @@
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
-        height: dp(30)
+        height: dp(25)
         WiFiLabel:
             text: root.ssid 
             font_size: FONT_MEDIUM
@@ -203,54 +213,85 @@
             size_hint_x: 0.7
             halign: 'left'
             valign: 'middle'
+            color: [0.2,0.2,0.2,1] 
         WiFiLabel: 
             text: f'({root.signal} dBm)' 
             halign: 'right'
             size_hint_x: 0.3
-            color: [0.7, 0.7, 0.7, 1]
+            color: [0.4, 0.4, 0.4, 1] 
             valign: 'middle'
             font_size: FONT_SMALL
     WiFiLabel:
-        text: f'Segurança: {root.security_type}' 
-        color: [0.8, 0.8, 0.8, 1]
+        text: f'Security: {root.security_type}' 
+        color: [0.4, 0.4, 0.4, 1]
         size_hint_y: None
-        height: dp(25)
+        height: dp(15)
         halign: 'left' 
         valign: 'middle'
         font_size: FONT_SMALL
     ConnectButton:
-        text: 'Connect'
+        text: 'Connect' 
         on_press: root.connect_action()
         size_hint_y: None
         height: dp(40)
 
 <ConnectionScreen>:
     FloatLayout: 
-        CompactLayout:
-            id: main_content
-            size_hint: 0.8, 0.8
+        ScreenLayout: 
+            size_hint: (0.7, 0.8) 
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-            HorizontalLayout:
+
+            TitleLabel:
+                text: 'WiFi Connections' 
                 size_hint_y: None
-                height: dp(60)
-                TitleLabel:
-                    text: 'WiFi Connections'
-                    font_size: FONT_MEDIUM
-                    color: SECONDARY_COLOR
-                SecondaryButton:
-                    text: 'Back to main'
-                    on_press: root.emit_navigate_back()
+                height: dp(40)
+
+            BoxLayout: 
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(50)
+                padding: dp(10), 0, dp(10), 0
+                spacing: dp(10)
+                canvas.before: 
+                    Color:
+                        rgba: [0.9, 0.9, 0.9, 1] 
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                HeaderLabel:
+                    text: "SSID"
+                    size_hint_x: 0.7
+                    valign: 'middle'
+                HeaderLabel:
+                    text: "Security (Signal)"
+                    halign: 'right'
+                    size_hint_x: 0.3
+                    valign: 'middle'
+
             ScrollView:
-                id: scroll_view_for_table
                 bar_width: dp(10)
                 do_scroll_x: False
+                size_hint_y: 1 
+                
                 BoxLayout:
                     id: network_list_container 
                     orientation: 'vertical'
                     spacing: SPACING_MEDIUM
-                    padding: PADDING_MEDIUM
-                    size_hint_y: None
+                    padding: SPACING_SMALL
+                    size_hint_y: None 
                     height: self.minimum_height
+
+            Label: 
+                id: empty_message_label
+                text: root.empty_list_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] 
+                size_hint_y: None
+                height: dp(40) if root.show_empty_message else 0 
+                opacity: 1 if root.show_empty_message else 0 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.size
 
 <SystemImageItem>:
     font_size: FONT_NORMAL
@@ -513,13 +554,12 @@
     
     DeleteButton: 
         text: 'Delete'
-        on_release: root.delete_action(root.file_name) # Chama a ação de exclusão
+        on_release: root.delete_action(root.file_name) 
 
-# --- ESTRUTURA DA IMAGES SCREEN ---
 <ImagesScreen>:
     FloatLayout:
-        ScreenLayout: # Este é o card branco centralizado
-            size_hint: (0.6, 0.8) # Ajuste o tamanho conforme necessário
+        ScreenLayout: 
+            size_hint: (0.6, 0.8) 
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
             TitleLabel:
@@ -527,38 +567,32 @@
                 size_hint_y: None
                 height: dp(60)
 
-            ScrollView: # Para a lista de arquivos
+            ScrollView: 
                 bar_width: dp(10)
                 do_scroll_x: False
-                size_hint_y: 1 # Ocupa o espaço restante verticalmente
+                size_hint_y: 1 
                 
                 BoxLayout:
-                    id: image_list_container # ID para referência em Python
+                    id: image_list_container 
                     orientation: 'vertical'
                     spacing: SPACING_SMALL
                     padding: SPACING_SMALL
-                    size_hint_y: None # Importante para que a altura do BoxLayout seja a soma dos filhos
+                    size_hint_y: None 
                     height: self.minimum_height
-                    
-                    # Os ImageListItem serão adicionados/removidos programaticamente em images_screen.py
-                    # Não colocamos um for-loop aqui no KV para ListProperty simples diretamente no BoxLayout
-                    # porque o BoxLayout não é um RecycleView.
-                    # A populção dinâmica é feita no Python.
 
-            Label: # Mensagem de lista vazia
+            Label: 
                 id: empty_message_label
                 text: root.empty_list_message
                 font_size: FONT_NORMAL
-                color: [0.4, 0.4, 0.4, 1] # Cor de texto para indicação
+                color: [0.4, 0.4, 0.4, 1] 
                 size_hint_y: None
-                # A altura e opacidade são controladas pela propriedade show_empty_message
                 height: dp(40) if root.show_empty_message else 0 
                 opacity: 1 if root.show_empty_message else 0 
                 halign: 'center'
                 valign: 'middle'
                 text_size: self.size
             
-            PrimaryButton: # Botão de Upload, AGORA ABAIXO da lista
+            PrimaryButton: 
                 text: 'Upload New File'
                 size_hint_y: None
                 height: BUTTON_HEIGHT
