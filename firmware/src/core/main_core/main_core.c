@@ -143,6 +143,48 @@ void* stateTransitionHandler()
                     ESP_LOGI("Main Core", "MNT State changed to WAITING");
                 }
             }
+            else if (receivedMessage.eventID == LOAD_REQUEST)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                    getConnState() == WAITING_REQUEST)
+                {
+                    setConnState(CRED_EXCHANGE);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "Conn State changed to CRED_EXCHANGE");
+                }
+            }
+            else if (receivedMessage.eventID == SEC_GSE_AUTH_SUCCESS)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                    getConnState() == CRED_EXCHANGE)
+                {
+                    setConnState(RECEIVING_PKTS);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
+                }
+            }
+            else if (receivedMessage.eventID == SEC_IMG_FORMAT_OK)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                    getConnState() == RECEIVING_PKTS)
+                {
+                    setConnState(IMG_VERIFICATION);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
+                }
+            }
+            else if (receivedMessage.eventID == SEC_IMG_HASH_OK &&
+                     receivedMessage.eventID == SEC_IMG_PN_OK)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                    getConnState() == IMG_VERIFICATION)
+                {
+                    setMntState(WAITING_AUTHORIZATION);
+                    setConnState(NOT_SET_CONN);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "Image verification successful, Conn State reset to NOT_SET_CONN");
+                }
+            }
         }
         // Lógica para tratar mensagens da fila e realizar transições de estado
         vTaskDelay(500 / portTICK_PERIOD_MS);
