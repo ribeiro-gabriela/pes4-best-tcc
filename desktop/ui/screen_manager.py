@@ -1,3 +1,4 @@
+import logging
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
@@ -24,6 +25,8 @@ class ScreenManager(App):
     help_button_widget: HelpIconButton = ObjectProperty(None)
 
     def build(self):
+        logging.getLogger('pywifi').setLevel(logging.WARNING) 
+
         if path_to_dat.exists():
             Builder.load_file(str(path_to_dat))
         else:
@@ -82,6 +85,10 @@ class ScreenManager(App):
         is_login_screen = (screen_name == ScreenName.LOGIN.value)
         self.toggle_menu_bar_visibility(not is_login_screen)
 
+        is_post_connection_screen = (screen_name == ScreenName.POST_CONNECTION.value)
+        if self.menu_bar_widget and self.menu_bar_widget.connection_button:
+            self.menu_bar_widget.set_connection_button_visibility(not is_post_connection_screen)
+
         self.navigator.navigate_to(screen_name)
 
     def toggle_menu_bar_visibility(self, visible: bool):
@@ -90,5 +97,5 @@ class ScreenManager(App):
             self.menu_bar_widget.disabled = not visible
             self.menu_bar_widget.height = dp(50) if visible else 0 
             self.menu_bar_widget.size_hint_y = None if visible else 0 
-            if self.root:
-                self.root.do_layout()
+            if self.menu_bar_widget.parent:
+                self.menu_bar_widget.parent.do_layout()

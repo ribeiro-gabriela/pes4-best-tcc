@@ -2,8 +2,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.togglebutton import ToggleButton 
-from kivy.uix.textinput import TextInput 
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.textinput import TextInput
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.metrics import dp
 from kivy.graphics import Color, RoundedRectangle
@@ -46,7 +46,7 @@ class HeaderLabel(Label):
 class NormalLabel(Label):
     pass
 
-class WifiLabel(Label):
+class WiFiLabel(Label):
     pass
 
 class VerticalLayout(BoxLayout):
@@ -58,25 +58,25 @@ class WifiNetworkItem(BoxLayout):
     security_type = StringProperty('')
     connect_action = ObjectProperty(None)
 
-PRIMARY = (0.2, 0.6, 0.8, 1)
-SECONDARY = (0.3, 0.3, 0.3, 1)
-
-class SystemImageItem(ToggleButton): 
+class SystemImageItem(ToggleButton):
     image_name = StringProperty('')
-    is_compatible = BooleanProperty(False) 
-    on_selection = ObjectProperty(None) 
+    on_selection = ObjectProperty(None)
+    active = BooleanProperty(False) 
 
     def __init__(self, **kwargs):
+        _on_selection_callback = kwargs.pop('on_selection', None)
         super().__init__(**kwargs)
-        self.group = 'system_images' 
-        self.size_hint_y = None
-        self.height = dp(50)
-        self.background_normal = ''
-        self.background_down = '' 
-        self.color = (1,1,1,1) 
 
-    def on_state(self, instance, value):
-        super().on_state(instance, value) 
+        if _on_selection_callback:
+            self.on_selection = _on_selection_callback
+
+    def on_release(self):
+        was_active_before_super = self.active
+        super().on_release() 
+
+        if self.active == was_active_before_super:
+            self.active = not was_active_before_super
+        
         if self.on_selection:
             self.on_selection(self)
 
@@ -90,9 +90,9 @@ class HelpIconButton(ButtonBehavior, BoxLayout):
     source = StringProperty('')
     label_text = StringProperty('')
 
-class ImageListItem(BoxLayout): 
-    file_name = StringProperty('') 
-    delete_action = ObjectProperty(None) 
+class ImageListItem(BoxLayout):
+    file_name = StringProperty('')
+    delete_action = ObjectProperty(None)
 
-class DeleteButton(Button): 
+class DeleteButton(Button):
     pass

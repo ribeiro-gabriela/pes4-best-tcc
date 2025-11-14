@@ -1,6 +1,5 @@
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
-
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
@@ -53,8 +52,8 @@ class ConnectionScreen(Screen):
 
             if not real_networks:
                 self.available_networks_data = [
-                    {"ssid": "RM_2G_TestData", "info": {"security": "WPA2", "signal": -50}},
-                    {"ssid": "RM_5G_TestData", "info": {"security": "Open", "signal": -70}},
+                    {"ssid": "WiFi_TestData", "info": {"security": "WPA2", "signal": -50}},
+                    {"ssid": "TestWiFi", "info": {"security": "Open", "signal": -70}},
                     {"ssid": "WIFI_TEST_3", "info": {"security": "WPA", "signal": -65}},
                 ]
             else:
@@ -96,7 +95,7 @@ class ConnectionScreen(Screen):
             self.connectToWifi(network_name, None)
         else:
             content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
-            content.add_widget(Label(text=f"Senha para {network_name}:", size_hint_y=None, height='40dp'))
+            content.add_widget(Label(text=f"Password to {network_name}:", size_hint_y=None, height='40dp'))
 
             def on_enter_pressed(instance):
                 self._connect_with_password(network_name, instance.text, popup)

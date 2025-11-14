@@ -71,7 +71,6 @@ class WifiModule:
                 )
                 for line in out.splitlines():
                     s = line.strip()
-                    # Ex.: "SSID                   : RM_2G"
                     if s.lower().startswith("ssid") and ":" in s:
                         _, val = s.split(":", 1)
                         ssid = val.strip()

@@ -9,11 +9,14 @@
 #:set ACCENT_COLOR [0.9, 0.5, 0.1, 1]
 #:set BACKGROUND_COLOR [0.95, 0.95, 0.95, 1]
 #:set TEXT_COLOR [0.9, 0.9, 0.9, 1]
-#:set TEXT_COLOR_DARK [0.2, 0.2, 0.2, 1]
+#:set TEXT_NORMAL [0.2, 0.2, 0.2, 1]
 #:set SUCCESS_COLOR [0.2, 0.7, 0.3, 1]
 #:set MENU_BACKGROUND_COLOR [0.03, 0.12, 0.22, 1]
 #:set MENU_BUTTON_COLOR [0.05, 0.2, 0.33, 1]
 #:set ACCENT_COLOR_DELETE [0.8, 0.2, 0.2, 1]
+#:set ITEM_NORMAL_BG [0.8, 0.8, 0.8, 1]       
+#:set ITEM_SELECTED_BG [0.7, 0.85, 0.95, 1]    
+#:set ITEM_SELECTED_TEXT [0.1, 0.4, 0.7, 1]    
 
 # Font sizes
 
@@ -87,10 +90,18 @@
             radius: [dp(5),] 
 
 <SecondaryButton@Button>:
-    background_color: SECONDARY_COLOR
-    font_size: FONT_MEDIUM
-    size_hint_y: None
-    height: BUTTON_HEIGHT
+    background_color: [0.3, 0.3, 0.3, 1] 
+    color: [1,1,1,1] # Texto branco
+    font_size: FONT_NORMAL
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
 
 <NavButton@Button>:
     background_color: SECONDARY_COLOR
@@ -118,20 +129,20 @@
 
 <TitleLabel@Label>:
     font_size: FONT_LARGE
-    color: TEXT_COLOR_DARK
+    color: TEXT_NORMAL
     text_size: self.size
     halign: 'center'
 
 <NormalLabel@Label>:
     font_size: FONT_NORMAL
-    color: TEXT_COLOR_DARK
+    color: TEXT_NORMAL
     text_size: self.size
     halign: 'left'
 
 <HeaderLabel@Label>:
     font_size: FONT_NORMAL
     bold: True
-    color: TEXT_COLOR_DARK
+    color: TEXT_NORMAL
     size_hint_y: None
     height: HEADER_HEIGHT
     text_size: self.size
@@ -139,7 +150,7 @@
 
 <WiFiLabel@Label>:
     font_size: FONT_SMALL
-    color: TEXT_COLOR_DARK
+    color: TEXT_NORMAL
     halign: 'left'
     valign: 'middle'
     size_hint_y: None
@@ -213,7 +224,7 @@
             size_hint_x: 0.7
             halign: 'left'
             valign: 'middle'
-            color: [0.2,0.2,0.2,1] 
+            color: TEXT_NORMAL
         WiFiLabel: 
             text: f'({root.signal} dBm)' 
             halign: 'right'
@@ -293,101 +304,131 @@
                 valign: 'middle'
                 text_size: self.size
 
-<SystemImageItem>:
-    font_size: FONT_NORMAL
-    halign: 'left'
-    valign: 'middle'
-    padding: PADDING_SMALL
+<SystemImageItem@ToggleButton>:
+    group: 'system_image_selection'
+    size_hint_y: None
+    height: dp(35) 
+    background_normal: ''
+    background_down: ''
+    
     canvas.before:
         Color:
-            rgba: SECONDARY_COLOR if self.state == 'normal' else PRIMARY_COLOR 
+            rgba: ITEM_NORMAL_BG if self.state == 'normal' else ITEM_SELECTED_BG
         RoundedRectangle:
             pos: self.pos
             size: self.size
             radius: [dp(5),]
     
-    BoxLayout:
+    BoxLayout: 
         orientation: 'horizontal'
-        padding: dp(5)
+        size_hint: 1, 1 
+        pos: root.pos
+        size: root.size 
+        padding: SPACING_MEDIUM 
+        spacing: SPACING_SMALL 
         
         Label: 
             text: root.image_name
             font_size: FONT_NORMAL
-            color: TEXT_COLOR
+            color: TEXT_NORMAL if root.state == 'normal' else ITEM_SELECTED_TEXT
+            bold: True if root.state == 'down' else False
             halign: 'left'
             valign: 'middle'
-            text_size: self.size
-            size_hint_x: 0.7 
-
-        Label: 
-            text: 'Compatible' if root.is_compatible else 'Imcompatible'
-            font_size: FONT_SMALL
-            color: SUCCESS_COLOR if root.is_compatible else ACCENT_COLOR
-            halign: 'right'
-            valign: 'middle'
-            text_size: self.size
-            size_hint_x: 0.3 
+            text_size: self.width, self.height 
+            size_hint_x: 1 
 
 <PostConnectionScreen>:
     FloatLayout:
-        id: main_content
-        size_hint: 0.9, 0.9
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        
-        
-        CompactLayout:
-            orientation: 'vertical'
-            spacing: SPACING_MEDIUM
-            padding: PADDING_MEDIUM
+        ScreenLayout: 
+            size_hint: (0.8, 0.8)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
-            HorizontalLayout: 
-                size_hint_y: None
-                height: dp(60)
-                TitleLabel:
-                    text: 'BC Module Connected'
-                    font_size: FONT_MEDIUM
-                    color: PRIMARY_COLOR
-                SecondaryButton: 
-                    text: 'Logout'
-                    on_press: root.emit_logout_event()
-
-            HorizontalLayout: 
+            TitleLabel:
+                text: 'BC Module Connected'
                 size_hint_y: None
                 height: dp(40)
-                NormalLabel:
-                    text: f'Hardware PN: {root.hardware_pn}'
-                    halign: 'left'
-
-            NormalLabel:
-                text: 'System Image Compatible:'
-                size_hint_y: None
-                height: dp(30)
-                halign: 'left'
-
-            ScrollView: 
-                bar_width: dp(10)
-                do_scroll_x: False
-                BoxLayout:
-                    id: image_list_container 
-                    orientation: 'vertical'
-                    spacing: SPACING_SMALL
-                    size_hint_y: None
-                    height: self.minimum_height
+                valign: 'top'
 
             BoxLayout: 
                 orientation: 'horizontal'
                 size_hint_y: None
-                height: dp(60)
+                height: dp(50)
                 spacing: SPACING_MEDIUM
+                padding: SPACING_SMALL, 0, SPACING_SMALL, 0
 
-                PrimaryButton:
-                    text: 'Load selected image'
-                    on_press: root.load_selected_image()
-                    disabled: not root.selected_image_item or not root.selected_image_item.is_compatible
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.7
 
+                    Label:
+                        text: 'Hardware PN:'
+                        font_size: FONT_NORMAL
+                        color: TEXT_NORMAL
+                        halign: 'left'
+                        valign: 'top'
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1] + dp(5)
+                    
+                    Label:
+                        text: root.hardware_pn
+                        font_size: FONT_NORMAL
+                        color: TEXT_NORMAL
+                        halign: 'left'
+                        valign: 'top'
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1] + dp(5)
+                    
                 SecondaryButton:
                     text: 'Disconnect BC Module'
-                    on_press: root.request_disconnect_confirmation()
+                    size_hint: None, None
+                    on_release: root.request_disconnect_confirmation()
+                    size_hint_x: 0.3 
+                    size_hint_y: 1
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, None
+
+            Label:
+                text: ' System Image Compatible:'
+                font_size: FONT_SMALL
+                color: [0.4,0.4,0.4,1]
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+                size_hint_y: None
+                height: dp(30)
+            
+            Label: 
+                text: root.loading_message if not root.error_message and not root.ids.image_list_container.children else root.error_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] if not root.show_error_message else [0.8, 0.2, 0.2, 1] 
+                halign: 'center'
+                valign: 'middle'
+                size_hint_y: None
+                height: dp(40) if (root.show_error_message or not root.ids.image_list_container.children) else 0
+                opacity: 1 if (root.show_error_message or not root.ids.image_list_container.children) else 0
+
+            ScrollView:
+                bar_width: dp(10)
+                do_scroll_x: False
+                size_hint_y: 1
+                
+                BoxLayout:
+                    id: image_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_SMALL
+                    padding: SPACING_SMALL
+                    size_hint_y: None
+                    height: self.minimum_height
+
+            PrimaryButton: 
+                text: 'Load selected image'
+                size_hint_y: None
+                height: BUTTON_HEIGHT
+                disabled: not root.is_load_button_enabled 
+                on_release: root.load_selected_image()
 
 <LoginCard>:
     orientation: 'vertical'
@@ -546,7 +587,7 @@
     Label:
         text: root.file_name
         font_size: FONT_NORMAL
-        color: TEXT_COLOR_DARK
+        color: TEXT_NORMAL
         halign: 'left'
         valign: 'middle'
         text_size: self.size

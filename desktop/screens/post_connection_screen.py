@@ -9,7 +9,7 @@ from kivy.metrics import dp
 from kivy.clock import Clock
 
 from data.enums import ScreenName
-from screens.components import SystemImageItem, NormalLabel, HelpButton
+from screens.components import SystemImageItem, NormalLabel 
 from screens.actions import action_show_help
 from ui.event_router import emit_event, event_router
 from data.events import Event
@@ -21,12 +21,14 @@ class PostConnectionScreen(Screen):
     
     hardware_pn = StringProperty('N/A')
     
-    image_list_container: Optional[BoxLayout] = None
-    
     selected_image_item: Optional[SystemImageItem] = ObjectProperty(None, allownone=True)
+    is_load_button_enabled = BooleanProperty(False)
+
+    loading_message = StringProperty("Looking for information on Module BC...")
+    error_message = StringProperty("") 
+    show_error_message = BooleanProperty(False)
     
     def __init__(self, **kwargs):
-        
         super().__init__(**kwargs)
         self.name = ScreenName.POST_CONNECTION.value
         event_router.register_callback(self._handle_event)
@@ -34,73 +36,59 @@ class PostConnectionScreen(Screen):
 
     def _is_test_mode(self) -> bool:
         return str(self.hardware_pn).startswith("HW-PN-TEST")
-    
-    def on_kv_post(self, base_widget):
-        self.image_list_container = self.ids.get('image_list_container')
-        print("KV posted; PostConnectionScreen ids:", list(self.ids.keys()))
-        if not self.image_list_container:
-            print("ERROR: id 'image_list_container' is NOT in the <PostConnectionScreen> of the KV")
-
-    def _on_item_released(self, item):
-        if item.state == 'down':
-            self.selected_image_item = item
-            print(f"[UI] Selected: {item.image_name}")
-        else:
-            if self.selected_image_item is item:
-                self.selected_image_item = None
-            print(f"[UI] Deselected: {item.image_name}")
-
-
-    def _bind_kv_elements(self, instance, value):
-        if 'image_list_container' in self.ids and self.ids.image_list_container:
-            self.image_list_container = self.ids.image_list_container
-        else:
-            print("ERROR: BoxLayout with id 'image_list_container' not found in PostConnectionScreen KV.")
-
 
     def on_enter(self, *args):
         print("Entering PostConnectionScreen.")
         self.selected_image_item = None 
-        
-        if self.image_list_container:
-            self.image_list_container.clear_widgets()
-            self.image_list_container.add_widget(NormalLabel(text="Looking for information on Module BC...", size_hint_y=None, height=dp(30)))
+        self.is_load_button_enabled = False 
+        self.show_error_message = False 
+        self.error_message = ""
+
+        list_container = self.ids.image_list_container
+        if list_container:
+            list_container.clear_widgets()
 
         Clock.schedule_once(lambda dt: self._load_module_info_and_images(), 0)
         
     def _load_module_info_and_images(self):
+        list_container = self.ids.image_list_container 
+        self.error_message = ""
+        self.show_error_message = False
+
         if not self._service_facade:
             print("ServiceFacade not set in PostConnectionScreen. Cannot load module info.")
-            if self.image_list_container:
-                self.image_list_container.clear_widgets()
-                self.image_list_container.add_widget(NormalLabel(text="Services unavailable. Please reload the screen.", halign='center'))
+            if list_container:
+                list_container.clear_widgets()
+                self.error_message = "Services unavailable. Please reload the screen."
+                self.show_error_message = True
             return
 
         try:
             self.hardware_pn = self._service_facade.connection_service.getConnectionHardwarePN()
             print(f"Hardware PN received: {self.hardware_pn}")
 
-            self._load_compatible_images(use_test_data_on_error=self._is_test_mode())
+            self._load_compatible_images()
 
         except Exception as e:
             print(f"Error getting hardware PN or loading images: {e}")
-            if self.image_list_container:
-                self.image_list_container.clear_widgets()
-                self.image_list_container.add_widget(NormalLabel(text=f"Error retrieving information from the module.: {e}", halign='center'))
+            if list_container:
+                list_container.clear_widgets()
+            self.error_message = f"Error retrieving information from the module.: {e}"
+            self.show_error_message = True
             
             if self.hardware_pn == 'N/A' or not self.hardware_pn:
                 self.hardware_pn = "BCM_TEST_PN"
                 self._load_compatible_images(use_test_data_on_error=True)
 
     def _load_compatible_images(self, use_test_data_on_error: bool = False):
-        if not self.image_list_container:
+        list_container = self.ids.image_list_container
+        if not list_container:
             print("image_list_container not initialized.")
             return
 
-        self.image_list_container.clear_widgets()
-        self.image_list_container.add_widget(
-            NormalLabel(text="Searching for compatible images...", size_hint_y=None, height=dp(30))
-        )
+        list_container.clear_widgets()
+        self.error_message = ""
+        self.show_error_message = False
 
         try:
             # [BST-314] 
@@ -134,55 +122,53 @@ class PostConnectionScreen(Screen):
                 using_test_data = True
 
 
-            self.image_list_container.clear_widgets() 
+            list_container.clear_widgets() 
 
             if using_test_data:
-                self.image_list_container.add_widget(NormalLabel(text="(Test Data)", halign='center'))
-                self.image_list_container.add_widget(Label(size_hint_y=None, height=dp(5)))
+                list_container.add_widget(NormalLabel(text="(Test Data)", halign='center'))
+                list_container.add_widget(Label(size_hint_y=None, height=dp(5)))
 
             if not self._all_images_data:
-                self.image_list_container.add_widget(
-                    NormalLabel(text="No compatible images found.", halign='center')
-                )
+                self.error_message = "No compatible images found."
+                self.show_error_message = True
                 return
 
             compatible_items = [d for d in self._all_images_data if d.get('compatible')]
 
             if not compatible_items:
-                self.image_list_container.add_widget(
-                    NormalLabel(text="No compatible images found.", halign='center')
-                )
+                self.error_message = "No compatible images found."
+                self.show_error_message = True
+
             else:
                 for img_data in compatible_items:
                     item = SystemImageItem(
                         image_name=img_data['name'],
-                        is_compatible=True,
                         on_selection=self.on_image_item_selected
                     )
-                    item.allow_no_selection = True
-                    item.bind(on_release=self._on_item_released)
-                    self.image_list_container.add_widget(item)
+                    list_container.add_widget(item)
 
 
         except Exception as e:
             print(f"Error loading compatible images: {e}")
-            self.image_list_container.clear_widgets()
-            self.image_list_container.add_widget(
-                NormalLabel(text=f"Error loading images: {e}", halign='center')
-            )
+            list_container.clear_widgets()
+            self.error_message = f"Error loading images: {e}"
+            self.show_error_message = True
 
+    def on_image_item_selected(self, clicked_item: SystemImageItem):
+        list_container = self.ids.image_list_container
+        for child in list_container.children:
+            if isinstance(child, SystemImageItem) and child is not clicked_item and child.active:
+                child.active = False
 
-    def on_image_item_selected(self, selected_item: SystemImageItem):
-        if selected_item.state == 'down': 
-            self.selected_image_item = selected_item
-            print(f"Selected image: {self.selected_image_item.image_name}, Compatible: {self.selected_image_item.is_compatible}")
-        else: 
-            if self.selected_image_item == selected_item: 
-                self.selected_image_item = None
-                print("Image deselected.")
-
+        if clicked_item.active:
+            self.selected_image_item = clicked_item
+            self.is_load_button_enabled = True
+        else:
+            self.selected_image_item = None
+            self.is_load_button_enabled = False
+            
     def load_selected_image(self):
-        if self.selected_image_item and self.selected_image_item.is_compatible:
+        if self.selected_image_item:
             image_name_to_load = self.selected_image_item.image_name
             print(f"Attempting to load image: {image_name_to_load}")
             
@@ -208,7 +194,7 @@ class PostConnectionScreen(Screen):
                 self._show_error_popup("It was not possible to prepare the file for transfer.")
         else:
             print("No compatible image selected to load or selected image is incompatible.")
-            self._show_error_popup("Please select a *compatible* image to upload..")
+            self._show_error_popup("Please select a compatible image to upload..")
 
     def request_disconnect_confirmation(self):
         print("Requesting disconnect confirmation...")
@@ -216,11 +202,11 @@ class PostConnectionScreen(Screen):
         content.add_widget(Label(text="Are you sure you want to disconnect from the BC Module?", halign='center', valign='middle', size_hint_y=None, height='40dp'))
         
         buttons = BoxLayout(size_hint_y=None, height='40dp', spacing='10dp')
-        btn_confirm = Button(text="Yes", background_color=(0.2, 0.7, 0.3, 1)) 
+        btn_confirm = Button(text="Yes") 
         btn_confirm.bind(on_release=lambda x: self._confirm_disconnect(popup))
         buttons.add_widget(btn_confirm)
         
-        btn_cancel = Button(text="No", background_color=(0.9, 0.5, 0.1, 1)) 
+        btn_cancel = Button(text="No") 
         btn_cancel.bind(on_release=lambda x: popup.dismiss())
         buttons.add_widget(btn_cancel)
         
@@ -255,6 +241,3 @@ class PostConnectionScreen(Screen):
 
     def _handle_event(self, event: Event) -> None:
         pass
-
-    def show_help(self):
-        action_show_help()()

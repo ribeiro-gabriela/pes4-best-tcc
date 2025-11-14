@@ -2,6 +2,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.metrics import dp
 from kivy.uix.image import Image
+from kivy.properties import ObjectProperty 
 
 from data.enums import ScreenName
 from screens.components import HorizontalLayout, MenuButton
@@ -10,6 +11,8 @@ from data.events import Event
 
 
 class TopMenuBar(BoxLayout):
+    connection_button = ObjectProperty(None)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'horizontal'
@@ -41,9 +44,9 @@ class TopMenuBar(BoxLayout):
         button_images.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.IMAGES.value}))
         left_buttons.add_widget(button_images)
 
-        button_connection = MenuButton(text=ScreenName.CONNECTION.name)
-        button_connection.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
-        left_buttons.add_widget(button_connection)
+        self.connection_button = MenuButton(text=ScreenName.CONNECTION.name)
+        self.connection_button.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
+        left_buttons.add_widget(self.connection_button)
 
         self.add_widget(left_buttons)
 
@@ -53,3 +56,9 @@ class TopMenuBar(BoxLayout):
         logout_button = MenuButton(text="Logout") 
         logout_button.on_press = lambda: emit_event(Event(Event.EventType.LOGOUT)) 
         self.add_widget(logout_button)
+
+    def set_connection_button_visibility(self, visible: bool):
+        if self.connection_button:
+            self.connection_button.opacity = 1 if visible else 0
+            self.connection_button.disabled = not visible
+            self.connection_button.width = dp(100) if visible else 0 
