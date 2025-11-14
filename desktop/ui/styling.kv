@@ -638,3 +638,86 @@
                 size_hint_y: None
                 height: BUTTON_HEIGHT
                 on_release: root.open_file_chooser()
+
+<FileTransferScreen>:
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.7, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            spacing: SPACING_LARGE 
+            padding: PADDING_LARGE 
+
+            TitleLabel:
+                text: 'TRANSFER STATUS'
+                size_hint_y: None
+                height: dp(40)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: dp(80) 
+                spacing: SPACING_SMALL
+                padding: dp(10), dp(0), dp(10), dp(0) 
+                
+                Label:
+                    id: selected_file_label
+                    text: root.selected_file_text 
+                    font_size: FONT_NORMAL
+                    color: TEXT_NORMAL
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, self.height
+                    size_hint_y: None
+                    height: dp(30)
+
+                Label:
+                    id: transfer_status_label
+                    text: root.transfer_status_text 
+                    font_size: FONT_NORMAL
+                    color: TEXT_NORMAL
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, self.height
+                    size_hint_y: None
+                    height: dp(30)
+            
+            ProgressBar:
+                id: progress_bar
+                value: root.progress_value 
+                max: 100
+                size_hint_y: None
+                height: dp(10)
+            
+            Label:
+                id: progress_label
+                text: root.progress_text 
+                font_size: FONT_NORMAL
+                color: TEXT_NORMAL
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+                size_hint_y: None
+                height: dp(40)
+            
+            BoxLayout:
+                size_hint_y: 1 
+
+            SecondaryButton:
+                id: btn_cancel_transfer
+                text: 'Cancel Transfer'
+                on_release: root.cancel_transfer() 
+                disabled: not root.transfer_in_progress 
+                size_hint_y: None
+                height: BUTTON_HEIGHT * 0.8 
+
+            PrimaryButton:
+                id: btn_back
+                text: 'Return to Post-Connection'
+                on_release: root.go_to_post_connection() 
+                opacity: 1 if not root.transfer_in_progress and root.transfer_started else 0
+                disabled: root.transfer_in_progress 
+                size_hint_y: None
+                height: BUTTON_HEIGHT * 0.8 if not root.transfer_in_progress and root.transfer_started else 0 

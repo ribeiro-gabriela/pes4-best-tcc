@@ -48,6 +48,11 @@ class TopMenuBar(BoxLayout):
         self.connection_button.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
         left_buttons.add_widget(self.connection_button)
 
+        #RETIRAR AO SAIR DO MODO DE TESTE
+        button_transfer = MenuButton(text=ScreenName.FILE_TRANSFER.name)
+        button_transfer.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.FILE_TRANSFER.value}))
+        left_buttons.add_widget(button_transfer)
+
         self.add_widget(left_buttons)
 
         spacer = Label()

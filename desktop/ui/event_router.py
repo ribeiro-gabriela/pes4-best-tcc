@@ -14,6 +14,10 @@ class EventRouter:
     def register_callback(self, callback: Callable[[Event], None]):
         self.__callbacks.append(callback)
 
+    def unregister_callback(self, callback: Callable[[Event], None]):
+        if callback in self.__callbacks:
+            self.__callbacks.remove(callback)
+
 event_router = EventRouter()
 
 def emit_event(event: Event)->None:

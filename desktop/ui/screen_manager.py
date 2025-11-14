@@ -83,7 +83,9 @@ class ScreenManager(App):
         assert self.navigator is not None
 
         is_login_screen = (screen_name == ScreenName.LOGIN.value)
-        self.toggle_menu_bar_visibility(not is_login_screen)
+        is_file_transfer_screen = (screen_name == ScreenName.FILE_TRANSFER.value)
+        no_menu_screen = is_login_screen or is_file_transfer_screen
+        self.toggle_menu_bar_visibility(not no_menu_screen) 
 
         is_post_connection_screen = (screen_name == ScreenName.POST_CONNECTION.value)
         if self.menu_bar_widget and self.menu_bar_widget.connection_button:
