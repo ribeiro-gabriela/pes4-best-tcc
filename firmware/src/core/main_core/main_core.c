@@ -91,6 +91,7 @@ void* stateTransitionHandler()
 
     int verificationHash = 0;
     int verificationPN = 0;
+    int verificationFormat = 0;
 
     while (1)
     {
@@ -177,7 +178,8 @@ void* stateTransitionHandler()
                 }
             }
             else if (receivedMessage.eventID == SEC_IMG_HASH_OK ||
-                     receivedMessage.eventID == SEC_IMG_PN_OK)
+                     receivedMessage.eventID == SEC_IMG_PN_OK ||
+                     receivedMessage.eventID == SEC_IMG_FORMAT_OK)
             {
                 if (receivedMessage.eventID == SEC_IMG_HASH_OK && verificationHash == 0)
                 {
@@ -187,8 +189,12 @@ void* stateTransitionHandler()
                 {
                     verificationPN = 1;
                 }
+                else if (receivedMessage.eventID == SEC_IMG_FORMAT_OK && verificationFormat == 0)
+                {
+                    verificationFormat = 1;
+                }
 
-                if (verificationHash == 1 && verificationPN == 1)
+                if (verificationHash == 1 && verificationPN == 1 && verificationFormat == 1)
                 {
                     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                         getConnState() == IMG_VERIFICATION)
@@ -201,6 +207,24 @@ void* stateTransitionHandler()
 
                     verificationHash = 0;
                     verificationPN = 0;
+                    verificationFormat = 0;
+                }
+            }
+            else if (receivedMessage.eventID == SEC_ERR_IMG_HASH_MISMATCH ||
+                     receivedMessage.eventID == SEC_ERR_IMG_PN_MISMATCH ||
+                     receivedMessage.eventID == SEC_ERR_IMG_BAD_FORMAT)
+            {
+                // Reset verification flags on any error
+                verificationHash = 0;
+                verificationPN = 0;
+                verificationFormat = 0;
+
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                    getConnState() == IMG_VERIFICATION)
+                {
+                    setConnState(RECEIVING_PKTS);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGE("Main Core", "Image verification failed");
                 }
             }
         }
