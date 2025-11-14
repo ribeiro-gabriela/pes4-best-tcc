@@ -721,3 +721,40 @@
                 disabled: root.transfer_in_progress 
                 size_hint_y: None
                 height: BUTTON_HEIGHT * 0.8 if not root.transfer_in_progress and root.transfer_started else 0 
+
+<ErrorScreen>:
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.8, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            spacing: SPACING_LARGE 
+            padding: PADDING_LARGE 
+            
+            TitleLabel:
+                text: 'An error occurred!'
+                color: [1, 0, 0, 1] 
+                size_hint_y: None
+                height: dp(40)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+
+            Label: 
+                id: error_message_label
+                text: root.error_message 
+                font_size: FONT_NORMAL 
+                color: [0.9, 0.2, 0.2, 1] 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width * 0.9, None 
+                size_hint_y: None
+                height: self.texture_size[1] + dp(20) 
+            
+            BoxLayout: 
+                size_hint_y: 1
+
+            PrimaryButton:
+                text: 'Dismiss'
+                on_release: root.dismiss_error() 
+                size_hint_y: None
+                height: BUTTON_HEIGHT 
