@@ -79,6 +79,7 @@ void deinitMaintenanceMode()
 
 void* stateTransitionHandler()
 {
+    // Verificar se a fila tem o tamanho correto, podemos reduzir o tamanho da fila se necessário
     BCQueue = xQueueCreate(10, sizeof(QueueMessage_t));
     if (BCQueue == NULL)
     {
