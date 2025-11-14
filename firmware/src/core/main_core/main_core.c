@@ -89,6 +89,9 @@ void* stateTransitionHandler()
     vQueueAddToRegistry(BCQueue, "BCQueue");
     QueueMessage_t receivedMessage;
 
+    int verificationHash = 0;
+    int verificationPN = 0;
+
     while (1)
     {
         if (xQueueReceive(BCQueue, &receivedMessage, 100 / portTICK_PERIOD_MS) == pdPASS)
@@ -163,7 +166,7 @@ void* stateTransitionHandler()
                     ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
                 }
             }
-            else if (receivedMessage.eventID == SEC_IMG_FORMAT_OK)
+            else if (receivedMessage.eventID == COMM_TRANSFER_COMPLETE)
             {
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == RECEIVING_PKTS)
@@ -173,20 +176,34 @@ void* stateTransitionHandler()
                     ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
                 }
             }
-            else if (receivedMessage.eventID == SEC_IMG_HASH_OK &&
+            else if (receivedMessage.eventID == SEC_IMG_HASH_OK ||
                      receivedMessage.eventID == SEC_IMG_PN_OK)
             {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                    getConnState() == IMG_VERIFICATION)
+                if (receivedMessage.eventID == SEC_IMG_HASH_OK && verificationHash == 0)
                 {
-                    setMntState(WAITING_AUTHORIZATION);
-                    setConnState(NOT_SET_CONN);
-                    printf("Log Message: %s\n", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "Image verification successful, Conn State reset to NOT_SET_CONN");
+                    verificationHash = 1;
+                }
+                else if (receivedMessage.eventID == SEC_IMG_PN_OK && verificationPN == 0)
+                {
+                    verificationPN = 1;
+                }
+
+                if (verificationHash == 1 && verificationPN == 1)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+                        getConnState() == IMG_VERIFICATION)
+                    {
+                        setMntState(WAITING_AUTHORIZATION);
+                        setConnState(NOT_SET_CONN);
+                        printf("Log Message: %s\n", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "Image verification successful, Conn State reset to NOT_SET_CONN");
+                    }
+
+                    verificationHash = 0;
+                    verificationPN = 0;
                 }
             }
         }
-        // Lógica para tratar mensagens da fila e realizar transições de estado
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        //vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
