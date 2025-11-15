@@ -28,6 +28,7 @@ class LoginScreen(Screen):
 
     def _handle_event(self, event: Event) -> None:
         if event.type == Event.EventType.LOGIN_FAILURE:
+            # [BST-300]
             if self.manager and self.manager.current == self.name:
                 self.login_message = event.properties.get('message', 'Login failure')
                 if self.password_input:
@@ -74,4 +75,5 @@ class LoginScreen(Screen):
             self.login_message = "Please enter the password."
             return
 
+        # [BST-331]
         emit_event(Event(Event.EventType.LOGIN_ATTEMPT, properties={'username': username, 'password': password}))

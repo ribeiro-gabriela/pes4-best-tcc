@@ -17,6 +17,15 @@ from ui.event_router import emit_event, event_router
 from data.events import Event
 from typing import Optional, Dict, Any
 
+
+# [BST-332]
+def check_authentication(screen_instance, action: callable, *args, **kwargs):
+    service_facade = screen_instance._service_facade
+    if service_facade and service_facade.isAuthenticated():
+        action(*args, **kwargs)
+    else:
+        emit_event(Event(Event.EventType.LOGOUT))
+
 class ConnectionScreen(Screen):
     _service_facade: ServiceFacade = None
     
@@ -38,6 +47,7 @@ class ConnectionScreen(Screen):
             pass 
 
     def on_enter(self, *args):
+        # [BST-306]
         if self._service_facade:
             self.load_wifi_connections()
         else:
@@ -48,6 +58,7 @@ class ConnectionScreen(Screen):
         list_container.clear_widgets()
 
         if self._service_facade:
+            # [BST-306]
             real_networks = self._service_facade.getWifiConnections()
 
             if not real_networks:
@@ -59,6 +70,7 @@ class ConnectionScreen(Screen):
             else:
                 self.available_networks_data = real_networks
             
+            # [BST-309]
             self.available_networks_data.sort(key=lambda x: x["info"]["signal"], reverse=False)
 
             for conn_data in self.available_networks_data:
@@ -119,7 +131,11 @@ class ConnectionScreen(Screen):
 
     def _connect_with_password(self, network_name: str, password: str, popup: Popup):
         popup.dismiss()
-        self.connectToWifi(network_name, password)
+        self.on_connect_clicked(network_name, password)
+
+    def on_connect_clicked(self, network_name, password=None):
+        # [BST-332]
+        check_authentication(self, self.connectToWifi, network_name, password)
 
     def connectToWifi(self, network_name, password=None):
         print(f"Attempting to connect to: {network_name}")

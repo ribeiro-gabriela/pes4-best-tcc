@@ -8,12 +8,23 @@ from data.enums import ScreenName
 from screens.components import HorizontalLayout, MenuButton
 from ui.event_router import emit_event
 from data.events import Event
+from services.service_facade import ServiceFacade
 
+service_facade: ServiceFacade = None
+
+# [BST-332]
+"""def check_authentication(target_screen: str):
+    if service_facade and service_facade.isAuthenticated():
+        emit_event(Event(Event.EventType.NAVIGATE, properties={'target': target_screen}))
+    else:
+        emit_event(Event(Event.EventType.LOGOUT))"""
 
 class TopMenuBar(BoxLayout):
     connection_button = ObjectProperty(None)
+    button_images = ObjectProperty(None)
 
     def __init__(self, **kwargs):
+        # [BST-327]
         super().__init__(**kwargs)
         self.orientation = 'horizontal'
         self.size_hint_y = None
@@ -37,14 +48,23 @@ class TopMenuBar(BoxLayout):
         left_buttons = HorizontalLayout()
 
         button_home = MenuButton(text="HOME")
+        # [BST-332]
+        #button_home.on_press = lambda: check_authentication(ScreenName.MAIN.value)
+        #TROCAR A LINHA COMENTADA
         button_home.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
         left_buttons.add_widget(button_home)
 
-        button_images = MenuButton(text=ScreenName.IMAGES.name)
-        button_images.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.IMAGES.value}))
-        left_buttons.add_widget(button_images)
+        self.button_images = MenuButton(text="Manage Images")
+        # [BST-332]
+        #self.button_images.on_press = lambda: check_authentication(ScreenName.IMAGES.value)
+        #TROCAR A LINHA COMENTADA
+        self.button_images.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.IMAGES.value}))
+        left_buttons.add_widget(self.button_images)
 
-        self.connection_button = MenuButton(text=ScreenName.CONNECTION.name)
+        self.connection_button = MenuButton(text="Search BC Modules")
+        # [BST-332]
+        #self.connection_button.on_press = lambda: check_authentication(ScreenName.CONNECTION.value)
+        #TROCAR A LINHA COMENTADA
         self.connection_button.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
         left_buttons.add_widget(self.connection_button)
 
@@ -66,4 +86,10 @@ class TopMenuBar(BoxLayout):
         if self.connection_button:
             self.connection_button.opacity = 1 if visible else 0
             self.connection_button.disabled = not visible
-            self.connection_button.width = dp(100) if visible else 0 
+            self.connection_button.width = dp(130) if visible else 0 
+
+    def set_images_button_visibility(self, visible: bool):
+        if self.button_images:
+            self.button_images.opacity = 1 if visible else 0
+            self.button_images.disabled = not visible
+            self.button_images.width = dp(130) if visible else 0 

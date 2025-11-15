@@ -1,5 +1,6 @@
 #:kivy 2.0.0
 
+# [BST - 330]
 # ----- STYLING CONSTANTS -----
 
 # Color definitions (RGBA values)
@@ -31,7 +32,7 @@
 #:set BUTTON_HEIGHT 60
 #:set TABLE_ROW_HEIGHT 60
 #:set HEADER_HEIGHT 40
-#:set MENU_BUTTON_WIDTH 100
+#:set MENU_BUTTON_WIDTH 130
 #:set NAV_BUTTON_WIDTH 200
 
 # Spacing values
@@ -242,6 +243,7 @@
         font_size: FONT_SMALL
     ConnectButton:
         text: 'Connect' 
+        # [BST-310]
         on_press: root.connect_action()
         size_hint_y: None
         height: dp(40)
@@ -379,11 +381,13 @@
                         text_size: self.width, None
                         size_hint_y: None
                         height: self.texture_size[1] + dp(5)
-                    
+
+                # [BST-312]    
                 SecondaryButton:
                     text: 'Disconnect BC Module'
                     size_hint: None, None
-                    on_release: root.request_disconnect_confirmation()
+                    # [BST-315]
+                    on_release: root.on_disconnect_clicked()
                     size_hint_x: 0.3 
                     size_hint_y: 1
                     halign: 'center'
@@ -428,7 +432,7 @@
                 size_hint_y: None
                 height: BUTTON_HEIGHT
                 disabled: not root.is_load_button_enabled 
-                on_release: root.load_selected_image()
+                on_release: root.load_image_clicked()
 
 <LoginCard>:
     orientation: 'vertical'
@@ -543,15 +547,17 @@
                 height: self.minimum_height 
 
                 PrimaryButton:
-                    text: 'Go to Images'
+                    text: 'Manage Images'
                     size_hint_y: None
                     height: BUTTON_HEIGHT * 0.8 
+                    # [BST-304]
                     on_release: root.emit_navigate_to_images() 
 
                 PrimaryButton:
-                    text: 'Go to Connections'
+                    text: 'Search BC Modules'
                     size_hint_y: None
                     height: BUTTON_HEIGHT * 0.8
+                    # [BST-305]
                     on_release: root.emit_navigate_to_connections()
 
 <DeleteButton@Button>:
@@ -662,6 +668,7 @@
                 spacing: SPACING_SMALL
                 padding: dp(10), dp(0), dp(10), dp(0) 
                 
+                # [BST-323]
                 Label:
                     id: selected_file_label
                     text: root.selected_file_text 
@@ -684,6 +691,7 @@
                     size_hint_y: None
                     height: dp(30)
             
+            # [BST-325]
             ProgressBar:
                 id: progress_bar
                 value: root.progress_value 
@@ -716,7 +724,7 @@
             PrimaryButton:
                 id: btn_back
                 text: 'Return to Post-Connection'
-                on_release: root.go_to_post_connection() 
+                on_release: root.return_clicked()
                 opacity: 1 if not root.transfer_in_progress and root.transfer_started else 0
                 disabled: root.transfer_in_progress 
                 size_hint_y: None

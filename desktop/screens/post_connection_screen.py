@@ -16,6 +16,15 @@ from data.events import Event
 from services.service_facade import ServiceFacade 
 from typing import Optional, Dict, Any, List
 
+
+# [BST-332]
+def check_authentication(screen_instance, action: callable, *args, **kwargs):
+    service_facade = screen_instance._service_facade
+    if service_facade and service_facade.isAuthenticated():
+        action(*args, **kwargs)
+    else:
+        emit_event(Event(Event.EventType.LOGOUT))
+
 class PostConnectionScreen(Screen):
     _service_facade: ServiceFacade = None 
     
@@ -38,7 +47,6 @@ class PostConnectionScreen(Screen):
         return str(self.hardware_pn).startswith("HW-PN-TEST")
 
     def on_enter(self, *args):
-        print("Entering PostConnectionScreen.")
         self.selected_image_item = None 
         self.is_load_button_enabled = False 
         self.show_error_message = False 
@@ -48,6 +56,7 @@ class PostConnectionScreen(Screen):
         if list_container:
             list_container.clear_widgets()
 
+        # [BST-313]
         Clock.schedule_once(lambda dt: self._load_module_info_and_images(), 0)
         
     def _load_module_info_and_images(self):
@@ -64,9 +73,10 @@ class PostConnectionScreen(Screen):
             return
 
         try:
+            # [BST-313]
             self.hardware_pn = self._service_facade.connection_service.getConnectionHardwarePN()
             print(f"Hardware PN received: {self.hardware_pn}")
-
+            # [BST-314]
             self._load_compatible_images()
 
         except Exception as e:
@@ -166,7 +176,11 @@ class PostConnectionScreen(Screen):
         else:
             self.selected_image_item = None
             self.is_load_button_enabled = False
-            
+
+    def load_image_clicked(self):
+        # [BST-332]
+        check_authentication(self, self.load_selected_image)
+
     def load_selected_image(self):
         if self.selected_image_item:
             image_name_to_load = self.selected_image_item.image_name
@@ -180,6 +194,7 @@ class PostConnectionScreen(Screen):
             
             if selected_record:
                 try:
+                    # [BST-318]
                     emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.FILE_TRANSFER.value}))
                     
                     emit_event(Event(Event.EventType.LOAD_IMAGE_REQUESTED, properties={
@@ -188,19 +203,23 @@ class PostConnectionScreen(Screen):
                     }))
                     
                 except Exception as e:
-                    print(f"Error preparing file for transfer: {e}")
-                    self._show_error_popup(f"Error preparing file for transfer: {e}")
+                    emit_event(Event(Event.EventType.ERROR, error=e, properties={"message": f"Error preparing file for transfer: {e}"}))
             else:
-                self._show_error_popup("It was not possible to prepare the file for transfer.")
+                emit_event(Event(Event.EventType.ERROR, error=Exception("It was not possible to prepare the file for transfer.")))
         else:
             print("No compatible image selected to load or selected image is incompatible.")
             self._show_error_popup("Please select a compatible image to upload..")
 
+    def on_disconnect_clicked(self):
+        # [BST-332]
+        check_authentication(self, self.request_disconnect_confirmation)
+
     def request_disconnect_confirmation(self):
-        print("Requesting disconnect confirmation...")
+        # [BST-315]
         content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
         content.add_widget(Label(text="Are you sure you want to disconnect from the BC Module?", halign='center', valign='middle', size_hint_y=None, height='40dp'))
         
+        # [BST-316]
         buttons = BoxLayout(size_hint_y=None, height='40dp', spacing='10dp')
         btn_confirm = Button(text="Yes") 
         btn_confirm.bind(on_release=lambda x: self._confirm_disconnect(popup))
@@ -217,11 +236,10 @@ class PostConnectionScreen(Screen):
 
     def _confirm_disconnect(self, popup: Popup):
         popup.dismiss()
-        print("Disconnect confirmed. Disconnecting from Módulo BC...")
         if self._service_facade:
             try:
                 self._service_facade.connection_service.disconnect()
-                print("Disconnected successfully. Navigating to Main screen.")
+                # [BST-317]
                 emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
             except Exception as e:
                 print(f"Error during disconnection: {e}")

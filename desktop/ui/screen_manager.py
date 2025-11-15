@@ -25,6 +25,7 @@ class ScreenManager(App):
     help_button_widget: HelpIconButton = ObjectProperty(None)
 
     def build(self):
+        # [BST - 330]
         logging.getLogger('pywifi').setLevel(logging.WARNING) 
 
         if path_to_dat.exists():
@@ -44,6 +45,7 @@ class ScreenManager(App):
         )
         root_float_layout.add_widget(background_image)
 
+        # [BST-327]
         self.menu_bar_widget = TopMenuBar()
         self.menu_bar_widget.size_hint = (1, None) 
         self.menu_bar_widget.height = dp(50)
@@ -59,6 +61,8 @@ class ScreenManager(App):
         navigator_container.add_widget(self.navigator.screen_manager)
         root_float_layout.add_widget(navigator_container)
 
+        # [BST-328]
+        # [BST-326]
         self.help_button_widget = HelpIconButton(
             source='./uploads/help.png', 
             label_text='Help'
@@ -66,6 +70,7 @@ class ScreenManager(App):
         self.help_button_widget.size_hint = (None, None)
         self.help_button_widget.size = (dp(60), dp(80))
         self.help_button_widget.pos_hint = {'right': 0.98, 'bottom': 0.02}
+        # [BST-329]
         self.help_button_widget.bind(on_release=lambda x: action_show_help())
         root_float_layout.add_widget(self.help_button_widget)
 
@@ -88,8 +93,14 @@ class ScreenManager(App):
         self.toggle_menu_bar_visibility(not no_menu_screen) 
 
         is_post_connection_screen = (screen_name == ScreenName.POST_CONNECTION.value)
+        is_images_screen = (screen_name == ScreenName.IMAGES.value)
+        no_connection_button = is_post_connection_screen or is_images_screen
         if self.menu_bar_widget and self.menu_bar_widget.connection_button:
-            self.menu_bar_widget.set_connection_button_visibility(not is_post_connection_screen)
+            self.menu_bar_widget.set_connection_button_visibility(not no_connection_button)
+
+        is_connection_screen = (screen_name == ScreenName.CONNECTION.value)
+        if self.menu_bar_widget and self.menu_bar_widget.button_images:
+            self.menu_bar_widget.set_images_button_visibility(not is_connection_screen)
 
         self.navigator.navigate_to(screen_name)
 
