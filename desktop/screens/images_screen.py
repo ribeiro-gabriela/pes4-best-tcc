@@ -1,111 +1,140 @@
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty
 from kivy.uix.filechooser import FileChooserListView
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+from kivy.metrics import dp
 import shutil
 import os
 import platform
 
 from data.enums import ScreenName
-from screens.actions import action_go_to_screen
-from screens.components import ScreenLayout, TitleLabel, PrimaryButton, SecondaryButton
+from data.classes import File, FileRecord
+from screens.components import ImageListItem
+from data.events import Event
+from services.service_facade import ServiceFacade
+from ui.event_router import emit_event
 
-UPLOAD_DIR = "uploads"
+
+UPLOAD_DIR = "uploaded_files"
+
+# [BST-332]
+def check_authentication(screen_instance, action: callable, *args, **kwargs):
+    service_facade = screen_instance._service_facade
+    if service_facade and service_facade.isAuthenticated():
+        action(*args, **kwargs)
+    else:
+        emit_event(Event(Event.EventType.LOGOUT))
 
 class ImagesScreen(Screen):
-    def __init__(self):
-        super().__init__()
+    _service_facade: ServiceFacade = None
+    image_files = ListProperty([]) 
+    empty_list_message = StringProperty("No files saved.")
+    show_empty_message = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.name = ScreenName.IMAGES.value
 
+    def on_enter(self, *args):
+        print("Entered Images Screen. Loading files...")
+        self.load_image_files()
+
+    def load_image_files(self):
+        # SIMULAÇÃO APENAS
         if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR)
+            os.makedirs(UPLOAD_DIR) 
 
-        self.layout = ScreenLayout(orientation='vertical')
-        self.layout.add_widget(TitleLabel(text=f'{self.name} screen'))
+        current_files = []
+        for file_name in os.listdir(UPLOAD_DIR):
+            full_path = os.path.join(UPLOAD_DIR, file_name)
+            if os.path.isfile(full_path):
+                current_files.append({'name': file_name, 'path': full_path})
 
-        btn_back = SecondaryButton(text=f'Back to {ScreenName.MAIN.value}')
-        btn_back.on_press = action_go_to_screen(ScreenName.MAIN)
-        self.layout.add_widget(btn_back)
+        # [BST-307]
+        #current_files: List[FileRecord] = self._service_facade.listImportedFiles()
+        
+        self.image_files = current_files
 
-        btn_upload = PrimaryButton(text='Upload')
-        btn_upload.bind(on_press=self.open_file_chooser) # pyright: ignore[reportAttributeAccessIssue]
-        self.layout.add_widget(btn_upload)
+        list_container = self.ids.image_list_container 
+        list_container.clear_widgets() 
 
-        # Lista de arquivos
-        self.files_box = BoxLayout(orientation='vertical', size_hint_y=None)
-        self.files_box.bind(minimum_height=self.files_box.setter('height')) # pyright: ignore[reportAttributeAccessIssue]
-        scroll = ScrollView()
-        scroll.add_widget(self.files_box)
-        self.layout.add_widget(scroll)
+        if not self.image_files:
+            self.show_empty_message = True
+        else:
+            self.show_empty_message = False
+            for img_file in self.image_files:
+                item = ImageListItem(
+                    file_name=img_file['name'],
+                    delete_action=self.delete_file 
+                    #SIMULAÇÃO, TROCAR A LINHA COMENTADA
+                    # delete_action=lambda pn=img_file.softwarePN: self.on_delete_clicked(pn)
+                )
+                list_container.add_widget(item)
 
-        self.refresh_file_list()
-        self.add_widget(self.layout)
+        print(f"Loaded {len(self.image_files)} image files.")
 
-    def open_file_chooser(self, instance):
-        # Detecta SO e escolhe ponto inicial
+    def open_file_chooser(self):
+        # [BST-308]
         if platform.system() == "Windows":
             start_path = "C:\\"
         else:
-            start_path = os.path.expanduser("~")  # macOS/Linux
+            start_path = os.path.expanduser("~") 
 
         chooser = FileChooserListView(path=start_path, filters=['*.*'])
 
-        # Botão Voltar pasta
-        btn_back_folder = Button(text="Voltar", size_hint_y=None, height=40)
-        btn_back_folder.bind(on_press=lambda btn: self.go_back_folder(chooser)) # pyright: ignore[reportAttributeAccessIssue]
+        btn_back_folder = Button(text="Return", size_hint_y=None, height=40)
+        btn_back_folder.bind(on_press=lambda btn: self.go_back_folder(chooser)) 
 
-        # Botão Upload
         btn_upload_file = Button(text="Upload", size_hint_y=None, height=40)
-        btn_upload_file.bind(on_press=lambda btn: self.on_upload_clicked(chooser)) # pyright: ignore[reportAttributeAccessIssue]
+        btn_upload_file.bind(on_press=lambda btn: self.on_upload_clicked(chooser)) 
 
-        # Layout para botões
         btn_row = BoxLayout(size_hint_y=None, height=40)
         btn_row.add_widget(btn_back_folder)
         btn_row.add_widget(btn_upload_file)
 
-        # Layout principal
         layout = BoxLayout(orientation="vertical")
         layout.add_widget(chooser)
         layout.add_widget(btn_row)
 
         popup = Popup(title="Select a file", content=layout, size_hint=(0.9, 0.9))
-        self._file_popup = popup  # guardar para fechar depois
-        self._file_chooser = chooser  # guardar para usar no upload
+        self._file_popup = popup  
+        self._file_chooser = chooser 
         popup.open()
 
     def go_back_folder(self, chooser):
-        """Volta para a pasta anterior no FileChooser."""
         parent_dir = os.path.dirname(chooser.path)
         if os.path.exists(parent_dir) and parent_dir != chooser.path:
             chooser.path = parent_dir
 
     def on_upload_clicked(self, chooser):
-        """Confirma upload do arquivo selecionado."""
         if chooser.selection:
-            self.save_file(chooser.selection[0])
+            # [BST-332]
+            check_authentication(self, self.save_file, chooser.selection[0])
         if hasattr(self, "_file_popup"):
             self._file_popup.dismiss()
 
     def save_file(self, file_path):
+        """file_name = os.path.basename(file_path)
+        file_object = File(path = file_path, fileName = file_name)
+        # [BST-333]
+        self._service_facade.importFile(file_object)
+        self.load_image_files()"""
+
+        # SIMULAÇÃO APENAS 
         filename = os.path.basename(file_path)
         dest_path = os.path.join(UPLOAD_DIR, filename)
         shutil.copy(file_path, dest_path)
-        self.refresh_file_list()
+        self.load_image_files()
 
-    def refresh_file_list(self):
-        self.files_box.clear_widgets()
-        for filename in os.listdir(UPLOAD_DIR):
-            file_row = BoxLayout(size_hint_y=None, height=40)
-            file_row.add_widget(Label(text=filename))
-            btn_delete = Button(text="Delete", size_hint_x=None, width=100)
-            btn_delete.bind(on_press=lambda inst, f=filename: self.delete_file(f)) # pyright: ignore[reportAttributeAccessIssue]
-            file_row.add_widget(btn_delete)
-            self.files_box.add_widget(file_row)
+    def on_delete_clicked(self, software_pn: str):
+        # [BST-332]
+        check_authentication(self, self.delete_file, software_pn)
 
     def delete_file(self, filename):
+        # SIMULAÇÃO APENAS
         os.remove(os.path.join(UPLOAD_DIR, filename))
-        self.refresh_file_list()
+        #self._service_facade.deleteImportedFile(software_pn)
+        self.load_image_files()

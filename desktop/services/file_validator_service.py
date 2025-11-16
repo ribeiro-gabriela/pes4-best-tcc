@@ -1,6 +1,5 @@
 import hashlib
 from typing import Dict
-
 from data.classes import File
 from services.logging_service import LoggingService
 
@@ -8,70 +7,41 @@ class FileValidatorService:
     def __init__(self):
         self.logging_service = LoggingService(FileValidatorService.__name__)
 
-    # --- Métodos de Simulação de Leitura de Seção (Mock) ---
-    # (Estes métodos simulam a leitura de seções 'HEADER', 'DATA' e 'TRAILING'
-    # de um formato de arquivo binário proprietário, conforme inferido
-    # pelos requisitos)
-
     def _read_header(self, file: File) -> Dict[str, str]:
-        """
-        Mock: Simula a leitura da seção 'HEADER'.
-        Lança IOError se o arquivo contiver 'read_error'.
-        """
-        if "read_error" in file.fileName:
-            raise IOError(f"Simulated read error for {file.fileName}")
+        with open(file.path, 'rb') as f:
+            # Ler somente o Header do arquivo
+            header = f.read(40)
+            
+            # Extrair somente o Software PN
+            sw_pn_bytes = header[0:20]
+            sw_pn = sw_pn_bytes.rstrip(b'\x00').decode('ascii')
+            
+            # Extrair somente o Hardware PN
+            hw_pn_bytes = header[20:40]
+            hw_pn = hw_pn_bytes.rstrip(b'\x00').decode('ascii')
+            
+        return {"sw_pn": sw_pn, "hw_pn": hw_pn}
+    
+    def _read_data_and_trailing(self, file: File) -> str:
+        with open(file.path, 'rb') as f:
+            # Lê o arquivo inteiro
+            file_content = f.read()
 
-        # [BST-269]
-        if "invalid_sw_pn" in file.fileName:
-            # (Simula um cabeçalho sem SW PN válido)
-            return {"hardwarePN": "HW123"}
+            # Extrai somente a parte dos dados, excluindo o Header e o SHA-256 hash
+            data = file_content[40:-32]   
 
-        # [BST-276]
-        if "mismatch_hw" in file.fileName:
-            # (Simula um cabeçalho com HW PN diferente)
-            return {"softwarePN": "SW-VALID", "hardwarePN": "HW_WRONG"}
-
-        # (Simula um cabeçalho válido)
-        return {"softwarePN": "SW-VALID", "hardwarePN": "HW123"}
-
-    def _read_data(self, file: File) -> bytes:
-        """
-        Mock: Simula a leitura da seção 'DATA'.
-        Lança IOError se o arquivo contiver 'read_error'.
-        """
-        if "read_error" in file.fileName:
-            raise IOError(f"Simulated read error for {file.fileName}")
-
-        # [BST-272]
-        if "invalid_hash" in file.fileName:
-            return b"data_payload_that_will_fail_hash_check"
-
-        return b"valid_data_payload_content"
-
-    def _read_trailing(self, file: File) -> str:
-        """
-        Mock: Simula a leitura da seção 'TRAILING' (Hash).
-        Lança IOError se o arquivo contiver 'read_error'.
-        """
-        if "read_error" in file.fileName:
-            raise IOError(f"Simulated read error for {file.fileName}")
-
-        # [BST-271]
-        if "invalid_hash" in file.fileName:
-            return "wrong_hash_value_abc123"
-
-        # (Retorna o hash correto para 'valid_data_payload_content')
-        return hashlib.sha256(b"valid_data_payload_content").hexdigest()
-
-    # --- Métodos de Verificação ---
+            # Extrai somente o SHA-256 hash
+            trailing = file_content[-32:].hex()
+            
+        return data, trailing
 
     def checkIdentification(self, file: File) -> bool:
         try:
             header = self._read_header(file)
+            sw_pn = header.get("sw_pn")
+            hw_pn = header.get("hw_pn")
 
             # [BST-269]
-            # (Verifica se a chave 'softwarePN' existe e tem um valor)
-            sw_pn = header.get("softwarePN")
             is_valid = sw_pn is not None and sw_pn != ""
 
             # [BST-280]
@@ -80,23 +50,18 @@ class FileValidatorService:
             )
 
             # [BST-269]
-            return is_valid
+            return sw_pn, hw_pn, is_valid
 
         except Exception as e:
-            # [BST-281]
             self.logging_service.error(
                 f"File read error during checkIdentification for {file.fileName}", e
             )
-            # [BST-281]
-            return False
+            return None, None, False
 
     def checkIntegrity(self, file: File) -> bool:
         try:
-            # [BST-271]
-            extracted_hash = self._read_trailing(file)
-
-            # [BST-272]
-            data_section = self._read_data(file)
+            # [BST-271, BST-272]
+            data_section, extracted_hash = self._read_data_and_trailing(file)
             calculated_hash = hashlib.sha256(data_section).hexdigest()
 
             # [BST-274]
@@ -108,15 +73,13 @@ class FileValidatorService:
             )
 
             # [BST-274]
-            return is_valid
+            return data_section, extracted_hash, is_valid
 
         except Exception as e:
-            # [BST-281]
             self.logging_service.error(
                 f"File read error during checkIntegrity for {file.fileName}", e
             )
-            # [BST-281]
-            return False
+            return None, None, False
 
     def checkCompatibility(self, file: File, hardwarePN: str) -> bool:
         try:
@@ -140,5 +103,4 @@ class FileValidatorService:
             self.logging_service.error(
                 f"File read error during checkCompatibility for {file.fileName}", e
             )
-            # [BST-281]
             return False

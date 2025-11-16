@@ -10,6 +10,7 @@ def action_go_to_screen(screen: ScreenName) -> Callable[[], None]:
 
     return lambda: emit_event(event)
 
+# [BST-329]
 def action_show_help() -> Callable[[], None]:
     return _show_help_callable
 

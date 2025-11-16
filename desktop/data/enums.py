@@ -9,6 +9,15 @@ class ScreenName(Enum):
     FILE_TRANSFER = "file_transfer"
     ERROR = "error"
 
+class AppState(Enum):
+    LOGIN = 'Login'
+    MAIN = 'Main'
+    CONNECTION = 'Connection'
+    IMAGES = 'Images'
+    POST_CONNECTION = 'PostConnection'
+    LOADING = 'Loading'
+    ERROR = 'Error'
+
 class ArincFileType(Enum):
     LUI='LUI'
     LUS='LUS'
