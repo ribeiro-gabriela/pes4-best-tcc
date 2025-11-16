@@ -1,29 +1,15 @@
-from ui.desktop_app import DesktopAppUi
+from pathlib import Path
+import sys
+from kivy.resources import resource_add_path, resource_find
 
-from custom_types.events import Event
-from services.event_emitter import register_callback
+BASE = Path(__file__).resolve().parent
+resource_add_path(str(BASE / "ui"))
 
-desktop_app = DesktopAppUi()
+print("KV encontrado?", resource_find("styling.kv"))
 
-def print_event(event :Event) -> None:
-    print(event)
+from ui.ui_manager import UiManager
 
-def route_navigation_event(event :Event) -> None:
-    if event.type != Event.EventType.NAVIGATE:
-        return
-    
-    if not event.properties:
-        raise Exception("Navigation error: missing target screen name on event properties")
-    
-    target = event.properties.get("target", "")
-
-    try:
-        desktop_app.navigate_to(target)
-    except Exception as e:
-        raise Exception("Navigation error") from e
-
-register_callback(print_event)
-register_callback(route_navigation_event)
+desktop_app = UiManager()
 
 if __name__ == '__main__':
     desktop_app.run()
