@@ -4,6 +4,7 @@ from pywifi import const
 import time
 import traceback
 import threading
+from tftpy import TftpClient
 
 import sys, subprocess, tempfile, os
 
@@ -11,6 +12,8 @@ from data.classes import Connection, Package, Request, Response
 from data.errors import RequestTimeoutError, ConnectionAuthenticationError
 
 class WifiModule:
+    _tftp_client: TftpClient | None = None
+
     def __init__(self):
         self.wifi = pywifi.PyWiFi()
         self.iface = self.wifi.interfaces()[0]  
@@ -224,11 +227,13 @@ class WifiModule:
                         ssid_ok = (self._current_ssid_windows() == target)
                     if ssid_ok:
                         print(f"Successfully connected to {target}.")
+                        
+                        self._tftp_client = TftpClient(target, 69)
                         return Connection(
                             device=target,
                             hardwarePN="HW-PN-REAL-WIFI",
-                            address="0.0.0.0",
-                            connectedAt=str(time.time()),
+                            address="192.168.1.1",
+                            connectedAt=int(time.time()),
                             pauseHealthCheck=False
                         )
                 time.sleep(0.5)
@@ -246,11 +251,13 @@ class WifiModule:
             ok = self._win_fallback_connect(iface_name, target, password, wpa2=wpa2)
             if ok:
                 print(f"Successfully connected to {target} (via NETSH fallback).")
+                        
+                self._tftp_client = TftpClient(target, 69)
                 return Connection(
                     device=target,
                     hardwarePN="HW-PN-REAL-WIFI",
-                    address="0.0.0.0",
-                    connectedAt=str(time.time()),
+                    address="192.168.1.1",
+                    connectedAt=int(time.time()),
                     pauseHealthCheck=False
                 )
 
@@ -264,13 +271,23 @@ class WifiModule:
         with self.lock:
             self.iface.disconnect()
 
-    def sendPackage(self, pkg: Package) -> None: 
-        print(f"Sending package (mock): {pkg.data}")
-        pass
     
-    def receivePackage(self) -> Package: 
-        print("Receiving package (mock)")
-        return Package(data="Mock received data") 
+    # [BST-226]
+    def sendPackage(self, pkg: Package) -> None:
+        if (self._tftp_client is None):
+            raise Exception("Not connected")
+        
+        self._tftp_client.upload(pkg.name, pkg.path, timeout=60, retries=3)
+    
+    # [BST-226]
+    def receivePackage(self, file_name: str) -> Package:
+        if (self._tftp_client is None):
+            raise Exception("Not connected")
+        
+        file_path = f'tmp/client/{int(time.time())}-{file_name}'
+        self._tftp_client.download(file_name, file_path, timeout=60, retries=3)
+
+        return Package(file_name, file_path)
     
     def sendRequest(self, req: Request, timeout: int) -> Response: 
         print(f"Sending request (mock): {req.command} with timeout {timeout}")
