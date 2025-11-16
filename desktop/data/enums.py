@@ -17,3 +17,7 @@ class AppState(Enum):
     POST_CONNECTION = 'PostConnection'
     LOADING = 'Loading'
     ERROR = 'Error'
+    
+class ArincTransferResult(Enum):
+    SUCCESS='success'
+    FAILED='failed'

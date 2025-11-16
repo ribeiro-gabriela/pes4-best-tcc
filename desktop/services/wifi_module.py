@@ -144,7 +144,7 @@ class WifiModule:
             time.sleep(0.5)
         return False
 
-    def connect(self, target: str, password: str = None) -> Connection:
+    def connect(self, target: str, password: str|None = None) -> Connection:
         print(f"Attempting to connect to {target}" + (f" with password: {'*' * len(password)}" if password else " (no password)"))
 
         with self.lock:

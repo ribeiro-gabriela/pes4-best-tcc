@@ -112,7 +112,7 @@ class ConnectionService:
                 consolidated_networks[ssid] = network
         return list(consolidated_networks.values())
 
-    def connect(self, target: str, password: str = None):
+    def connect(self, target: str, password: str|None = None):
         # [BST-224]
         self.logging_service.log("Attempting connection...")
         try:

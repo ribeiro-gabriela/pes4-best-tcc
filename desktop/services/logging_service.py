@@ -1,9 +1,7 @@
 import logging
 import sys
 
-# [BST-298]
-# [BST-296]
-# [BST-297]
+# [BST-296, BST-297, BST-298]
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 # [BST-298]
@@ -11,6 +9,7 @@ logging.basicConfig(
     level=logging.INFO,
     format=log_format,
     handlers=[logging.FileHandler("service.log"), logging.StreamHandler(sys.stdout)],
+    force=True
 )
 
 class LoggingService:
@@ -18,7 +17,6 @@ class LoggingService:
         # [BST-297]
         self.logger = logging.getLogger(service_name)
 
-    # [BST-294]
     def log(self, message: str) -> None:
         # [BST-294]
         self.logger.info(message)
