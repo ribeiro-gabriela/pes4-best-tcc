@@ -60,6 +60,9 @@ class ImportedFilesService:
         # [BST-256]
         search_pattern = os.path.join(self.storage_path, f"{softwarePN}-*.txt")
         found_files = glob.glob(search_pattern)
+
+        if not found_files:
+            raise FileAccessError("File not found")
         
         txt_path = found_files[0]
         

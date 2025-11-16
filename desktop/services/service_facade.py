@@ -4,8 +4,11 @@ from services.file_tranfer_service import FileTransferService
 from services.imported_files_service import ImportedFilesService
 from services.user_authentication_service import UserAuthenticationService
 from services.file_validator_service import FileValidatorService
-from services.wifi_module import get_wifi_connections
 from typing import List, Any
+
+from typing import List, Any, Tuple
+from data.errors import IdentificationError
+
 
 class ServiceFacade:
     def __init__(
@@ -22,9 +25,15 @@ class ServiceFacade:
         self.imported_files_service = imported_files_service
         self.file_validator_service = file_validator_service
 
-    def login(self, username: str, password: str) -> None:
+    def login(self, username: str, password: str) -> Tuple[bool, str]:
         # [BST-331]
-        return self.authentication_service.login(username, password)
+        try:
+            self.authentication_service.login(username, password)
+            return True, "Login successfully!"
+        except IdentificationError as e:
+            return False, str(e) 
+        except Exception as e:
+            return False, f"An unexpected error occurred during login: {e}"
 
     def isAuthenticated(self) -> bool:
         # [BST-332]
@@ -84,3 +93,9 @@ class ServiceFacade:
 
     def checkFileCompatibility(self, file: File, hardwarePN: str) -> bool:
         return self.file_validator_service.checkCompatibility(file, hardwarePN)
+    
+    def getWifiConnections(self) -> List[dict]: 
+        return self.connection_service.scan() 
+    
+    def connectToWifi(self, target: str, password: str|None = None) -> None: 
+        self.connection_service.connect(target, password)

@@ -2,8 +2,9 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 from services.logging_service import LoggingService
-from data.classes import Session
+from data.classes import Session, User
 from services.user_database_module import UserDatabase
+from data.errors import IdentificationError
 
 # [BST-288]
 INACTIVITY_TIMEOUT_MINUTES = 10
@@ -33,6 +34,7 @@ class UserAuthenticationService:
             self.logging_service.log(
                 f"Failed authentication attempt for user {username}."
             )
+            raise IdentificationError("Invalid username or password. Please try again.")
 
     def _check_inactivity(self) -> None:
         if self.currentSession:

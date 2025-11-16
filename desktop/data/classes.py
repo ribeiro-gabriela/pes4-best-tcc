@@ -4,8 +4,8 @@ import uuid
 
 @dataclass
 class User:
-    id: uuid.UUID
     username: str
+    password_hash: str
 
 @dataclass
 class Session:
@@ -44,8 +44,9 @@ class Package:
 
 @dataclass
 class Request:
-    pass
+    command: str
 
 @dataclass
 class Response:
-    pass
+    status: str
+    data: str

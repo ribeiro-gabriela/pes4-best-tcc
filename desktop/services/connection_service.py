@@ -7,11 +7,15 @@ from data.errors import ConnectionAuthenticationError, DisconnectedError, Reques
 from services.logging_service import LoggingService
 from services.wifi_module import WifiModule
 
+from ui.event_router import emit_event
+from data.events import Event
+from data.enums import AppState
 
 class ConnectionService:
-    def __init__(self, wifi_module: WifiModule):
+    def __init__(self, wifi_module: WifiModule, test_mode: bool = True):
         self.logging_service = LoggingService(ConnectionService.__name__)
         self.wifi_module = wifi_module
+        self.test_mode = test_mode  # Flag para modo de teste com hardware PN simulado
         
         # [BST-225]
         # [BST-219]
@@ -46,7 +50,7 @@ class ConnectionService:
             self.currentConnection = None
             
             # [BST-206]
-            self.ui_manager.emitEvent("Reconnection")
+            emit_event(Event(Event.EventType.RECONNECTION))
             
             retry_attempts = 3
             success = False
@@ -63,7 +67,7 @@ class ConnectionService:
 
             if success:
                 # [BST-205]
-                self.ui_manager.emitEvent("ReconnectionSuccess")
+                emit_event(Event(Event.EventType.RECONNECTION_SUCCESS))
                 self.logging_service.log("Reconnection successful.")
             else:
                 # [BST-207]
@@ -79,7 +83,7 @@ class ConnectionService:
             if self.currentConnection and not self.currentConnection.pauseHealthCheck:
                 try:
                     # [BST-210]
-                    self.sendRequest("HEALTH_CHECK")
+                    self.sendRequest(Request(command="HEALTH_CHECK"))
                 except (RequestTimeoutError, ConnectionError) as e:
                     # [BST-212]
                     self.logging_service.error("Health check failed, initiating retry...", e)
@@ -96,18 +100,24 @@ class ConnectionService:
             self._health_check_thread = threading.Thread(target=self._health_check_loop, daemon=True)
             self._health_check_thread.start()
 
-    def scan(self) -> List[str]:
+    def scan(self) -> List[dict]:
         # [BST-222]
-        networks = self.wifi_module.scan()
+        networks = self.wifi_module.scan() 
         # [BST-223]
-        return networks
+        consolidated_networks = {}
+        for network in networks:
+            ssid = network["ssid"]
+            signal = network["info"]["signal"]
+            if ssid not in consolidated_networks or signal > consolidated_networks[ssid]["info"]["signal"]:
+                consolidated_networks[ssid] = network
+        return list(consolidated_networks.values())
 
-    def connect(self,  target: str):
+    def connect(self, target: str, password: str|None = None):
         # [BST-224]
         self.logging_service.log("Attempting connection...")
         try:
-            # [BST-218]
-            connection_base = self.wifi_module.connect(target)
+            # [BST-218] 
+            connection_base = self.wifi_module.connect(target, password)
             
             # [BST-220]
             auth_success = self._perform_authentication(connection_base)
@@ -119,21 +129,40 @@ class ConnectionService:
             # [BST-219]
             self.currentConnection = connection_base
             
-            # [BST-215]
-            hardware_pn = self.sendRequest("GET_HARDWARE_PN")
+            # [BST-215] 
+            if self.test_mode:
+                # Modo de teste: usa hardware PN simulado
+                hardware_pn = f"HW-PN-TEST-{target.upper().replace(' ', '-')}"
+                self.logging_service.log(f"Test mode: Using simulated hardware PN: {hardware_pn}")
+            else:
+                # Modo real: tenta obter hardware PN do dispositivo
+                try:
+                    hardware_pn_response = self.sendRequest(Request(command="GET_HARDWARE_PN"))
+                    hardware_pn = hardware_pn_response.data
+                except Exception as hw_error:
+                    hardware_pn = f"HW-PN-FALLBACK-{target.upper().replace(' ', '-')}"
+                    self.logging_service.log(f"Hardware PN request failed, using fallback: {hardware_pn}. Error: {hw_error}")
             
             # [BST-216]
             self.currentConnection.hardwarePN = hardware_pn
             
             # [BST-224]
             self.logging_service.log(f"Connection successful. HW_PN: {hardware_pn}")
+
+            emit_event(Event(Event.EventType.CONNECTION_SUCCESS, properties={"target": hardware_pn}))
             
             # [BST-210]
             self._start_health_check()
 
+        except ConnectionAuthenticationError as e: 
+            self.logging_service.error(f"Authentication failed for {target}", e)
+            emit_event(Event(Event.EventType.CONNECTION_FAILURE, properties={"message": f"Authentication failed for '{target}': {e}"}))
+            self.currentConnection = None 
+
         except Exception as e:
             # [BST-224]
             self.logging_service.error("Connection failed", e)
+            emit_event(Event(Event.EventType.ERROR, error=e, properties={"message": f"Failed to connect to {target}: {e}"}))
             self.currentConnection = None
             if isinstance(e, (ConnectionError, RequestTimeoutError)):
                 pass
@@ -219,9 +248,9 @@ class ConnectionService:
     
     def sendRequest(self, request: Request) -> Response:
         # [BST-224]
-        self.logging_service.log(f"Sending request: {request}")
+        self.logging_service.log(f"Sending request: {request.command}")
         if not self.isConnected():
-            err = ConnectionError(f"Cannot send request '{request}': Not connected.")
+            err = ConnectionError(f"Cannot send request '{request.command}': Not connected.")
             self.logging_service.error("SendRequest failed", err)
             raise err
             
@@ -230,23 +259,23 @@ class ConnectionService:
             timeout = 60
             response = self.wifi_module.sendRequest(request, timeout=timeout)
             # [BST-224]
-            self.logging_service.log(f"SendRequest successful. Response: {response}")
+            self.logging_service.log(f"SendRequest successful. Response: {response.status}")
             return response
         
         except RequestTimeoutError as e:
             # [BST-211]
             # [BST-224]
-            self.logging_service.error(f"SendRequest '{request}' timed out", e)
+            self.logging_service.error(f"SendRequest '{request.command}' timed out", e)
             # [BST-212]
             self._handle_reconnection()
             raise e
             
         except Exception as e:
             # [BST-224]
-            self.logging_service.error(f"SendRequest '{request}' failed", e)
+            self.logging_service.error(f"SendRequest '{request.command}' failed", e)
             # [BST-212]
             self._handle_reconnection()
-            raise ConnectionError(f"SendRequest '{request}' failed.") from e
+            raise ConnectionError(f"SendRequest '{request.command}' failed.") from e
 
     def pauseHealthCheck(self):
         if self.currentConnection:
