@@ -1,5 +1,5 @@
 from pathlib import Path
-import sys
+import os
 from kivy.resources import resource_add_path, resource_find
 
 from services.arinc_module import ArincModule
@@ -16,9 +16,12 @@ resource_add_path(str(BASE / "ui"))
 
 print("KV encontrado?", resource_find("styling.kv"))
 
+FILE_DIRECTORY = "file_directory"
+if not os.path.exists(FILE_DIRECTORY):
+    os.makedirs(FILE_DIRECTORY)
+
 from services.user_database_module import UserDatabase
 from ui.ui_manager import UiManager
-
 
 user_database = UserDatabase() 
 wifi_module = WifiModule() 
@@ -31,7 +34,7 @@ connection_service = ConnectionService(
     wifi_module,
     test_mode=False  # Habilita modo de teste com hardware PN simulado
 )
-arinc_module = ArincModule(connection_service) 
+arinc_module = ArincModule(connection_service, FILE_DIRECTORY) 
 file_transfer_service = FileTransferService(
     file_validator_service,
     connection_service,
@@ -39,7 +42,7 @@ file_transfer_service = FileTransferService(
 )
 imported_files_service = ImportedFilesService(
     file_validator_service,
-    "uploaded_files"
+    f"{FILE_DIRECTORY}/images"
 )
 
 service_facade = ServiceFacade(

@@ -28,21 +28,21 @@ from tftpy import TftpServer
 
 version: Literal["A4"] = "A4"
 
-_SERVER_PATH = "tftp/server"
-_CLIENT_PATH = "tftp/client"
-
 class ArincModule:
     transfer_status: TransferStatus | None = None
     transfer_thread: threading.Thread | None = None
 
-    def __init__(self, connection_service: ConnectionService):
+    def __init__(self, connection_service: ConnectionService, base_path: str):
         self.logging_service = LoggingService(ConnectionService.__name__)
         self.connection_service = connection_service
 
-        if not os.path.exists(_SERVER_PATH):
-            os.makedirs(_SERVER_PATH)
-        if not os.path.exists(_CLIENT_PATH):
-            os.makedirs(_CLIENT_PATH)
+        self._SERVER_PATH = base_path+"/tftp/server"
+        self._CLIENT_PATH = base_path+"/tftp/client"
+
+        if not os.path.exists(self._SERVER_PATH):
+            os.makedirs(self._SERVER_PATH)
+        if not os.path.exists(self._CLIENT_PATH):
+            os.makedirs(self._CLIENT_PATH)
         
         self.tftp_server_thread = threading.Thread(
             target=self._tftp_server_thread, daemon=True
@@ -102,17 +102,17 @@ class ArincModule:
 
     def _get_LUI_file(self, target: str) -> ArincLUI | None:
         pkg = self.connection_service.receivePackage(f"{target}.{ArincFileType.LUI.value}")
-        return _parse_LUI_file(pkg.path)
+        return self._parse_LUI_file(pkg.path)
 
     def _put_file(self, target: str, file_path: str, file_type: ArincFileType):
         pkg = Package(f"{target}.{file_type}", file_path)
         self.connection_service.sendPackage(pkg)
 
     def _read_LUS_file(self, target: str) -> ArincLUS | None:
-        return _parse_LUS_file(f"{_SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
+        return self._parse_LUS_file(f"{self._SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
 
     def _tftp_server_thread(self):
-        server = TftpServer(f"{_SERVER_PATH}/", self._server_callback)
+        server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
         server.listen()
 
     def _arinc_transfer_thread(self):
@@ -189,166 +189,166 @@ class ArincModule:
                 file_record.hardwarePN,
                 file_record.sizeBytes,
             )
-            file_path = _encode_LUH_file(target, luh_file)
+            file_path = self._encode_LUH_file(target, luh_file)
             return open(file_path, "rb")
 
         return None
 
 
-def _parse_LUS_file(file_path: str) -> ArincLUS | None:
-    try:
-        with open(file_path, "rb") as file:
-            file_lenght = int.from_bytes(file.read(4), "big", signed=False)
-            protocol_version = file.read(2).decode("ascii")
-            status_code = LoadProtocolStatusCode(file.read(2).hex())
-            status_description_lenght = int.from_bytes(
-                file.read(2), "big", signed=False
-            )
-
-            status_description = None
-            if status_description_lenght > 0:
-                status_description = file.read(status_description_lenght).decode(
-                    "ascii"
-                )[:-1]
-
-            counter = int.from_bytes(file.read(2), "big", signed=False)
-            exception_timer = int.from_bytes(file.read(2), "big", signed=False)
-            estimation_time = int.from_bytes(file.read(2), "big", signed=False)
-            load_list_ratio = int(file.read(3).decode("ascii"))
-            number_of_header_files = int.from_bytes(file.read(2), "big", signed=False)
-
-            header_files = []
-            header_files = header_files
-            for _ in range(number_of_header_files):
-                header_file_name_lenght = int.from_bytes(
-                    file.read(1), "big", signed=False
-                )
-                header_file_name = file.read(header_file_name_lenght).decode("ascii")[
-                    :-1
-                ]
-
-                load_part_number_name_lenght = int.from_bytes(
-                    file.read(1), "big", signed=False
-                )
-                load_part_number_name = file.read(load_part_number_name_lenght).decode(
-                    "ascii"
-                )[:-1]
-
-                load_ratio = int(file.read(3).decode("ascii"))
-                load_status = LoadProtocolStatusCode(file.read(4).hex())
-
-                load_status_description_lenght = int.from_bytes(
+    def _parse_LUS_file(self, file_path: str) -> ArincLUS | None:
+        try:
+            with open(file_path, "rb") as file:
+                file_lenght = int.from_bytes(file.read(4), "big", signed=False)
+                protocol_version = file.read(2).decode("ascii")
+                status_code = LoadProtocolStatusCode(file.read(2).hex())
+                status_description_lenght = int.from_bytes(
                     file.read(2), "big", signed=False
                 )
-                load_status_description = None
-                if load_status_description_lenght > 0:
-                    load_status_description = file.read(
-                        load_status_description_lenght
-                    ).decode("ascii")[:-1]
 
-                header_files.append(
-                    ArincLUSHeaderFile(
-                        header_file_name,
-                        load_part_number_name,
-                        load_ratio,
-                        load_status,
-                        load_status_description,
+                status_description = None
+                if status_description_lenght > 0:
+                    status_description = file.read(status_description_lenght).decode(
+                        "ascii"
+                    )[:-1]
+
+                counter = int.from_bytes(file.read(2), "big", signed=False)
+                exception_timer = int.from_bytes(file.read(2), "big", signed=False)
+                estimation_time = int.from_bytes(file.read(2), "big", signed=False)
+                load_list_ratio = int(file.read(3).decode("ascii"))
+                number_of_header_files = int.from_bytes(file.read(2), "big", signed=False)
+
+                header_files = []
+                header_files = header_files
+                for _ in range(number_of_header_files):
+                    header_file_name_lenght = int.from_bytes(
+                        file.read(1), "big", signed=False
                     )
+                    header_file_name = file.read(header_file_name_lenght).decode("ascii")[
+                        :-1
+                    ]
+
+                    load_part_number_name_lenght = int.from_bytes(
+                        file.read(1), "big", signed=False
+                    )
+                    load_part_number_name = file.read(load_part_number_name_lenght).decode(
+                        "ascii"
+                    )[:-1]
+
+                    load_ratio = int(file.read(3).decode("ascii"))
+                    load_status = LoadProtocolStatusCode(file.read(4).hex())
+
+                    load_status_description_lenght = int.from_bytes(
+                        file.read(2), "big", signed=False
+                    )
+                    load_status_description = None
+                    if load_status_description_lenght > 0:
+                        load_status_description = file.read(
+                            load_status_description_lenght
+                        ).decode("ascii")[:-1]
+
+                    header_files.append(
+                        ArincLUSHeaderFile(
+                            header_file_name,
+                            load_part_number_name,
+                            load_ratio,
+                            load_status,
+                            load_status_description,
+                        )
+                    )
+
+                return ArincLUS(
+                    status_code,
+                    status_description,
+                    counter,
+                    exception_timer,
+                    estimation_time,
+                    load_list_ratio,
+                    header_files,
                 )
-
-            return ArincLUS(
-                status_code,
-                status_description,
-                counter,
-                exception_timer,
-                estimation_time,
-                load_list_ratio,
-                header_files,
-            )
-    except:
-        return None
+        except:
+            return None
 
 
-def _parse_LUI_file(file_path: str) -> ArincLUI | None:
-    try:
-        with open(file_path, "rb") as file:
-            file_lenght = int.from_bytes(file.read(4), "big", signed=False)
-            protocol_version = file.read(2).decode("ascii")
-            status_code = LoadProtocolStatusCode(file.read(2).hex())
-            status_description_lenght = int.from_bytes(
-                file.read(2), "big", signed=False
-            )
-            status_description = None
-            if status_description_lenght > 0:
-                status_description = file.read(-1).decode("ascii")[:-1]
+    def _parse_LUI_file(self, file_path: str) -> ArincLUI | None:
+        try:
+            with open(file_path, "rb") as file:
+                file_lenght = int.from_bytes(file.read(4), "big", signed=False)
+                protocol_version = file.read(2).decode("ascii")
+                status_code = LoadProtocolStatusCode(file.read(2).hex())
+                status_description_lenght = int.from_bytes(
+                    file.read(2), "big", signed=False
+                )
+                status_description = None
+                if status_description_lenght > 0:
+                    status_description = file.read(-1).decode("ascii")[:-1]
 
-            return ArincLUI(status_code, status_description)
-    except:
-        return None
+                return ArincLUI(status_code, status_description)
+        except:
+            return None
 
 
-def _encode_LUR_file(target: str, lur_file: ArincLUR) -> str:
-    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
+    def _encode_LUR_file(self, target: str, lur_file: ArincLUR) -> str:
+        file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
 
-    if os.path.exists(file_path):
-        os.unlink(file_path)
+        if os.path.exists(file_path):
+            os.unlink(file_path)
 
-    with open(file_path, "xb") as file:
-        bytes_to_write = bytearray(version, "ascii")
+        with open(file_path, "xb") as file:
+            bytes_to_write = bytearray(version, "ascii")
 
-        bytes_to_write.extend(
-            len(lur_file.HeaderFiles).to_bytes(2, "big", signed=False)
-        )
-
-        for hf in lur_file.HeaderFiles:
             bytes_to_write.extend(
-                (len(hf.FileName) + 1).to_bytes(1, "big", signed=False)
+                len(lur_file.HeaderFiles).to_bytes(2, "big", signed=False)
             )
-            bytes_to_write.extend(hf.FileName.encode("ascii"))
+
+            for hf in lur_file.HeaderFiles:
+                bytes_to_write.extend(
+                    (len(hf.FileName) + 1).to_bytes(1, "big", signed=False)
+                )
+                bytes_to_write.extend(hf.FileName.encode("ascii"))
+                bytes_to_write.extend(b"\0")
+
+                bytes_to_write.extend(
+                    (len(hf.PartNumberName) + 1).to_bytes(1, "big", signed=False)
+                )
+                bytes_to_write.extend(hf.PartNumberName.encode("ascii"))
+                bytes_to_write.extend(b"\0")
+
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write(bytes_to_write)
+
+        return file_path
+
+
+    def _encode_LUH_file(self, target: str, luh_file: ArincLUH) -> str:
+        file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
+
+        if os.path.exists(file_path):
+            os.unlink(file_path)
+
+        with open(file_path, "xb") as file:
+            bytes_to_write = bytearray(version, "ascii")
+
+            bytes_to_write.extend((luh_file.Size * 8).to_bytes(4, "big", signed=False))
+
+            bytes_to_write.extend(
+                (len(luh_file.SoftwarePartNumber) + 1).to_bytes(1, "big", signed=False)
+            )
+            bytes_to_write.extend(luh_file.SoftwarePartNumber.encode("ascii"))
             bytes_to_write.extend(b"\0")
 
             bytes_to_write.extend(
-                (len(hf.PartNumberName) + 1).to_bytes(1, "big", signed=False)
+                (len(luh_file.HardwarePartNumber) + 1).to_bytes(1, "big", signed=False)
             )
-            bytes_to_write.extend(hf.PartNumberName.encode("ascii"))
+            bytes_to_write.extend(luh_file.HardwarePartNumber.encode("ascii"))
             bytes_to_write.extend(b"\0")
 
-        file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
-        file.write(bytes_to_write)
+            bytes_to_write.extend(
+                (len(luh_file.DataHash) + 1).to_bytes(1, "big", signed=False)
+            )
+            bytes_to_write.extend(luh_file.DataHash.encode("ascii"))
+            bytes_to_write.extend(b"\0")
 
-    return file_path
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write(bytes_to_write)
 
-
-def _encode_LUH_file(target: str, luh_file: ArincLUH) -> str:
-    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
-
-    if os.path.exists(file_path):
-        os.unlink(file_path)
-
-    with open(file_path, "xb") as file:
-        bytes_to_write = bytearray(version, "ascii")
-
-        bytes_to_write.extend((luh_file.Size * 8).to_bytes(4, "big", signed=False))
-
-        bytes_to_write.extend(
-            (len(luh_file.SoftwarePartNumber) + 1).to_bytes(1, "big", signed=False)
-        )
-        bytes_to_write.extend(luh_file.SoftwarePartNumber.encode("ascii"))
-        bytes_to_write.extend(b"\0")
-
-        bytes_to_write.extend(
-            (len(luh_file.HardwarePartNumber) + 1).to_bytes(1, "big", signed=False)
-        )
-        bytes_to_write.extend(luh_file.HardwarePartNumber.encode("ascii"))
-        bytes_to_write.extend(b"\0")
-
-        bytes_to_write.extend(
-            (len(luh_file.DataHash) + 1).to_bytes(1, "big", signed=False)
-        )
-        bytes_to_write.extend(luh_file.DataHash.encode("ascii"))
-        bytes_to_write.extend(b"\0")
-
-        file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
-        file.write(bytes_to_write)
-
-    return file_path
+        return file_path
