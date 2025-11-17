@@ -10,9 +10,9 @@ from data.errors import IdentificationError
 INACTIVITY_TIMEOUT_MINUTES = 10
 
 class UserAuthenticationService:
-    def __init__(self, user_database: UserDatabase, logging_service = LoggingService('UserAuthenticationService')):
+    def __init__(self, user_database: UserDatabase):
         self.user_database = user_database
-        self.logging_service = logging_service
+        self.logging_service = LoggingService(UserAuthenticationService.__name__)
         self.currentSession: Optional[Session] = None
 
     def login(self, username: str, password: str) -> None:
