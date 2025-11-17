@@ -33,18 +33,62 @@ class ConnectionScreen(Screen):
     empty_list_message = StringProperty("No WiFi networks found.")
     show_empty_message = BooleanProperty(False)
 
+    _is_waiting_for_connection = BooleanProperty(False)
+    _reconnection_popup: Optional[Popup] = ObjectProperty(None, allownone=True)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = ScreenName.CONNECTION.value
         event_router.register_callback(self._handle_event)
 
+    def _show_wait_popup(self, title: str, message: str):
+        if self._reconnection_popup:
+            return
+            
+        content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
+        
+        content.add_widget(Label(
+            text=message, 
+            halign='center', 
+            valign='middle', 
+            size_hint_y=None, 
+            height='60dp' 
+        ))
+        
+        self._reconnection_popup = Popup(
+            title=title, 
+            content=content, 
+            size_hint=(0.7, 0.4), 
+            auto_dismiss=False 
+        )
+        self._reconnection_popup.open()
+
+    def _dismiss_wait_popup(self):
+        if self._reconnection_popup:
+            self._reconnection_popup.dismiss()
+            self._reconnection_popup = None
+            self._is_waiting_for_connection = False
+
     def _handle_event(self, event: Event) -> None:
         if event.type == Event.EventType.CONNECTION_FAILURE:
             if self.manager and self.manager.current == self.name:
+                self._dismiss_wait_popup()
                 message = event.properties.get('message', 'WiFi connection failure.')
                 self._show_error_popup(message)
         elif event.type == Event.EventType.CONNECTION_SUCCESS:
-            pass 
+            if self.manager and self.manager.current == self.name:
+                self._dismiss_wait_popup() 
+        elif event.type == Event.EventType.RECONNECTION_SUCCESS:
+            if self.manager and self.manager.current == self.name:
+                self._dismiss_wait_popup()
+        elif event.type == Event.EventType.RECONNECTION:
+            # [BST-206]
+            if self.manager and self.manager.current == self.name:
+                self._is_waiting_for_connection = True
+                self._show_wait_popup(
+                    title="Reconnection in Progress",
+                    message="Please wait while the system attempts to reconnect to the device."
+                )
 
     def on_enter(self, *args):
         # [BST-306]
@@ -138,10 +182,15 @@ class ConnectionScreen(Screen):
         check_authentication(self, self.connectToWifi, network_name, password)
 
     def connectToWifi(self, network_name, password=None):
+
+        if self._is_waiting_for_connection:
+            self._show_error_popup("Automatic reconnection is in progress.")
+            return        
+
         print(f"Attempting to connect to: {network_name}")
         if self._service_facade:
             try:
-                self._service_facade.connectToWifi(network_name, password)
+                emit_event(Event(Event.EventType.CONNECTION_ATTEMPT, properties={'target': network_name, 'password': password}))
             except Exception as e:
                 print(f"Connection failed: {e}")
                 emit_event(Event(Event.EventType.ERROR, error=e, properties={"message": f"Failed to connect to {network_name}: {e}"}))

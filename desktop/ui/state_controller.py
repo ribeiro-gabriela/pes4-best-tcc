@@ -138,6 +138,8 @@ class StateController:
                 self._transition_to(AppState.POST_CONNECTION)
             case Event.EventType.CONNECTION_FAILURE:
                 self._transition_to_error(event)
+            case Event.EventType.RECONNECTION_SUCCESS:
+                self._transition_to(AppState.POST_CONNECTION)
             case _:
                 self._handle_global_events(event)
 
@@ -162,6 +164,8 @@ class StateController:
                 # [E12] PostConnection > Loading
                 # [BST-318]
                 self._transition_to(AppState.LOADING)
+            case Event.EventType.RECONNECTION:
+                self._transition_to(AppState.CONNECTION)
             case _:
                 self._handle_global_events(event)
 
