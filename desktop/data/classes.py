@@ -56,7 +56,7 @@ class Response:
 
 @dataclass
 class TransferStatus:
-    canceled: bool
+    cancelled: bool
     currentTarget: str
     transferStep: ArincTransferStep
     fileRecord: FileRecord

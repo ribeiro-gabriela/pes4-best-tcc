@@ -198,7 +198,7 @@ class PostConnectionScreen(Screen):
                     emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.FILE_TRANSFER.value}))
                     
                     emit_event(Event(Event.EventType.LOAD_IMAGE_REQUESTED, properties={
-                        'file': selected_record.file,
+                        'file': selected_record,
                         'hardware_pn': self.hardware_pn
                     }))
                     

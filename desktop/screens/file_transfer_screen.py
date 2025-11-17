@@ -10,7 +10,7 @@ import threading
 from typing import Callable, Optional
 
 from data.enums import ScreenName
-from data.classes import File
+from data.classes import FileRecord
 from ui.event_router import emit_event, event_router
 from data.events import Event
 from services.service_facade import ServiceFacade
@@ -32,7 +32,7 @@ class FileTransferScreen(Screen):
     transfer_started = BooleanProperty(False)
 
     _service_facade: Optional[ServiceFacade] = None
-    _selected_file: Optional[File] = None
+    _selected_file: Optional[FileRecord] = None
     _progress_event = None 
 
     def __init__(self, **kwargs):
@@ -54,7 +54,7 @@ class FileTransferScreen(Screen):
         
         # [BST-332]
         # [BST-322]
-        check_authentication(self, self.confirm_transfer, file_name=self._selected_file.fileName)
+        check_authentication(self, self.confirm_transfer, file_name=self._selected_file.file.fileName)
 
     def on_leave(self, *args):
         super().on_leave(*args)
@@ -81,9 +81,9 @@ class FileTransferScreen(Screen):
             
             if file_obj:
                 self._selected_file = file_obj
-                self.selected_file_text = f'Transferring: {file_obj.fileName}'
+                self.selected_file_text = f'Transferring: {file_obj.file.fileName}'
                 self.transfer_status_text = f'Connected to the module: {hardware_pn}'
-                print(f"File pre-selected for transfer: {file_obj.fileName}")
+                print(f"File pre-selected for transfer: {file_obj.file.fileName}")
                 
                 self.start_transfer()
 
@@ -92,7 +92,8 @@ class FileTransferScreen(Screen):
         check_authentication(self, self.start_transfer)
 
     def start_transfer(self):
-        if not self._service_facade:
+        service_facade = self._service_facade
+        if not service_facade:
             self.transfer_status_text = 'Error: Service not ready'
             return
         file = self._selected_file
@@ -109,7 +110,7 @@ class FileTransferScreen(Screen):
         def transfer_thread():
             try:
                 # [BST-319] 
-                result = self._service_facade.startTransfer(file)
+                result = service_facade.startTransfer(file)
                 # CÓDIGO PARA SIMULAÇÃO, REMOVER PARA TESTAR O CASO REAL 
                 # result = True 
                 

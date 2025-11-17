@@ -1,5 +1,5 @@
 from typing import Any
-from data.classes import File
+from data.classes import FileRecord
 from data.errors import (
     CompatibilityError,
     DisconnectedError,
@@ -24,7 +24,8 @@ class FileTransferService:
         self.connection_service = connection_service
         self.arinc_module = arinc_module
 
-    def startTransfer(self, file: File) -> bool:
+    def startTransfer(self, file_record: FileRecord) -> bool:
+        file = file_record.file
         # [BST-244]
         if not self.connection_service.isConnected():
             # [BST-242]
@@ -71,7 +72,7 @@ class FileTransferService:
         )
 
         # [BST-235]
-        result = self.arinc_module.startTransfer(file)
+        result = self.arinc_module.startTransfer(file_record)
 
         # [BST-238]
         return result

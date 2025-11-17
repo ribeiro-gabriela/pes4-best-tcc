@@ -56,9 +56,9 @@ class ServiceFacade:
     def isConnected(self) -> bool:
         return self.connection_service.isConnected()
 
-    def startTransfer(self, file: File) -> bool:
+    def startTransfer(self, file_record: FileRecord) -> bool:
         # [BST-319]
-        return self.file_transfer_service.startTransfer(file)
+        return self.file_transfer_service.startTransfer(file_record)
 
     def getProgress(self) -> Any:
         # [BST-320, BST-321, BST-324]

@@ -93,7 +93,7 @@ class ArincModule:
             self.logging_service.log("Not in transfer")
             return
 
-        self.transfer_status.canceled = True
+        self.transfer_status.cancelled = True
         self.transfer_status.transferResult = ArincTransferResult.FAILED
 
         if self.transfer_thread is not None:
@@ -116,7 +116,7 @@ class ArincModule:
         server.listen()
 
     def _arinc_transfer_thread(self):
-        while self.transfer_status and not self.transfer_status.canceled:
+        while self.transfer_status and not self.transfer_status.cancelled:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
 
@@ -152,7 +152,7 @@ class ArincModule:
                     self.transfer_status.transferResult = ArincTransferResult.SUCCESS
 
                 case "1003" | "1004" | "1005":  # operation aborted
-                    self.transfer_status.canceled = True
+                    self.transfer_status.cancelled = True
                     self.transfer_status.transferStep = (
                         ArincTransferStep.NOT_IN_TRANSFER
                     )
@@ -174,7 +174,7 @@ class ArincModule:
 
         target = self.transfer_status.currentTarget
 
-        if self.transfer_status.canceled:
+        if self.transfer_status.cancelled:
             # return canceled status file
             return None
 
