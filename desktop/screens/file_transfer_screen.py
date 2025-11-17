@@ -7,7 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.metrics import dp
 import threading
-from typing import Optional
+from typing import Callable, Optional
 
 from data.enums import ScreenName
 from data.classes import File
@@ -16,7 +16,7 @@ from data.events import Event
 from services.service_facade import ServiceFacade
 
 # [BST-332]
-def check_authentication(screen_instance, action: callable, *args, **kwargs):
+def check_authentication(screen_instance, action: Callable, *args, **kwargs):
     service_facade = screen_instance._service_facade
     if service_facade and service_facade.isAuthenticated():
         action(*args, **kwargs)
@@ -38,27 +38,27 @@ class FileTransferScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = ScreenName.FILE_TRANSFER.value
-
-    def on_enter(self):
-        super().on_enter()
         event_router.register_callback(self._handle_file_preselection)
-        self.reset_transfer_state()
+
+    def on_enter(self, *args):
+        super().on_enter(*args)
+        # self.reset_transfer_state()
 
         # SIMULAÇÃO
-        self._selected_file = File(
-            fileName='firmware_v1.3.0_beta.bin',
-            path='/simulated/path/to/firmware_v1.3.0_beta.bin'
-        )
-        self.transfer_status_text = 'Simulating connection to module: SIM-TEST-MODULE'
-        self.selected_file_text = f'Transfering file: {self._selected_file.fileName}'
+        # self._selected_file = File(
+        #     fileName='firmware_v1.3.0_beta.bin',
+        #     path='/simulated/path/to/firmware_v1.3.0_beta.bin'
+        # )
+        # self.transfer_status_text = 'Simulating connection to module: SIM-TEST-MODULE'
+        # self.selected_file_text = f'Transfering file: {self._selected_file.fileName}'
         
         # [BST-332]
         # [BST-322]
         check_authentication(self, self.confirm_transfer, file_name=self._selected_file.fileName)
 
-    def on_leave(self):
-        super().on_leave()
-        event_router.unregister_callback(self._handle_file_preselection)
+    def on_leave(self, *args):
+        super().on_leave(*args)
+        # event_router.unregister_callback(self._handle_file_preselection)
         self.cancel_transfer_internal() 
         self.reset_transfer_state() 
 
@@ -92,8 +92,12 @@ class FileTransferScreen(Screen):
         check_authentication(self, self.start_transfer)
 
     def start_transfer(self):
-        if not self._selected_file or not self._service_facade:
-            self.transfer_status_text = 'Error: No file selected or service not ready.'
+        if not self._service_facade:
+            self.transfer_status_text = 'Error: Service not ready'
+            return
+        file = self._selected_file
+        if not file:
+            self.transfer_status_text = 'Error: No file selected'
             return
             
         self.transfer_in_progress = True 
@@ -105,9 +109,9 @@ class FileTransferScreen(Screen):
         def transfer_thread():
             try:
                 # [BST-319] 
-                #result = self._service_facade.file_transfer_service.startTransfer(self._selected_file)
+                result = self._service_facade.startTransfer(file)
                 # CÓDIGO PARA SIMULAÇÃO, REMOVER PARA TESTAR O CASO REAL 
-                result = True 
+                # result = True 
                 
                 if result:
                     # [BST-320]
@@ -127,18 +131,18 @@ class FileTransferScreen(Screen):
             
         try:
             # [BST-320]
-            # status = self._service_facade.file_transfer_service.getProgress()
+            status = self._service_facade.file_transfer_service.getProgress()
             # SIMULAÇÃO, REMOVER PARA TESTAR O CASO REAL
             
-            current_progress = self.progress_value
-            if current_progress < 100:
-                percentage = min(current_progress + 10, 100) 
-                if percentage == 100:
-                    status = "TransferFinished"
-                else:
-                    status = {'percentage': percentage}
-            else:
-                status = "TransferFinished" 
+            # current_progress = self.progress_value
+            # if current_progress < 100:
+            #     percentage = min(current_progress + 10, 100) 
+            #     if percentage == 100:
+            #         status = "TransferFinished"
+            #     else:
+            #         status = {'percentage': percentage}
+            # else:
+            #     status = "TransferFinished" 
 
             # [BST-325]
             if isinstance(status, dict) and 'percentage' in status:
@@ -184,7 +188,7 @@ class FileTransferScreen(Screen):
             return
             
         try:
-            # self._service_facade.file_transfer_service.cancel() 
+            self._service_facade.file_transfer_service.cancel() 
             # DESCOMENTAR PARA USAR O SERVIÇO REAL
             Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
         except Exception as e:

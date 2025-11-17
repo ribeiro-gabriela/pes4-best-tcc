@@ -85,7 +85,7 @@ class FileValidatorService:
         try:
             # [BST-276]
             header = self._read_header(file)
-            extracted_hw_pn = header.get("hardwarePN")
+            extracted_hw_pn = header.get("hw_pn")
 
             # [BST-278]
             is_valid = extracted_hw_pn == hardwarePN

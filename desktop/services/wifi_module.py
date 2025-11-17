@@ -8,6 +8,8 @@ import subprocess, tempfile, os
 from data.classes import Connection, Package, Request, Response
 from data.errors import RequestTimeoutError, ConnectionAuthenticationError
 
+import _wmi
+
 class WifiModule:
     _PASSWORD = "bcappassword"
     _tftp_client: TftpClient | None = None
@@ -21,56 +23,7 @@ class WifiModule:
                 text=True
             ))
 
-            ssids = []
-            current_ssid = None
-            current_bssid = None
-            
-            lines = result.splitlines()
-
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
-
-                # Split key and value
-                if ':' in line:
-                    key_part, value_part = line.split(':', 1)
-                    key = key_part.strip()
-                    value = value_part.strip()
-
-                    # Case A: New Network (SSID) detected
-                    if key.startswith('SSID'):
-                        # Save the previous network if it exists
-                        if current_ssid:
-                            ssids.append(current_ssid)
-                        
-                        # Initialize new network dict
-                        current_ssid = {
-                            'ssid': value, 
-                            'bssids': []
-                        }
-                        current_bssid = None # Reset BSSID context
-                    
-                    # Case B: New BSSID detected
-                    elif key.startswith('BSSID'):
-                        if current_ssid is not None:
-                            current_bssid = {'bssid': value}
-                            current_ssid['bssids'].append(current_bssid)
-                    
-                    # Case C: Property (Signal, Radio type, Authentication, etc.)
-                    else:
-                        # Logic: If we are inside a BSSID context, add property there.
-                        # Otherwise, add it to the main Network context.
-                        clean_key = key.lower().replace(' ', '_')
-                        
-                        if current_bssid is not None:
-                            current_bssid[clean_key] = value
-                        elif current_ssid is not None:
-                            current_ssid[clean_key] = value
-
-            # Append the final network after the loop finishes
-            if current_ssid:
-                ssids.append(current_ssid)
+            ssids = self._parse_netsh_output(result)
 
             for profile in ssids:
                 ssid = profile["ssid"]
@@ -96,6 +49,59 @@ class WifiModule:
         networks.sort(key=lambda x: int(x['info']['signal'].split(' ')[0]) if 'dBm' in x['info']['signal'] else -100)
         
         return networks
+
+    def _parse_netsh_output(self, result):
+        ssids = []
+        current_ssid = None
+        current_bssid = None
+            
+        lines = result.splitlines()
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+
+                # Split key and value
+            if ':' in line:
+                key_part, value_part = line.split(':', 1)
+                key = key_part.strip()
+                value = value_part.strip()
+
+                    # Case A: New Network (SSID) detected
+                if key.startswith('SSID'):
+                        # Save the previous network if it exists
+                    if current_ssid:
+                        ssids.append(current_ssid)
+                        
+                        # Initialize new network dict
+                    current_ssid = {
+                            'ssid': value, 
+                            'bssids': []
+                        }
+                    current_bssid = None # Reset BSSID context
+                    
+                    # Case B: New BSSID detected
+                elif key.startswith('BSSID'):
+                    if current_ssid is not None:
+                        current_bssid = {'bssid': value}
+                        current_ssid['bssids'].append(current_bssid)
+                    
+                    # Case C: Property (Signal, Radio type, Authentication, etc.)
+                else:
+                        # Logic: If we are inside a BSSID context, add property there.
+                        # Otherwise, add it to the main Network context.
+                    clean_key = key.lower().replace(' ', '_')
+                        
+                    if current_bssid is not None:
+                        current_bssid[clean_key] = value
+                    elif current_ssid is not None:
+                        current_ssid[clean_key] = value
+
+            # Append the final network after the loop finishes
+        if current_ssid:
+            ssids.append(current_ssid)
+        return ssids
 
     def _current_ssid_windows(self) -> str | None:
             try:
@@ -160,6 +166,21 @@ class WifiModule:
                 return True
             time.sleep(0.5)
         return False
+
+    def _get_target_ip(self) -> str:
+        # Retrieves subnet using wmic, filtering for IPEnabled adapters
+        cmd = 'wmic nicconfig where IPEnabled=True get DefaultIPGateway /format:csv'
+        result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+        
+        for line in result.stdout.splitlines():
+            if ',' in line and '{' in line: # Look for data lines with curly braces
+                # wmic returns subnets as {"255.255.255.0", "64"} (IPv4, IPv6)
+                # We strip the braces and take the first one
+                parts = line.split(',')
+                if len(parts) > 1:
+                    raw_subnet = parts[1].strip('{}').replace('"', '')
+                    return raw_subnet.split(';')[0] # Return just the first IPv4 mask
+        raise ConnectionError("Cannot get target IP")
 
     def connect(self, target: str, password: str|None = None) -> Connection:
         print(f"Attempting to connect to {target}" + (f" with password: {'*' * len(password)}" if password else " (no password)"))
@@ -273,12 +294,12 @@ class WifiModule:
         ok = self._win_fallback_connect(target, password)
         if ok:
             print(f"Successfully connected to {target} (via NETSH fallback).")
-                    
-            self._tftp_client = TftpClient(target, 69)
+            ip = self._get_target_ip()
+            self._tftp_client = TftpClient(ip, 69)
             return Connection(
                 device=target,
-                hardwarePN="HW-PN-REAL-WIFI",
-                address="192.168.1.1",
+                hardwarePN="",
+                address=ip,
                 connectedAt=int(time.time()),
                 pauseHealthCheck=False
             )

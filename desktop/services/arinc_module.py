@@ -101,7 +101,7 @@ class ArincModule:
             self.transfer_thread = None
 
     def _get_LUI_file(self, target: str) -> ArincLUI | None:
-        pkg = self.connection_service.receivePackage(f"{target}.{ArincFileType.LUI}")
+        pkg = self.connection_service.receivePackage(f"{target}.{ArincFileType.LUI.value}")
         return _parse_LUI_file(pkg.path)
 
     def _put_file(self, target: str, file_path: str, file_type: ArincFileType):
@@ -109,7 +109,7 @@ class ArincModule:
         self.connection_service.sendPackage(pkg)
 
     def _read_LUS_file(self, target: str) -> ArincLUS | None:
-        return _parse_LUS_file(f"{_SERVER_PATH}/{target}.{ArincFileType.LUS}")
+        return _parse_LUS_file(f"{_SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
 
     def _tftp_server_thread(self):
         server = TftpServer(f"{_SERVER_PATH}/", self._server_callback)
@@ -129,7 +129,7 @@ class ArincModule:
                         lur_file = ArincLUR(
                             [
                                 ArincLURHeaderFile(
-                                    f"{image_filename}.{ArincFileType.LUH}",
+                                    f"{image_filename}.{ArincFileType.LUH.value}",
                                     image_filename,
                                 )
                             ]
@@ -181,7 +181,7 @@ class ArincModule:
         if filename == self.transfer_status.fileRecord.file.fileName:
             return open(self.transfer_status.fileRecord.file.path, "rb")
 
-        if filename == f"{target}.{ArincFileType.LUH}":
+        if filename == f"{target}.{ArincFileType.LUH.value}":
             file_record = self.transfer_status.fileRecord
             luh_file = ArincLUH(
                 file_record.dataHash,
@@ -288,7 +288,7 @@ def _parse_LUI_file(file_path: str) -> ArincLUI | None:
 
 
 def _encode_LUR_file(target: str, lur_file: ArincLUR) -> str:
-    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUR}"
+    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
 
     if os.path.exists(file_path):
         os.unlink(file_path)
@@ -320,7 +320,7 @@ def _encode_LUR_file(target: str, lur_file: ArincLUR) -> str:
 
 
 def _encode_LUH_file(target: str, luh_file: ArincLUH) -> str:
-    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUH}"
+    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
 
     if os.path.exists(file_path):
         os.unlink(file_path)
