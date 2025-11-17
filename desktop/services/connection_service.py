@@ -72,6 +72,7 @@ class ConnectionService:
             else:
                 # [BST-207]
                 self.currentConnection = None
+                emit_event(Event(Event.EventType.DISCONNECT))
                 raise ConnectionError("Reconnection failed.")
         finally:
             self._retry_lock.release()

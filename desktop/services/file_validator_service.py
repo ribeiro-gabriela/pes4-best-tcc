@@ -22,7 +22,7 @@ class FileValidatorService:
             
         return {"sw_pn": sw_pn, "hw_pn": hw_pn}
     
-    def _read_data_and_trailing(self, file: File) -> str:
+    def _read_data_and_trailing(self, file: File) -> tuple[bytes,str]:
         with open(file.path, 'rb') as f:
             # Lê o arquivo inteiro
             file_content = f.read()
@@ -35,11 +35,11 @@ class FileValidatorService:
             
         return data, trailing
 
-    def checkIdentification(self, file: File) -> bool:
+    def checkIdentification(self, file: File) -> tuple[str, str, bool]:
         try:
             header = self._read_header(file)
-            sw_pn = header.get("sw_pn")
-            hw_pn = header.get("hw_pn")
+            sw_pn = header.get("sw_pn",'')
+            hw_pn = header.get("hw_pn",'')
 
             # [BST-269]
             is_valid = sw_pn is not None and sw_pn != ""
@@ -56,9 +56,9 @@ class FileValidatorService:
             self.logging_service.error(
                 f"File read error during checkIdentification for {file.fileName}", e
             )
-            return None, None, False
+            return '', '', False
 
-    def checkIntegrity(self, file: File) -> bool:
+    def checkIntegrity(self, file: File) -> tuple[bytes, str, bool]:
         try:
             # [BST-271, BST-272]
             data_section, extracted_hash = self._read_data_and_trailing(file)
@@ -79,7 +79,7 @@ class FileValidatorService:
             self.logging_service.error(
                 f"File read error during checkIntegrity for {file.fileName}", e
             )
-            return None, None, False
+            return b'', '', False
 
     def checkCompatibility(self, file: File, hardwarePN: str) -> bool:
         try:

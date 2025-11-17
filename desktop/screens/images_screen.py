@@ -1,3 +1,4 @@
+from typing import Callable
 from kivy.uix.screenmanager import Screen
 from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty
 from kivy.uix.filechooser import FileChooserListView
@@ -20,7 +21,7 @@ from ui.event_router import emit_event
 UPLOAD_DIR = "uploaded_files"
 
 # [BST-332]
-def check_authentication(screen_instance, action: callable, *args, **kwargs):
+def check_authentication(screen_instance, action: Callable, *args, **kwargs):
     service_facade = screen_instance._service_facade
     if service_facade and service_facade.isAuthenticated():
         action(*args, **kwargs)
@@ -43,18 +44,18 @@ class ImagesScreen(Screen):
         self.load_image_files()
 
     def load_image_files(self):
-        # SIMULAÇÃO APENAS
-        if not os.path.exists(UPLOAD_DIR):
-            os.makedirs(UPLOAD_DIR) 
+        # # SIMULAÇÃO APENAS
+        # if not os.path.exists(UPLOAD_DIR):
+        #     os.makedirs(UPLOAD_DIR) 
 
-        current_files = []
-        for file_name in os.listdir(UPLOAD_DIR):
-            full_path = os.path.join(UPLOAD_DIR, file_name)
-            if os.path.isfile(full_path):
-                current_files.append({'name': file_name, 'path': full_path})
+        # current_files = []
+        # for file_name in os.listdir(UPLOAD_DIR):
+        #     full_path = os.path.join(UPLOAD_DIR, file_name)
+        #     if os.path.isfile(full_path):
+        #         current_files.append({'name': file_name, 'path': full_path})
 
         # [BST-307]
-        #current_files: List[FileRecord] = self._service_facade.listImportedFiles()
+        current_files = self._service_facade.listImportedFiles()
         
         self.image_files = current_files
 
@@ -67,10 +68,10 @@ class ImagesScreen(Screen):
             self.show_empty_message = False
             for img_file in self.image_files:
                 item = ImageListItem(
-                    file_name=img_file['name'],
-                    delete_action=self.delete_file 
+                    file_name=img_file.softwarePN,
+                    # delete_action=self.delete_file 
                     #SIMULAÇÃO, TROCAR A LINHA COMENTADA
-                    # delete_action=lambda pn=img_file.softwarePN: self.on_delete_clicked(pn)
+                    delete_action=lambda pn=img_file.softwarePN: self.on_delete_clicked(pn)
                 )
                 list_container.add_widget(item)
 
@@ -117,17 +118,17 @@ class ImagesScreen(Screen):
             self._file_popup.dismiss()
 
     def save_file(self, file_path):
-        """file_name = os.path.basename(file_path)
+        file_name = os.path.basename(file_path)
         file_object = File(path = file_path, fileName = file_name)
         # [BST-333]
         self._service_facade.importFile(file_object)
-        self.load_image_files()"""
+        self.load_image_files()
 
         # SIMULAÇÃO APENAS 
-        filename = os.path.basename(file_path)
-        dest_path = os.path.join(UPLOAD_DIR, filename)
-        shutil.copy(file_path, dest_path)
-        self.load_image_files()
+        # filename = os.path.basename(file_path)
+        # dest_path = os.path.join(UPLOAD_DIR, filename)
+        # shutil.copy(file_path, dest_path)
+        # self.load_image_files()
 
     def on_delete_clicked(self, software_pn: str):
         # [BST-332]

@@ -15,11 +15,11 @@ from screens.components import WifiNetworkItem
 from services.service_facade import ServiceFacade
 from ui.event_router import emit_event, event_router 
 from data.events import Event
-from typing import Optional, Dict, Any
+from typing import Callable, Optional, Dict, Any
 
 
 # [BST-332]
-def check_authentication(screen_instance, action: callable, *args, **kwargs):
+def check_authentication(screen_instance, action: Callable, *args, **kwargs):
     service_facade = screen_instance._service_facade
     if service_facade and service_facade.isAuthenticated():
         action(*args, **kwargs)
@@ -103,31 +103,31 @@ class ConnectionScreen(Screen):
             self.show_empty_message = True
 
     def _prompt_for_password_if_needed(self, network_name: str, security_type: str):
-        if security_type == "Open" or security_type == "Unknown":
-            self.connectToWifi(network_name, None)
-        else:
-            content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
-            content.add_widget(Label(text=f"Password to {network_name}:", size_hint_y=None, height='40dp'))
+        self.connectToWifi(network_name, None)
+        # if security_type == "Open" or security_type == "Unknown":
+        # else:
+        #     content = BoxLayout(orientation='vertical', spacing='10dp', padding='10dp')
+        #     content.add_widget(Label(text=f"Password to {network_name}:", size_hint_y=None, height='40dp'))
 
-            def on_enter_pressed(instance):
-                self._connect_with_password(network_name, instance.text, popup)
+        #     def on_enter_pressed(instance):
+        #         self._connect_with_password(network_name, instance.text, popup)
 
-            password_input = TextInput(password=True, multiline=False, size_hint_y=None, height='40dp', on_text_validate=on_enter_pressed)
-            content.add_widget(password_input)
+        #     password_input = TextInput(password=True, multiline=False, size_hint_y=None, height='40dp', on_text_validate=on_enter_pressed)
+        #     content.add_widget(password_input)
             
-            buttons = BoxLayout(size_hint_y=None, height='40dp', spacing='10dp')
-            btn_connect = Button(text="Connect")
-            btn_connect.bind(on_release=lambda x: self._connect_with_password(network_name, password_input.text, popup))
-            buttons.add_widget(btn_connect)
+        #     buttons = BoxLayout(size_hint_y=None, height='40dp', spacing='10dp')
+        #     btn_connect = Button(text="Connect")
+        #     btn_connect.bind(on_release=lambda x: self._connect_with_password(network_name, password_input.text, popup))
+        #     buttons.add_widget(btn_connect)
             
-            btn_cancel = Button(text="Cancel")
-            btn_cancel.bind(on_release=lambda x: popup.dismiss())
-            buttons.add_widget(btn_cancel)
+        #     btn_cancel = Button(text="Cancel")
+        #     btn_cancel.bind(on_release=lambda x: popup.dismiss())
+        #     buttons.add_widget(btn_cancel)
             
-            content.add_widget(buttons)
+        #     content.add_widget(buttons)
 
-            popup = Popup(title="Connect to the Secure Network", content=content, size_hint=(0.7, 0.5))
-            popup.open()
+        #     popup = Popup(title="Connect to the Secure Network", content=content, size_hint=(0.7, 0.5))
+        #     popup.open()
 
     def _connect_with_password(self, network_name: str, password: str, popup: Popup):
         popup.dismiss()

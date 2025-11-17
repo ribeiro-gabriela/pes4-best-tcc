@@ -76,8 +76,8 @@ class StateController:
     def _handle_login_state(self, event: Event) -> None:
         match event.type:
             case Event.EventType.LOGIN_ATTEMPT:
-                username = event.properties.get('username')
-                password = event.properties.get('password')
+                username = event.properties.get('username', '')
+                password = event.properties.get('password', '')
                 
                 try:
                     # [BST-331]
@@ -123,7 +123,7 @@ class StateController:
                 # [E7] Connection > Main
                 self._transition_to(AppState.MAIN)
             case Event.EventType.CONNECTION_ATTEMPT:
-                target_network = event.properties.get('target')
+                target_network = event.properties.get('target', '')
                 password = event.properties.get('password')
                 try:
                     self.logging_service.log(f"StateController: Trying to connect to '{target_network}'...")

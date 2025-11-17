@@ -28,6 +28,8 @@ from tftpy import TftpServer
 
 version: Literal["A4"] = "A4"
 
+_SERVER_PATH = "tftp/server"
+_CLIENT_PATH = "tftp/client"
 
 class ArincModule:
     transfer_status: TransferStatus | None = None
@@ -36,6 +38,12 @@ class ArincModule:
     def __init__(self, connection_service: ConnectionService):
         self.logging_service = LoggingService(ConnectionService.__name__)
         self.connection_service = connection_service
+
+        if not os.path.exists(_SERVER_PATH):
+            os.makedirs(_SERVER_PATH)
+        if not os.path.exists(_CLIENT_PATH):
+            os.makedirs(_CLIENT_PATH)
+        
         self.tftp_server_thread = threading.Thread(
             target=self._tftp_server_thread, daemon=True
         )
@@ -101,10 +109,10 @@ class ArincModule:
         self.connection_service.sendPackage(pkg)
 
     def _read_LUS_file(self, target: str) -> ArincLUS | None:
-        return _parse_LUS_file(f"tmp/server/{target}.{ArincFileType.LUS}")
+        return _parse_LUS_file(f"{_SERVER_PATH}/{target}.{ArincFileType.LUS}")
 
     def _tftp_server_thread(self):
-        server = TftpServer("tmp/server/", self._server_callback)
+        server = TftpServer(f"{_SERVER_PATH}/", self._server_callback)
         server.listen()
 
     def _arinc_transfer_thread(self):
@@ -280,7 +288,7 @@ def _parse_LUI_file(file_path: str) -> ArincLUI | None:
 
 
 def _encode_LUR_file(target: str, lur_file: ArincLUR) -> str:
-    file_path = f"tmp/server/{target}.{ArincFileType.LUR}"
+    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUR}"
 
     if os.path.exists(file_path):
         os.unlink(file_path)
@@ -312,7 +320,7 @@ def _encode_LUR_file(target: str, lur_file: ArincLUR) -> str:
 
 
 def _encode_LUH_file(target: str, luh_file: ArincLUH) -> str:
-    file_path = f"tmp/server/{target}.{ArincFileType.LUH}"
+    file_path = f"{_SERVER_PATH}/{target}.{ArincFileType.LUH}"
 
     if os.path.exists(file_path):
         os.unlink(file_path)
