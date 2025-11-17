@@ -31,3 +31,16 @@ esp_err_t initConsole()
 
     return ESP_OK;
 }
+
+esp_err_t registerLog()
+{
+    FILE* logFile = fopen("/spiffs/log.txt", "a");
+    if (logFile == NULL)
+    {
+        ESP_LOGE("CLI", "Failed to open log file for appending");
+        return ESP_FAIL;
+    }
+
+    // Escrever mensagem de log no arquivo
+    return ESP_OK;
+}

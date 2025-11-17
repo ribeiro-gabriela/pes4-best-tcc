@@ -26,7 +26,7 @@ enum eventIDs {
     EVENT_SENSORS_LINK_DOWN,
     LOAD_REQUEST,
     LOG_INFO,
-    SEC_ERR_GSE_AUTH_FAILED,
+    SEC_ERR_GSE_AUTH_FAILED,            // Useless event, since the authentication failure is already covered by the wifi connection using wpa3
     SEC_ERR_IMG_BAD_FORMAT,
     SEC_ERR_IMG_HASH_MISMATCH,
     SEC_ERR_IMG_PN_MISMATCH,
@@ -34,7 +34,7 @@ enum eventIDs {
     WIFI_AP_START_FAILURE_EVENT,
     WIFI_CLIENT_CONNECTED,
     WIFI_CLIENT_DISCONNECTED,
-    SEC_GSE_AUTH_SUCCESS,       // New event IDs
+    SEC_GSE_AUTH_SUCCESS,               // New event IDs
     SEC_IMG_FORMAT_OK,
     SEC_IMG_HASH_OK,
     SEC_IMG_PN_OK

@@ -1,3 +1,6 @@
+#ifndef CLI_REGISTER_COMMANDS_H
+#define CLI_REGISTER_COMMANDS_H
+
 #include "esp_console.h"
 #include "cli_commands_handler.h"
 
@@ -44,3 +47,5 @@ void register_maintenance_mode(void)
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
+
+#endif

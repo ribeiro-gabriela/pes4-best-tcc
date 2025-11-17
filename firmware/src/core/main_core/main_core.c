@@ -9,19 +9,13 @@ TaskHandle_t stateTransitionHandle = NULL;
 
 QueueHandle_t BCQueue = NULL;
 
+extern int mntSignal;
+
 // Inicializa o core do sistema no estado operacional
 void initializeCore()
 {
-    //Initialize NVS
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
     partitionSetup();
+    initLogFile();
 
     initConsole();
 
@@ -89,10 +83,11 @@ void* stateTransitionHandler()
 
     vQueueAddToRegistry(BCQueue, "BCQueue");
     QueueMessage_t receivedMessage;
+    QueueMessage_t* msg;
 
-    int verificationHash = 0;
-    int verificationPN = 0;
-    int verificationFormat = 0;
+    bool verificationHash = false;
+    bool verificationPN = false;
+    bool verificationFormat = false;
 
     while (1)
     {
@@ -119,6 +114,7 @@ void* stateTransitionHandler()
             {
                 if (getBCState() != OP_MODE)
                 {
+                    mntSignal = false;
                     setBCState(OP_MODE);
                     setMntState(NOT_SET_MNT);
                     setConnState(NOT_SET_CONN);
@@ -153,21 +149,21 @@ void* stateTransitionHandler()
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == WAITING_REQUEST)
                 {
-                    setConnState(CRED_EXCHANGE);
+                    setConnState(RECEIVING_PKTS);
                     printf("Log Message: %s\n", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "Conn State changed to CRED_EXCHANGE");
                 }
             }
-            else if (receivedMessage.eventID == SEC_GSE_AUTH_SUCCESS)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                    getConnState() == CRED_EXCHANGE)
-                {
-                    setConnState(RECEIVING_PKTS);
-                    printf("Log Message: %s\n", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
-                }
-            }
+            // else if (receivedMessage.eventID == SEC_GSE_AUTH_SUCCESS)
+            // {
+            //     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
+            //         getConnState() == CRED_EXCHANGE)
+            //     {
+            //         setConnState(RECEIVING_PKTS);
+            //         printf("Log Message: %s\n", receivedMessage.logMessage);
+            //         ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
+            //     }
+            // }
             else if (receivedMessage.eventID == COMM_TRANSFER_COMPLETE)
             {
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
@@ -184,18 +180,18 @@ void* stateTransitionHandler()
             {
                 if (receivedMessage.eventID == SEC_IMG_HASH_OK && verificationHash == 0)
                 {
-                    verificationHash = 1;
+                    verificationHash = true;
                 }
                 else if (receivedMessage.eventID == SEC_IMG_PN_OK && verificationPN == 0)
                 {
-                    verificationPN = 1;
+                    verificationPN = true;
                 }
                 else if (receivedMessage.eventID == SEC_IMG_FORMAT_OK && verificationFormat == 0)
                 {
-                    verificationFormat = 1;
+                    verificationFormat = true;
                 }
 
-                if (verificationHash == 1 && verificationPN == 1 && verificationFormat == 1)
+                if (verificationHash && verificationPN && verificationFormat)
                 {
                     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                         getConnState() == IMG_VERIFICATION)
@@ -206,9 +202,9 @@ void* stateTransitionHandler()
                         ESP_LOGI("Main Core", "Image verification successful, Conn State reset to NOT_SET_CONN");
                     }
 
-                    verificationHash = 0;
-                    verificationPN = 0;
-                    verificationFormat = 0;
+                    verificationHash = false;
+                    verificationPN = false;
+                    verificationFormat = false;
                 }
             }
             else if (receivedMessage.eventID == SEC_ERR_IMG_HASH_MISMATCH ||
@@ -216,16 +212,117 @@ void* stateTransitionHandler()
                      receivedMessage.eventID == SEC_ERR_IMG_BAD_FORMAT)
             {
                 // Reset verification flags on any error
-                verificationHash = 0;
-                verificationPN = 0;
-                verificationFormat = 0;
+                verificationHash = false;
+                verificationPN = false;
+                verificationFormat = false;
 
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == IMG_VERIFICATION)
                 {
+                    // Send message according to mismatch to UDP server about verification failure so it can notify GSE
+
                     setConnState(RECEIVING_PKTS);
                     printf("Log Message: %s\n", receivedMessage.logMessage);
                     ESP_LOGE("Main Core", "Image verification failed");
+                }
+            }
+            else if (receivedMessage.eventID == COMM_AUTH_FAILURE ||
+                     receivedMessage.eventID == COMM_TIMEOUT)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == CONNECTED)
+                {
+                    setMntState(WAITING);
+                    setConnState(NOT_SET_CONN);
+                    printf("Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("Main Core", "MNT State changed to WAITING due to communication failure");
+                }
+            }
+            else if (receivedMessage.eventID == CORE_WARN_UNEXPECTED_EVENT)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGW("Main Core", "Received unexpected event");
+            }
+            else if (receivedMessage.eventID == LOG_INFO)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("Main Core", "Info log received");
+            }
+            else if (receivedMessage.eventID == ERR_GSE_PROBE_TIMEOUT)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGE("Main Core", "GSE probe timeout error");
+            }
+            else if (receivedMessage.eventID == ERR_AP_INIT_FAILED)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGE("Main Core", "Access Point initialization failed");
+                setBCState(OP_MODE);
+                setMntState(NOT_SET_MNT);
+                setConnState(NOT_SET_CONN);
+                deinitMaintenanceMode();
+                msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+                if (msg != NULL)
+                {
+                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                    sprintf((char*)msg->logMessage, "%lu: WiFi AP failed to start due to AP init failure", esp_log_early_timestamp());
+                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                    }
+                    free(msg);
+                }
+            }
+            else if (receivedMessage.eventID == EVENT_SENSORS_LINK_DOWN)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGE("Main Core", "Sensors link down event");
+                
+                msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+                if (msg != NULL)
+                {
+                    msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
+                    sprintf((char*)msg->logMessage, "%lu: Sensors link down, aborting maintenance mode", esp_log_early_timestamp());
+                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                    }
+                    free(msg);
+                }
+            }
+            else if (receivedMessage.eventID == SEC_ERR_GSE_AUTH_FAILED)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGE("Main Core", "GSE authentication failed");
+                if (getBCState() == MNT_MODE)
+                {
+                    setMntState(WAITING);
+                    setConnState(NOT_SET_CONN);
+                    ESP_LOGI("Main Core", "MNT State changed to WAITING due to GSE auth failure");
+                }
+            }
+            else if (receivedMessage.eventID == WIFI_AP_STARTED_OK)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("Main Core", "WiFi AP started successfully");
+            }
+            else if (receivedMessage.eventID == WIFI_AP_START_FAILURE_EVENT)
+            {
+                printf("Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGE("Main Core", "WiFi AP failed to start");
+                setBCState(OP_MODE);
+                setMntState(NOT_SET_MNT);
+                setConnState(NOT_SET_CONN);
+                deinitMaintenanceMode();
+                msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+                if (msg != NULL)
+                {
+                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                    sprintf((char*)msg->logMessage, "%lu: WiFi AP failed to start", esp_log_early_timestamp());
+                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                    }
+                    free(msg);
                 }
             }
         }
