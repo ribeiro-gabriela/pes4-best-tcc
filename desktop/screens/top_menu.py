@@ -13,11 +13,11 @@ from services.service_facade import ServiceFacade
 service_facade: ServiceFacade = None
 
 # [BST-332]
-"""def check_authentication(target_screen: str):
+def check_authentication(target_screen: str):
     if service_facade and service_facade.isAuthenticated():
         emit_event(Event(Event.EventType.NAVIGATE, properties={'target': target_screen}))
     else:
-        emit_event(Event(Event.EventType.LOGOUT))"""
+        emit_event(Event(Event.EventType.LOGOUT))
 
 class TopMenuBar(BoxLayout):
     connection_button = ObjectProperty(None)
@@ -49,29 +49,18 @@ class TopMenuBar(BoxLayout):
 
         button_home = MenuButton(text="HOME")
         # [BST-332]
-        #button_home.on_press = lambda: check_authentication(ScreenName.MAIN.value)
-        #TROCAR A LINHA COMENTADA
-        button_home.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
+        button_home.on_press = lambda: check_authentication(ScreenName.MAIN.value)
         left_buttons.add_widget(button_home)
 
         self.button_images = MenuButton(text="Manage Images")
         # [BST-332]
-        #self.button_images.on_press = lambda: check_authentication(ScreenName.IMAGES.value)
-        #TROCAR A LINHA COMENTADA
-        self.button_images.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.IMAGES.value}))
+        self.button_images.on_press = lambda: check_authentication(ScreenName.IMAGES.value)
         left_buttons.add_widget(self.button_images)
 
         self.connection_button = MenuButton(text="Search BC Modules")
         # [BST-332]
-        #self.connection_button.on_press = lambda: check_authentication(ScreenName.CONNECTION.value)
-        #TROCAR A LINHA COMENTADA
-        self.connection_button.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.CONNECTION.value}))
+        self.connection_button.on_press = lambda: check_authentication(ScreenName.CONNECTION.value)
         left_buttons.add_widget(self.connection_button)
-
-        #RETIRAR AO SAIR DO MODO DE TESTE
-        button_transfer = MenuButton(text=ScreenName.FILE_TRANSFER.name)
-        button_transfer.on_press = lambda: emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.FILE_TRANSFER.value}))
-        left_buttons.add_widget(button_transfer)
 
         self.add_widget(left_buttons)
 
