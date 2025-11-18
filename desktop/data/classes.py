@@ -104,4 +104,3 @@ class ArincLUH:
     DataHash: str
     SoftwarePartNumber: str
     HardwarePartNumber: str
-    Size: int

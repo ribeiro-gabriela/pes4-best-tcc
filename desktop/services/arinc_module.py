@@ -1,4 +1,3 @@
-from io import BufferedReader
 import threading
 import time
 import os
@@ -53,6 +52,8 @@ class ArincModule:
     def startTransfer(self, file: FileRecord) -> bool:
         if not self.connection_service.isConnected():
             raise Exception("Not connected")
+
+        self._create_file_with_data(file)
 
         hw_id = self.connection_service.getConnectionHardwarePN()
         target = f"{hw_id}_UNDEF"
@@ -123,18 +124,18 @@ class ArincModule:
             match lus_file:
                 case "0001":
                     if ArincTransferStep.LIST:
-                        image_filename = self.transfer_status.fileRecord.file.fileName
+                        software_pn = self.transfer_status.fileRecord.softwarePN
                         target = self.transfer_status.currentTarget
 
                         lur_file = ArincLUR(
                             [
                                 ArincLURHeaderFile(
-                                    f"{image_filename}.{ArincFileType.LUH.value}",
-                                    image_filename,
+                                    f"{software_pn}.{ArincFileType.LUH.value}",
+                                    f"{software_pn}.bin",
                                 )
                             ]
                         )
-                        file_path = _encode_LUR_file(target, lur_file)
+                        file_path = self._encode_LUR_file(target, lur_file)
                         self._put_file(target, file_path, ArincFileType.LUR)
 
                         self.transfer_status.transferStep = ArincTransferStep.TRANFER
@@ -178,16 +179,15 @@ class ArincModule:
             # return canceled status file
             return None
 
-        if filename == self.transfer_status.fileRecord.file.fileName:
-            return open(self.transfer_status.fileRecord.file.path, "rb")
+        # if filename == self.transfer_status.fileRecord.file.fileName:
+        #     return open(self.transfer_status.fileRecord.file.path, "rb")
 
         if filename == f"{target}.{ArincFileType.LUH.value}":
             file_record = self.transfer_status.fileRecord
             luh_file = ArincLUH(
-                file_record.dataHash,
                 file_record.softwarePN,
                 file_record.hardwarePN,
-                file_record.sizeBytes,
+                file_record.dataHash,
             )
             file_path = self._encode_LUH_file(target, luh_file)
             return open(file_path, "rb")
@@ -290,11 +290,8 @@ class ArincModule:
     def _encode_LUR_file(self, target: str, lur_file: ArincLUR) -> str:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
 
-        if os.path.exists(file_path):
-            os.unlink(file_path)
-
-        with open(file_path, "xb") as file:
-            bytes_to_write = bytearray(version, "ascii")
+        with open(file_path, "wb") as file:
+            bytes_to_write = bytearray()
 
             bytes_to_write.extend(
                 len(lur_file.HeaderFiles).to_bytes(2, "big", signed=False)
@@ -313,7 +310,8 @@ class ArincModule:
                 bytes_to_write.extend(hf.PartNumberName.encode("ascii"))
                 bytes_to_write.extend(b"\0")
 
-            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write(version.encode("ascii"))
+            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
@@ -322,13 +320,8 @@ class ArincModule:
     def _encode_LUH_file(self, target: str, luh_file: ArincLUH) -> str:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
 
-        if os.path.exists(file_path):
-            os.unlink(file_path)
-
-        with open(file_path, "xb") as file:
-            bytes_to_write = bytearray(version, "ascii")
-
-            bytes_to_write.extend((luh_file.Size * 8).to_bytes(4, "big", signed=False))
+        with open(file_path, "wb") as file:
+            bytes_to_write = bytearray()
 
             bytes_to_write.extend(
                 (len(luh_file.SoftwarePartNumber) + 1).to_bytes(1, "big", signed=False)
@@ -348,7 +341,36 @@ class ArincModule:
             bytes_to_write.extend(luh_file.DataHash.encode("ascii"))
             bytes_to_write.extend(b"\0")
 
-            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write(version.encode("ascii"))
+            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
+
+
+    def _create_file_with_data(self, file: FileRecord):
+        # Determine the paths for clarity and avoid confusion
+        data_output_path = file.file.path  # This will be the new file receiving the data
+        image_input_path = f"{self._SERVER_PATH}/{file.softwarePN}.bin"
+
+        HEADER_SIZE = 40
+        FOOTER_SIZE = 32
+        
+        # --- Step 1: Open the source file for reading (rb) ---
+        # The source file from which we copy the content (image_file)
+        with open(image_input_path, 'rb') as image_file:
+            # Get the total size of the source file
+            image_file.seek(0, 2)
+            total_size = image_file.tell()
+            
+            bytes_to_copy = total_size - HEADER_SIZE - FOOTER_SIZE
+
+            if bytes_to_copy <= 0:
+                raise Exception("Malformed sofware image file")
+
+            image_file.seek(HEADER_SIZE)
+            data_to_copy = image_file.read(bytes_to_copy)
+
+        with open(data_output_path, 'wb') as data_file:
+            data_file.write(data_to_copy)
+
