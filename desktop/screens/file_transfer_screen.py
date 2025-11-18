@@ -42,15 +42,6 @@ class FileTransferScreen(Screen):
 
     def on_enter(self, *args):
         super().on_enter(*args)
-        # self.reset_transfer_state()
-
-        # SIMULAÇÃO
-        # self._selected_file = File(
-        #     fileName='firmware_v1.3.0_beta.bin',
-        #     path='/simulated/path/to/firmware_v1.3.0_beta.bin'
-        # )
-        # self.transfer_status_text = 'Simulating connection to module: SIM-TEST-MODULE'
-        # self.selected_file_text = f'Transfering file: {self._selected_file.fileName}'
         
         # [BST-332]
         # [BST-322]
@@ -60,7 +51,7 @@ class FileTransferScreen(Screen):
         super().on_leave(*args)
         # event_router.unregister_callback(self._handle_file_preselection)
         self.cancel_transfer_internal() 
-        self.reset_transfer_state() 
+        # self.reset_transfer_state() 
 
     def reset_transfer_state(self):
         self.selected_file_text = 'No files being transferred'
@@ -83,9 +74,6 @@ class FileTransferScreen(Screen):
                 self._selected_file = file_obj
                 self.selected_file_text = f'Transferring: {file_obj.file.fileName}'
                 self.transfer_status_text = f'Connected to the module: {hardware_pn}'
-                print(f"File pre-selected for transfer: {file_obj.file.fileName}")
-                
-                self.start_transfer()
 
     def yes_button_clicked(self, popup: Popup):
         popup.dismiss()
@@ -107,22 +95,17 @@ class FileTransferScreen(Screen):
         self.progress_text = '0% - Starting...'
         self.progress_value = 0
         
-        def transfer_thread():
-            try:
-                # [BST-319] 
-                result = service_facade.startTransfer(file)
-                # CÓDIGO PARA SIMULAÇÃO, REMOVER PARA TESTAR O CASO REAL 
-                # result = True 
-                
-                if result:
-                    # [BST-320]
-                    self._progress_event = Clock.schedule_interval(self.update_progress, 0.5) 
-                else:
-                    Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
-            except Exception as e:
-                Clock.schedule_once(lambda dt: self.handle_transfer_error(e), 0)
-                
-        threading.Thread(target=transfer_thread, daemon=True).start()
+        # [BST-319] 
+        result = service_facade.startTransfer(file)
+            
+        try:
+            if result:
+                # [BST-320]
+                self._progress_event = Clock.schedule_interval(self.update_progress, 0.5) 
+            else:
+                Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
+        except Exception as e:
+            self.handle_transfer_error(e)
         
     def update_progress(self, dt):
         if not self._service_facade or not self.transfer_in_progress:
@@ -133,18 +116,7 @@ class FileTransferScreen(Screen):
         try:
             # [BST-320]
             status = self._service_facade.file_transfer_service.getProgress()
-            # SIMULAÇÃO, REMOVER PARA TESTAR O CASO REAL
             
-            # current_progress = self.progress_value
-            # if current_progress < 100:
-            #     percentage = min(current_progress + 10, 100) 
-            #     if percentage == 100:
-            #         status = "TransferFinished"
-            #     else:
-            #         status = {'percentage': percentage}
-            # else:
-            #     status = "TransferFinished" 
-
             # [BST-325]
             if isinstance(status, dict) and 'percentage' in status:
                 percentage = status['percentage']
@@ -190,7 +162,6 @@ class FileTransferScreen(Screen):
             
         try:
             self._service_facade.file_transfer_service.cancel() 
-            # DESCOMENTAR PARA USAR O SERVIÇO REAL
             Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
         except Exception as e:
             self.handle_transfer_error(e)
@@ -217,6 +188,7 @@ class FileTransferScreen(Screen):
         self.progress_text = 'Transfer interrupted by error'
         self.progress_value = 0 
         # [BST-321]
+        emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
         emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
 
     def confirm_transfer(self, file_name: str):

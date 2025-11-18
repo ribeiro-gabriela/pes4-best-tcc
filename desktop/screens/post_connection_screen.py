@@ -193,17 +193,14 @@ class PostConnectionScreen(Screen):
                     break
             
             if selected_record:
-                try:
-                    # [BST-318]
-                    emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.FILE_TRANSFER.value}))
-                    
-                    emit_event(Event(Event.EventType.LOAD_IMAGE_REQUESTED, properties={
-                        'file': selected_record,
-                        'hardware_pn': self.hardware_pn
-                    }))
-                    
-                except Exception as e:
-                    emit_event(Event(Event.EventType.ERROR, error=e, properties={"message": f"Error preparing file for transfer: {e}"}))
+                # [BST-318]
+                emit_event(Event(Event.EventType.LOAD_IMAGE_REQUESTED, properties={
+                    'file': selected_record,
+                    'hardware_pn': self.hardware_pn
+                }))
+                
+                emit_event(Event(Event.EventType.START_LOADING))
+                
             else:
                 emit_event(Event(Event.EventType.ERROR, error=Exception("It was not possible to prepare the file for transfer.")))
         else:

@@ -349,17 +349,13 @@ class ArincModule:
 
 
     def _create_file_with_data(self, file: FileRecord):
-        # Determine the paths for clarity and avoid confusion
-        data_output_path = file.file.path  # This will be the new file receiving the data
-        image_input_path = f"{self._SERVER_PATH}/{file.softwarePN}.bin"
+        data_output_path = f"{self._SERVER_PATH}/{file.softwarePN}.bin"
+        image_input_path = file.file.path
 
         HEADER_SIZE = 40
         FOOTER_SIZE = 32
         
-        # --- Step 1: Open the source file for reading (rb) ---
-        # The source file from which we copy the content (image_file)
         with open(image_input_path, 'rb') as image_file:
-            # Get the total size of the source file
             image_file.seek(0, 2)
             total_size = image_file.tell()
             
