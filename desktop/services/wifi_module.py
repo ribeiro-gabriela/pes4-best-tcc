@@ -143,7 +143,7 @@ class WifiModule:
             # subprocess.run(['nmcli', 'device', 'disconnect', self._interface], capture_output=True)
             
             # Connect command
-            cmd = ['nmcli', 'device', 'wifi', 'connect', ssid, 'password', password]
+            cmd = ['nmcli', 'device', 'wifi', 'connect', ssid, 'password', password, 'key-mgmt','sae']
             result = subprocess.run(cmd, capture_output=True, text=True)
             
             if result.returncode != 0:
