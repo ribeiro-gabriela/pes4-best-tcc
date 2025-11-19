@@ -102,7 +102,7 @@ int parkingBrakeHandler(int argc, char **argv)
         else if (strcmp(argv[1], "disable") == 0)
         {
             sensors.parkingBrake = false;
-            ESP_LOGI(TAG, "Parking brake set to released");
+            ESP_LOGW(TAG, "Parking brake set to released");
             checkMaintenanceMode();
         }
         return 0;
@@ -131,7 +131,7 @@ int weightOnWheelsHandler(int argc, char **argv)
         else if (strcmp(argv[1], "disable") == 0)
         {
             sensors.weightOnWheels = false;
-            ESP_LOGI(TAG, "Weight on wheels set to false");
+            ESP_LOGW(TAG, "Weight on wheels set to false");
             checkMaintenanceMode();
         }
 
@@ -161,24 +161,16 @@ int maintenanceModeHandler(int argc, char **argv)
             else
             {
                 sensors.mntSignal = true;
-                checkMaintenanceMode();
                 ESP_LOGI(TAG, "Maintenance lever enabled");
-                
+                checkMaintenanceMode();
             }
         }
         else if (strcmp(argv[1], "disable") == 0)
         {
-            if (getBCState() != MNT_MODE)
-            {
-                ESP_LOGW(TAG, "Maintenance lever already disabled");
-            }
-            else
-            {
-                sensors.mntSignal = false;
-                
-                ESP_LOGI(TAG, "Maintenance lever disabled");
-                checkMaintenanceMode();
-            }
+            sensors.mntSignal = false;
+            
+            ESP_LOGW(TAG, "Maintenance lever disabled");
+            checkMaintenanceMode();
         }
 
         return 0;
