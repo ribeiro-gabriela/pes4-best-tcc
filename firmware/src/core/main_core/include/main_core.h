@@ -3,16 +3,14 @@
 
 #include <string.h>
 
-#include "fsm_core.h"
-#include "wifi_core.h"
-#include "cli.h"
-#include "hashing.h"
-#include "tftp.h"
-#include "storage_core.h"
+#include "fsm.h"
+#include "comm_port.h"
+#include "cli_port.h"
+#include "verification_port.h"
+#include "storage_port.h"
 #include "esp_mac.h"
 
 #include "freertos/queue.h"
-
 
 enum eventIDs { 
     COMM_AUTH_FAILURE,
@@ -26,7 +24,7 @@ enum eventIDs {
     EVENT_SENSORS_LINK_DOWN,
     LOAD_REQUEST,
     LOG_INFO,
-    SEC_ERR_GSE_AUTH_FAILED,            // Useless event, since the authentication failure is already covered by the wifi connection using wpa3
+    SEC_ERR_GSE_AUTH_FAILED,            // Evento desnecessário, já que a autenticação é feita por WPA3-Enterprise
     SEC_ERR_IMG_BAD_FORMAT,
     SEC_ERR_IMG_HASH_MISMATCH,
     SEC_ERR_IMG_PN_MISMATCH,
@@ -39,6 +37,13 @@ enum eventIDs {
     SEC_IMG_HASH_OK,
     SEC_IMG_PN_OK
 };
+
+typedef struct
+{
+    bool parkingBrake;
+    bool weightOnWheels;
+    bool mntSignal;
+} sensorData_t;
 typedef struct
 {
     enum eventIDs eventID ;
