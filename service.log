@@ -1,0 +1,572 @@
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:17:29,079 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:17:29,365 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:17:29,365 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:17:29,366 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:17:29,366 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:17:29,366 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:17:29,366 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:17:29,367 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:17:29,367 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:17:29,367 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:17:29,367 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:17:52,642 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:17:52,642 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:17:52,642 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:17:52,643 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:17:52,643 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:17:52,643 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:17:52,644 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:17:52,644 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:17:52,645 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:17:52,645 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:18:14,696 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:18:14,696 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:18:14,696 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:18:14,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:18:14,697 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:18:14,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:18:14,698 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:18:14,698 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:18:14,698 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:18:14,698 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:18:37,210 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:18:37,210 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:18:37,210 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:18:37,211 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:18:37,212 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:20:18,113 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'tftpy'
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:21:05,498 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:21:05,512 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:21:05,512 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\__init__.py", line 13, in <module>
+2025-11-18 12:21:05,512 - kivy - WARNING - stderr:     from .TftpServer import TftpServer
+2025-11-18 12:21:05,512 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpServer.py", line 16, in <module>
+2025-11-18 12:21:05,513 - kivy - WARNING - stderr:     from .TftpContexts import TftpContextServer
+2025-11-18 12:21:05,513 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpContexts.py", line 18, in <module>
+2025-11-18 12:21:05,513 - kivy - WARNING - stderr:     import fcntl
+2025-11-18 12:21:05,513 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'fcntl'
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:21:38,340 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:21:38,345 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\__init__.py", line 13, in <module>
+2025-11-18 12:21:38,345 - kivy - WARNING - stderr:     from .TftpServer import TftpServer
+2025-11-18 12:21:38,345 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpServer.py", line 16, in <module>
+2025-11-18 12:21:38,346 - kivy - WARNING - stderr:     from .TftpContexts import TftpContextServer
+2025-11-18 12:21:38,346 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpContexts.py", line 18, in <module>
+2025-11-18 12:21:38,346 - kivy - WARNING - stderr:     import fcntl
+2025-11-18 12:21:38,347 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'fcntl'
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\__init__.py", line 13, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from .TftpServer import TftpServer
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpServer.py", line 16, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     from .TftpContexts import TftpContextServer
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpContexts.py", line 18, in <module>
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr:     import fcntl
+2025-11-18 12:22:03,329 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'fcntl'
+2025-11-18 12:22:23,296 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:22:23,296 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:22:23,296 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:22:23,296 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 11, in <module>
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:     class WifiModule:
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 13, in WifiModule
+2025-11-18 12:22:23,308 - kivy - WARNING - stderr:     _tftp_client: TftpClient | None = None
+2025-11-18 12:22:23,312 - kivy - WARNING - stderr:                   ^^^^^^^^^^
+2025-11-18 12:22:23,312 - kivy - WARNING - stderr: NameError: name 'TftpClient' is not defined
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 11, in <module>
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:     class WifiModule:
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 13, in WifiModule
+2025-11-18 12:22:42,383 - kivy - WARNING - stderr:     _tftp_client: TftpClient | None = None
+2025-11-18 12:22:42,398 - kivy - WARNING - stderr:                   ^^^^^^^^^^
+2025-11-18 12:22:42,398 - kivy - WARNING - stderr: NameError: name 'TftpClient' is not defined
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 12, in <module>
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:     class WifiModule:
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 14, in WifiModule
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:     _tftp_client: TftpClient | None = None
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr:                   ~~~~~~~~~~~^~~~~~
+2025-11-18 12:22:51,697 - kivy - WARNING - stderr: TypeError: unsupported operand type(s) for |: 'NoneType' and 'NoneType'
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 12, in <module>
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:     class WifiModule:
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 14, in WifiModule
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:     _tftp_client: TftpClient | None = None
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr:                   ~~~~~~~~~~~^~~~~~
+2025-11-18 12:23:04,579 - kivy - WARNING - stderr: TypeError: unsupported operand type(s) for |: 'NoneType' and 'NoneType'
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 25, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\__init__.py", line 13, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from .TftpServer import TftpServer
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpServer.py", line 16, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     from .TftpContexts import TftpContextServer
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpContexts.py", line 18, in <module>
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr:     import fcntl
+2025-11-18 12:23:14,132 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'fcntl'
+2025-11-18 16:27:19,063 - ImportedFilesService - INFO - File retrieved successfully: SW_PN TARGET_SW
+2025-11-18 16:27:19,067 - ImportedFilesService - INFO - Delete operation successful for SW_PN DELETE_TEST. 2 files removed.
+2025-11-18 16:27:19,069 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN NONEXISTENT_SW.
+2025-11-18 16:27:19,072 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 16:27:19,074 - ImportedFilesService - ERROR - Import failed: Identification check failed for bad_id.bin
+data.errors.IdentificationError: Import failed: Identification check failed for bad_id.bin
+2025-11-18 16:27:19,076 - ImportedFilesService - ERROR - Import failed: Integrity check failed for bad_integrity.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for bad_integrity.bin
+2025-11-18 16:27:19,079 - ImportedFilesService - ERROR - Import failed: File with SW_PN DUPLICATE_SW already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN DUPLICATE_SW already exists.
+2025-11-18 16:27:19,084 - ImportedFilesService - INFO - Import successful: create_fail.bin imported as SW_CREATE.bin
+2025-11-18 16:35:45,395 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 16:35:45,396 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW_NONEXISTENT.
+2025-11-18 16:35:45,397 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 16:35:45,399 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 16:35:45,399 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 16:35:45,402 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_INTEGRITY_OK.bin
+2025-11-18 16:35:45,402 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 16:35:45,402 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 16:35:45,402 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 16:35:45,406 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 16:36:20,265 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 16:36:20,266 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW_NONEXISTENT.
+2025-11-18 16:36:20,267 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 16:36:20,271 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 16:36:20,272 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 16:36:20,274 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_INTEGRITY_OK.bin
+2025-11-18 16:36:20,274 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 16:36:20,280 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 16:36:20,282 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 16:36:20,285 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_FINAL.bin
+2025-11-18 16:45:00,285 - ImportedFilesService - INFO - Import successful: test_248.bin imported as SW_248.bin
+2025-11-18 16:46:18,794 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 16:46:18,796 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW_NONEXISTENT.
+2025-11-18 16:46:18,797 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 16:46:18,800 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 16:46:18,800 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 16:46:18,802 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_INTEGRITY_OK.bin
+2025-11-18 16:46:18,802 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 16:46:18,804 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 16:46:18,805 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 16:46:18,807 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 16:51:06,546 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 16:51:06,546 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW_NONEXISTENT.
+2025-11-18 16:51:06,548 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 16:51:06,551 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 16:51:06,551 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 16:51:06,553 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_INTEGRITY_OK.bin
+2025-11-18 16:51:06,553 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 16:51:06,556 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 16:51:06,556 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 16:51:06,558 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 17:03:45,102 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:04:06,809 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:06:07,282 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:06:07,284 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:06:07,285 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:06:07,288 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_IMPORT.bin
+2025-11-18 17:06:07,288 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 17:06:07,290 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_INTEGRITY_OK.bin
+2025-11-18 17:06:07,292 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 17:06:07,296 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 17:06:07,298 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 17:06:07,301 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 17:16:25,385 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:16:25,387 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:16:25,387 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:16:25,390 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW001 already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW001 already exists.
+2025-11-18 17:16:58,325 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:16:58,327 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:16:58,328 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:16:58,334 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW005.bin
+2025-11-18 17:16:58,334 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 17:16:58,335 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW005 already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW005 already exists.
+2025-11-18 17:17:24,458 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:17:24,460 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:17:24,462 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:17:24,465 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW004.bin
+2025-11-18 17:17:24,465 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 17:17:24,468 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW005.bin
+2025-11-18 17:17:24,468 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 17:17:24,470 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CREATE.bin
+2025-11-18 17:17:24,470 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW_CREATE already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW_CREATE already exists.
+2025-11-18 17:17:24,472 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 17:21:03,842 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:21:03,845 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:21:03,846 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:21:03,849 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW004.bin
+2025-11-18 17:21:03,849 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 17:21:03,852 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW005.bin
+2025-11-18 17:21:03,853 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 17:21:03,856 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW007.bin
+2025-11-18 17:21:03,857 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW007 already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW007 already exists.
+2025-11-18 17:21:03,861 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW_CHECK_NEW.bin
+2025-11-18 17:23:01,590 - ImportedFilesService - INFO - File retrieved successfully: SW_PN SW001
+2025-11-18 17:23:01,592 - ImportedFilesService - INFO - Delete operation: No files found for SW_PN SW010.
+2025-11-18 17:23:01,594 - ImportedFilesService - INFO - Delete operation successful for SW_PN SW002. 2 files removed.
+2025-11-18 17:23:01,599 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW004.bin
+2025-11-18 17:23:01,599 - ImportedFilesService - ERROR - Import failed: Identification check failed for import_test.bin
+data.errors.IdentificationError: Import failed: Identification check failed for import_test.bin
+2025-11-18 17:23:01,602 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW005.bin
+2025-11-18 17:23:01,602 - ImportedFilesService - ERROR - Import failed: Integrity check failed for import_test.bin
+data.errors.IntegrityError: Import failed: Integrity check failed for import_test.bin
+2025-11-18 17:23:01,607 - ImportedFilesService - INFO - Import successful: import_test.bin imported as SW007.bin
+2025-11-18 17:23:01,608 - ImportedFilesService - ERROR - Import failed: File with SW_PN SW007 already exists.
+data.errors.DuplicateFileError: Import failed: File with SW_PN SW007 already exists.
+2025-11-19 09:24:25,335 - kivy - WARNING - stderr: Traceback (most recent call last):
+2025-11-19 09:24:25,339 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\main.py", line 5, in <module>
+2025-11-19 09:24:25,339 - kivy - WARNING - stderr:     from services.arinc_module import ArincModule
+2025-11-19 09:24:25,339 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\arinc_module.py", line 24, in <module>
+2025-11-19 09:24:25,339 - kivy - WARNING - stderr:     from services.connection_service import ConnectionService
+2025-11-19 09:24:25,343 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\connection_service.py", line 8, in <module>
+2025-11-19 09:24:25,343 - kivy - WARNING - stderr:     from services.wifi_module import WifiModule
+2025-11-19 09:24:25,343 - kivy - WARNING - stderr:   File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\wifi_module.py", line 4, in <module>
+2025-11-19 09:24:25,343 - kivy - WARNING - stderr:     from tftpy import TftpClient
+2025-11-19 09:24:25,343 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\__init__.py", line 13, in <module>
+2025-11-19 09:24:25,355 - kivy - WARNING - stderr:     from .TftpServer import TftpServer
+2025-11-19 09:24:25,356 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpServer.py", line 16, in <module>
+2025-11-19 09:24:25,360 - kivy - WARNING - stderr:     from .TftpContexts import TftpContextServer
+2025-11-19 09:24:25,363 - kivy - WARNING - stderr:   File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\tftpy\TftpContexts.py", line 18, in <module>
+2025-11-19 09:24:25,370 - kivy - WARNING - stderr:     import fcntl
+2025-11-19 09:24:25,371 - kivy - WARNING - stderr: ModuleNotFoundError: No module named 'fcntl'
+2025-11-19 09:25:03,274 - kivy - INFO - Factory: 195 symbols loaded
+2025-11-19 09:25:04,888 - kivy - INFO - Image: Providers: img_tex, img_dds, img_sdl2 (img_pil, img_ffpyplayer ignored)
+2025-11-19 09:25:06,249 - kivy - INFO - Text: Provider: sdl2
+2025-11-19 09:25:06,787 - kivy - INFO - Window: Provider: sdl2
+2025-11-19 09:25:07,705 - kivy - INFO - GL: Using the "OpenGL" graphics system
+2025-11-19 09:25:07,710 - kivy - INFO - GL: GLEW initialization succeeded
+2025-11-19 09:25:07,710 - kivy - INFO - GL: Backend used <glew>
+2025-11-19 09:25:07,711 - kivy - INFO - GL: OpenGL version <b'4.6.0 - Build 32.0.101.6913'>
+2025-11-19 09:25:07,711 - kivy - INFO - GL: OpenGL vendor <b'Intel'>
+2025-11-19 09:25:07,711 - kivy - INFO - GL: OpenGL renderer <b'Intel(R) UHD Graphics'>
+2025-11-19 09:25:07,713 - kivy - INFO - GL: OpenGL parsed version: 4, 6
+2025-11-19 09:25:07,713 - kivy - INFO - GL: Shading version <b'4.60 - Build 32.0.101.6913'>
+2025-11-19 09:25:07,714 - kivy - INFO - GL: Texture max size <16384>
+2025-11-19 09:25:07,714 - kivy - INFO - GL: Texture max units <32>
+2025-11-19 09:25:07,777 - kivy - INFO - Window: auto add sdl2 input provider
+2025-11-19 09:25:07,788 - kivy - INFO - Window: virtual keyboard not allowed, single mode, not docked
+2025-11-19 09:25:08,323 - tftpy.TftpServer - INFO - Server requested on ip 0.0.0.0, port 69
+2025-11-19 09:25:08,323 - UiManager - INFO - Starting the UiManager configuration...
+2025-11-19 09:25:08,324 - tftpy.TftpServer - INFO - Starting receive loop...
+2025-11-19 09:25:08,324 - UiManager - INFO - ScreenManager initialized and ServiceFacade injected.
+2025-11-19 09:25:08,325 - StateController - INFO - Application initialization. Transitioning to Login.
+2025-11-19 09:25:08,325 - StateController - INFO - Attempt to transition to the same state: Login. No action taken.
+2025-11-19 09:25:08,325 - UiManager - INFO - The StateController has been initialized.
+2025-11-19 09:25:08,349 - kivy - WARNING - Factory: Ignored class "MenuButton" re-declaration. Current -  module: None, cls: <class 'screens.components.MenuButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,350 - kivy - WARNING - Factory: Ignored class "SecondaryButton" re-declaration. Current -  module: None, cls: <class 'screens.components.SecondaryButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,350 - kivy - WARNING - Factory: Ignored class "ConnectButton" re-declaration. Current -  module: None, cls: <class 'screens.components.ConnectButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,351 - kivy - WARNING - Factory: Ignored class "TitleLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.TitleLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,353 - kivy - WARNING - Factory: Ignored class "NormalLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.NormalLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,353 - kivy - WARNING - Factory: Ignored class "HeaderLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.HeaderLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,354 - kivy - WARNING - Factory: Ignored class "WiFiLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.WiFiLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,354 - kivy - WARNING - Factory: Ignored class "ScreenLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.ScreenLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,355 - kivy - WARNING - Factory: Ignored class "CompactLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.CompactLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,355 - kivy - WARNING - Factory: Ignored class "HorizontalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.HorizontalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,355 - kivy - WARNING - Factory: Ignored class "VerticalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.VerticalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,356 - kivy - WARNING - Factory: Ignored class "TableLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.TableLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: GridLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,356 - kivy - WARNING - Factory: Ignored class "SystemImageItem" re-declaration. Current -  module: None, cls: <class 'screens.components.SystemImageItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: ToggleButton, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,356 - kivy - WARNING - Factory: Ignored class "DeleteButton" re-declaration. Current -  module: None, cls: <class 'screens.components.DeleteButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,356 - kivy - WARNING - Factory: Ignored class "ImageListItem" re-declaration. Current -  module: None, cls: <class 'screens.components.ImageListItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:25:08,392 - kivy - WARNING - Deprecated property "<BooleanProperty name=allow_stretch>" of object "<kivy.uix.image.Image object at 0x000002013E102DD0>" has been set, it will be removed in a future version
+2025-11-19 09:25:08,392 - kivy - WARNING - Deprecated property "<BooleanProperty name=keep_ratio>" of object "<kivy.uix.image.Image object at 0x000002013E102DD0>" was accessed, it will be removed in a future version
+2025-11-19 09:25:08,401 - kivy - INFO - GL: NPOT texture support is available
+2025-11-19 09:25:08,516 - kivy - INFO - Base: Start application main loop
+2025-11-19 09:25:13,829 - UserDatabase - INFO - [UserDB] Validating user credentials: Pedrinho
+2025-11-19 09:25:13,830 - UserDatabase - INFO - [UserDB] User 'Pedrinho' NOT found.
+2025-11-19 09:25:13,830 - UserAuthenticationService - INFO - Failed authentication attempt for user Pedrinho. currentSession is still None.
+2025-11-19 09:25:13,830 - StateController - INFO - Login failed for 'Pedrinho': Invalid username or password. Please try again.
+2025-11-19 09:27:02,959 - UserDatabase - INFO - [UserDB] Validating user credentials: admin
+2025-11-19 09:27:02,959 - UserDatabase - INFO - [UserDB] User 'admin' found. Comparing passwords.
+2025-11-19 09:27:02,961 - UserDatabase - INFO - [UserDB] Correct password for 'admin'.
+2025-11-19 09:27:02,961 - UserAuthenticationService - INFO - User admin authenticated successfully.
+2025-11-19 09:27:02,962 - UserAuthenticationService - INFO - currentSession created for user admin at 2025-11-19 09:27:02.961910.
+2025-11-19 09:27:02,964 - StateController - INFO - Login successful. Transitioning to Main.
+2025-11-19 09:27:02,964 - StateController - INFO - State transition: Login -> Main
+2025-11-19 09:30:18,969 - kivy - INFO - Base: Leaving application in progress...
+2025-11-19 09:30:26,569 - kivy - INFO - Factory: 195 symbols loaded
+2025-11-19 09:30:26,656 - kivy - INFO - Image: Providers: img_tex, img_dds, img_sdl2 (img_pil, img_ffpyplayer ignored)
+2025-11-19 09:30:26,673 - kivy - INFO - Text: Provider: sdl2
+2025-11-19 09:30:26,693 - kivy - INFO - Window: Provider: sdl2
+2025-11-19 09:30:26,913 - kivy - INFO - GL: Using the "OpenGL" graphics system
+2025-11-19 09:30:26,915 - kivy - INFO - GL: GLEW initialization succeeded
+2025-11-19 09:30:26,915 - kivy - INFO - GL: Backend used <glew>
+2025-11-19 09:30:26,915 - kivy - INFO - GL: OpenGL version <b'4.6.0 - Build 32.0.101.6913'>
+2025-11-19 09:30:26,915 - kivy - INFO - GL: OpenGL vendor <b'Intel'>
+2025-11-19 09:30:26,915 - kivy - INFO - GL: OpenGL renderer <b'Intel(R) UHD Graphics'>
+2025-11-19 09:30:26,915 - kivy - INFO - GL: OpenGL parsed version: 4, 6
+2025-11-19 09:30:26,916 - kivy - INFO - GL: Shading version <b'4.60 - Build 32.0.101.6913'>
+2025-11-19 09:30:26,916 - kivy - INFO - GL: Texture max size <16384>
+2025-11-19 09:30:26,916 - kivy - INFO - GL: Texture max units <32>
+2025-11-19 09:30:26,933 - kivy - INFO - Window: auto add sdl2 input provider
+2025-11-19 09:30:26,935 - kivy - INFO - Window: virtual keyboard not allowed, single mode, not docked
+2025-11-19 09:30:26,960 - tftpy.TftpServer - INFO - Server requested on ip 0.0.0.0, port 69
+2025-11-19 09:30:26,961 - UiManager - INFO - Starting the UiManager configuration...
+2025-11-19 09:30:26,961 - tftpy.TftpServer - INFO - Starting receive loop...
+2025-11-19 09:30:26,961 - UiManager - INFO - ScreenManager initialized and ServiceFacade injected.
+2025-11-19 09:30:26,962 - StateController - INFO - Application initialization. Transitioning to Login.
+2025-11-19 09:30:26,962 - StateController - INFO - Attempt to transition to the same state: Login. No action taken.
+2025-11-19 09:30:26,962 - UiManager - INFO - The StateController has been initialized.
+2025-11-19 09:30:26,986 - kivy - WARNING - Factory: Ignored class "MenuButton" re-declaration. Current -  module: None, cls: <class 'screens.components.MenuButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,986 - kivy - WARNING - Factory: Ignored class "SecondaryButton" re-declaration. Current -  module: None, cls: <class 'screens.components.SecondaryButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,987 - kivy - WARNING - Factory: Ignored class "ConnectButton" re-declaration. Current -  module: None, cls: <class 'screens.components.ConnectButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "TitleLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.TitleLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "NormalLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.NormalLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "HeaderLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.HeaderLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "WiFiLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.WiFiLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "ScreenLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.ScreenLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,988 - kivy - WARNING - Factory: Ignored class "CompactLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.CompactLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,989 - kivy - WARNING - Factory: Ignored class "HorizontalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.HorizontalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,989 - kivy - WARNING - Factory: Ignored class "VerticalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.VerticalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,989 - kivy - WARNING - Factory: Ignored class "TableLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.TableLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: GridLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,989 - kivy - WARNING - Factory: Ignored class "SystemImageItem" re-declaration. Current -  module: None, cls: <class 'screens.components.SystemImageItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: ToggleButton, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,989 - kivy - WARNING - Factory: Ignored class "DeleteButton" re-declaration. Current -  module: None, cls: <class 'screens.components.DeleteButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:26,990 - kivy - WARNING - Factory: Ignored class "ImageListItem" re-declaration. Current -  module: None, cls: <class 'screens.components.ImageListItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:30:27,026 - kivy - WARNING - Deprecated property "<BooleanProperty name=allow_stretch>" of object "<kivy.uix.image.Image object at 0x000002115B952A50>" has been set, it will be removed in a future version
+2025-11-19 09:30:27,027 - kivy - WARNING - Deprecated property "<BooleanProperty name=keep_ratio>" of object "<kivy.uix.image.Image object at 0x000002115B952A50>" was accessed, it will be removed in a future version
+2025-11-19 09:30:27,036 - kivy - INFO - GL: NPOT texture support is available
+2025-11-19 09:30:27,099 - kivy - INFO - Base: Start application main loop
+2025-11-19 09:30:30,337 - UserDatabase - INFO - [UserDB] Validating user credentials: admin
+2025-11-19 09:30:30,337 - UserDatabase - INFO - [UserDB] User 'admin' found. Comparing passwords.
+2025-11-19 09:30:30,338 - UserDatabase - INFO - [UserDB] Correct password for 'admin'.
+2025-11-19 09:30:30,338 - UserAuthenticationService - INFO - User admin authenticated successfully.
+2025-11-19 09:30:30,339 - UserAuthenticationService - INFO - currentSession created for user admin at 2025-11-19 09:30:30.338211.
+2025-11-19 09:30:30,340 - StateController - INFO - Login successful. Transitioning to Main.
+2025-11-19 09:30:30,340 - StateController - INFO - State transition: Login -> Main
+2025-11-19 09:31:56,475 - UserAuthenticationService - INFO - Session for user admin invalidated due to inactivity. currentSession set to Session(user=User(username='admin', password_hash='admin'), lastActivityAt=datetime.datetime(2025, 11, 19, 9, 30, 30, 338211)).
+2025-11-19 09:31:56,476 - StateController - INFO - Global event logout received. Logging out and transitioning to Login.
+2025-11-19 09:31:56,477 - StateController - INFO - State transition: Main -> Login
+2025-11-19 09:32:24,832 - kivy - INFO - Base: Leaving application in progress...
+2025-11-19 09:32:31,208 - kivy - INFO - Factory: 195 symbols loaded
+2025-11-19 09:32:31,297 - kivy - INFO - Image: Providers: img_tex, img_dds, img_sdl2 (img_pil, img_ffpyplayer ignored)
+2025-11-19 09:32:31,312 - kivy - INFO - Text: Provider: sdl2
+2025-11-19 09:32:31,334 - kivy - INFO - Window: Provider: sdl2
+2025-11-19 09:32:31,542 - kivy - INFO - GL: Using the "OpenGL" graphics system
+2025-11-19 09:32:31,543 - kivy - INFO - GL: GLEW initialization succeeded
+2025-11-19 09:32:31,543 - kivy - INFO - GL: Backend used <glew>
+2025-11-19 09:32:31,544 - kivy - INFO - GL: OpenGL version <b'4.6.0 - Build 32.0.101.6913'>
+2025-11-19 09:32:31,544 - kivy - INFO - GL: OpenGL vendor <b'Intel'>
+2025-11-19 09:32:31,544 - kivy - INFO - GL: OpenGL renderer <b'Intel(R) UHD Graphics'>
+2025-11-19 09:32:31,544 - kivy - INFO - GL: OpenGL parsed version: 4, 6
+2025-11-19 09:32:31,544 - kivy - INFO - GL: Shading version <b'4.60 - Build 32.0.101.6913'>
+2025-11-19 09:32:31,545 - kivy - INFO - GL: Texture max size <16384>
+2025-11-19 09:32:31,545 - kivy - INFO - GL: Texture max units <32>
+2025-11-19 09:32:31,560 - kivy - INFO - Window: auto add sdl2 input provider
+2025-11-19 09:32:31,562 - kivy - INFO - Window: virtual keyboard not allowed, single mode, not docked
+2025-11-19 09:32:31,582 - tftpy.TftpServer - INFO - Server requested on ip 0.0.0.0, port 69
+2025-11-19 09:32:31,582 - UiManager - INFO - Starting the UiManager configuration...
+2025-11-19 09:32:31,583 - tftpy.TftpServer - INFO - Starting receive loop...
+2025-11-19 09:32:31,583 - UiManager - INFO - ScreenManager initialized and ServiceFacade injected.
+2025-11-19 09:32:31,583 - StateController - INFO - Application initialization. Transitioning to Login.
+2025-11-19 09:32:31,583 - StateController - INFO - Attempt to transition to the same state: Login. No action taken.
+2025-11-19 09:32:31,584 - UiManager - INFO - The StateController has been initialized.
+2025-11-19 09:32:31,607 - kivy - WARNING - Factory: Ignored class "MenuButton" re-declaration. Current -  module: None, cls: <class 'screens.components.MenuButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,607 - kivy - WARNING - Factory: Ignored class "SecondaryButton" re-declaration. Current -  module: None, cls: <class 'screens.components.SecondaryButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,607 - kivy - WARNING - Factory: Ignored class "ConnectButton" re-declaration. Current -  module: None, cls: <class 'screens.components.ConnectButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,607 - kivy - WARNING - Factory: Ignored class "TitleLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.TitleLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,608 - kivy - WARNING - Factory: Ignored class "NormalLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.NormalLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,608 - kivy - WARNING - Factory: Ignored class "HeaderLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.HeaderLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,608 - kivy - WARNING - Factory: Ignored class "WiFiLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.WiFiLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,608 - kivy - WARNING - Factory: Ignored class "ScreenLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.ScreenLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,608 - kivy - WARNING - Factory: Ignored class "CompactLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.CompactLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "HorizontalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.HorizontalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "VerticalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.VerticalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "TableLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.TableLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: GridLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "SystemImageItem" re-declaration. Current -  module: None, cls: <class 'screens.components.SystemImageItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: ToggleButton, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "DeleteButton" re-declaration. Current -  module: None, cls: <class 'screens.components.DeleteButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,609 - kivy - WARNING - Factory: Ignored class "ImageListItem" re-declaration. Current -  module: None, cls: <class 'screens.components.ImageListItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:32:31,643 - kivy - WARNING - Deprecated property "<BooleanProperty name=allow_stretch>" of object "<kivy.uix.image.Image object at 0x000001782D2D2A50>" has been set, it will be removed in a future version
+2025-11-19 09:32:31,643 - kivy - WARNING - Deprecated property "<BooleanProperty name=keep_ratio>" of object "<kivy.uix.image.Image object at 0x000001782D2D2A50>" was accessed, it will be removed in a future version
+2025-11-19 09:32:31,649 - kivy - INFO - GL: NPOT texture support is available
+2025-11-19 09:32:31,716 - kivy - INFO - Base: Start application main loop
+2025-11-19 09:32:35,210 - UserDatabase - INFO - [UserDB] Validating user credentials: admin
+2025-11-19 09:32:35,211 - UserDatabase - INFO - [UserDB] User 'admin' found. Comparing passwords.
+2025-11-19 09:32:35,211 - UserDatabase - INFO - [UserDB] Correct password for 'admin'.
+2025-11-19 09:32:35,212 - UserAuthenticationService - INFO - User admin authenticated successfully.
+2025-11-19 09:32:35,212 - UserAuthenticationService - INFO - currentSession created for user admin at 2025-11-19 09:32:35.212269.
+2025-11-19 09:32:35,212 - StateController - INFO - Login successful. Transitioning to Main.
+2025-11-19 09:32:35,213 - StateController - INFO - State transition: Login -> Main
+2025-11-19 09:34:36,626 - StateController - ERROR - Transition to the error state of Main.
+Traceback (most recent call last):
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\base.py", line 339, in mainloop
+    self.idle()
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\base.py", line 383, in idle
+    self.dispatch_input()
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\base.py", line 334, in dispatch_input
+    post_dispatch_input(*pop(0))
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\base.py", line 302, in post_dispatch_input
+    wid.dispatch('on_touch_up', me)
+  File "kivy\\_event.pyx", line 731, in kivy._event.EventDispatcher.dispatch
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\uix\behaviors\button.py", line 179, in on_touch_up
+    self.dispatch('on_release')
+  File "kivy\\_event.pyx", line 727, in kivy._event.EventDispatcher.dispatch
+  File "kivy\\_event.pyx", line 1307, in kivy._event.EventObservers.dispatch
+  File "kivy\\_event.pyx", line 1191, in kivy._event.EventObservers._dispatch
+  File "C:\Users\rafael.augusto_driva\AppData\Roaming\Python\Python311\site-packages\kivy\lang\builder.py", line 60, in custom_callback
+    exec(__kvlang__.co_value, idmap)
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv", line 561, in <module>
+    on_release: root.emit_navigate_to_connections()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\screens\main_screen.py", line 29, in emit_navigate_to_connections
+    check_authentication(ScreenName.CONNECTION.value)
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\screens\main_screen.py", line 12, in check_authentication
+    if service_facade and service_facade.isAuthenticated():
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\service_facade.py", line 40, in isAuthenticated
+    return self.authentication_service.isAuthenticated()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\user_authentication_service.py", line 56, in isAuthenticated
+    self._check_inactivity()
+  File "c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\services\user_authentication_service.py", line 51, in _check_inactivity
+    f"Session for user {self.currentSession.user.username} invalidated due to inactivity. currentSession set to {self.currentSession}."
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'user'
+2025-11-19 09:34:41,257 - StateController - INFO - Error dismissed. Returning to the previous state: Main.
+2025-11-19 09:34:41,258 - StateController - INFO - State transition: Error -> Main
+2025-11-19 09:34:42,451 - StateController - INFO - Global event logout received. Logging out and transitioning to Login.
+2025-11-19 09:34:42,453 - StateController - INFO - State transition: Main -> Login
+2025-11-19 09:35:22,392 - kivy - INFO - Base: Leaving application in progress...
+2025-11-19 09:35:23,333 - kivy - INFO - Factory: 195 symbols loaded
+2025-11-19 09:35:23,532 - kivy - INFO - Image: Providers: img_tex, img_dds, img_sdl2 (img_pil, img_ffpyplayer ignored)
+2025-11-19 09:35:23,563 - kivy - INFO - Text: Provider: sdl2
+2025-11-19 09:35:23,619 - kivy - INFO - Window: Provider: sdl2
+2025-11-19 09:35:23,978 - kivy - INFO - GL: Using the "OpenGL" graphics system
+2025-11-19 09:35:23,980 - kivy - INFO - GL: GLEW initialization succeeded
+2025-11-19 09:35:23,980 - kivy - INFO - GL: Backend used <glew>
+2025-11-19 09:35:23,981 - kivy - INFO - GL: OpenGL version <b'4.6.0 - Build 32.0.101.6913'>
+2025-11-19 09:35:23,981 - kivy - INFO - GL: OpenGL vendor <b'Intel'>
+2025-11-19 09:35:23,981 - kivy - INFO - GL: OpenGL renderer <b'Intel(R) UHD Graphics'>
+2025-11-19 09:35:23,982 - kivy - INFO - GL: OpenGL parsed version: 4, 6
+2025-11-19 09:35:23,982 - kivy - INFO - GL: Shading version <b'4.60 - Build 32.0.101.6913'>
+2025-11-19 09:35:23,982 - kivy - INFO - GL: Texture max size <16384>
+2025-11-19 09:35:23,985 - kivy - INFO - GL: Texture max units <32>
+2025-11-19 09:35:24,011 - kivy - INFO - Window: auto add sdl2 input provider
+2025-11-19 09:35:24,015 - kivy - INFO - Window: virtual keyboard not allowed, single mode, not docked
+2025-11-19 09:35:24,046 - UiManager - INFO - Starting the UiManager configuration...
+2025-11-19 09:35:24,046 - tftpy.TftpServer - INFO - Server requested on ip 0.0.0.0, port 69
+2025-11-19 09:35:24,047 - UiManager - INFO - ScreenManager initialized and ServiceFacade injected.
+2025-11-19 09:35:24,047 - StateController - INFO - Application initialization. Transitioning to Login.
+2025-11-19 09:35:24,047 - tftpy.TftpServer - INFO - Starting receive loop...
+2025-11-19 09:35:24,047 - StateController - INFO - Attempt to transition to the same state: Login. No action taken.
+2025-11-19 09:35:24,048 - UiManager - INFO - The StateController has been initialized.
+2025-11-19 09:35:24,078 - kivy - WARNING - Factory: Ignored class "MenuButton" re-declaration. Current -  module: None, cls: <class 'screens.components.MenuButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,078 - kivy - WARNING - Factory: Ignored class "SecondaryButton" re-declaration. Current -  module: None, cls: <class 'screens.components.SecondaryButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,078 - kivy - WARNING - Factory: Ignored class "ConnectButton" re-declaration. Current -  module: None, cls: <class 'screens.components.ConnectButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,079 - kivy - WARNING - Factory: Ignored class "TitleLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.TitleLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,079 - kivy - WARNING - Factory: Ignored class "NormalLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.NormalLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,079 - kivy - WARNING - Factory: Ignored class "HeaderLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.HeaderLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,080 - kivy - WARNING - Factory: Ignored class "WiFiLabel" re-declaration. Current -  module: None, cls: <class 'screens.components.WiFiLabel'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Label, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,080 - kivy - WARNING - Factory: Ignored class "ScreenLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.ScreenLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,080 - kivy - WARNING - Factory: Ignored class "CompactLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.CompactLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,081 - kivy - WARNING - Factory: Ignored class "HorizontalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.HorizontalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,081 - kivy - WARNING - Factory: Ignored class "VerticalLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.VerticalLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,081 - kivy - WARNING - Factory: Ignored class "TableLayout" re-declaration. Current -  module: None, cls: <class 'screens.components.TableLayout'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: GridLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,082 - kivy - WARNING - Factory: Ignored class "SystemImageItem" re-declaration. Current -  module: None, cls: <class 'screens.components.SystemImageItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: ToggleButton, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,082 - kivy - WARNING - Factory: Ignored class "DeleteButton" re-declaration. Current -  module: None, cls: <class 'screens.components.DeleteButton'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: Button, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,082 - kivy - WARNING - Factory: Ignored class "ImageListItem" re-declaration. Current -  module: None, cls: <class 'screens.components.ImageListItem'>, baseclass: None, filename: None. Ignored -  module: None, cls: None, baseclass: BoxLayout, filename: c:\Users\rafael.augusto_driva\Documents\PES\pes4-best-tcc\desktop\ui\styling.kv.
+2025-11-19 09:35:24,124 - kivy - WARNING - Deprecated property "<BooleanProperty name=allow_stretch>" of object "<kivy.uix.image.Image object at 0x000001FF10E869E0>" has been set, it will be removed in a future version
+2025-11-19 09:35:24,124 - kivy - WARNING - Deprecated property "<BooleanProperty name=keep_ratio>" of object "<kivy.uix.image.Image object at 0x000001FF10E869E0>" was accessed, it will be removed in a future version
+2025-11-19 09:35:24,133 - kivy - INFO - GL: NPOT texture support is available
+2025-11-19 09:35:24,221 - kivy - INFO - Base: Start application main loop
+2025-11-19 09:35:28,127 - UserDatabase - INFO - [UserDB] Validating user credentials: admin
+2025-11-19 09:35:28,127 - UserDatabase - INFO - [UserDB] User 'admin' found. Comparing passwords.
+2025-11-19 09:35:28,129 - UserDatabase - INFO - [UserDB] Correct password for 'admin'.
+2025-11-19 09:35:28,129 - UserAuthenticationService - INFO - User admin authenticated successfully.
+2025-11-19 09:35:28,130 - UserAuthenticationService - INFO - currentSession created for user admin at 2025-11-19 09:35:28.129065.
+2025-11-19 09:35:28,130 - StateController - INFO - Login successful. Transitioning to Main.
+2025-11-19 09:35:28,130 - StateController - INFO - State transition: Login -> Main
+2025-11-19 09:36:36,024 - UserAuthenticationService - INFO - Session for user admin invalidated due to inactivity.
+2025-11-19 09:36:36,027 - UserAuthenticationService - INFO - currentSession set to None due to inactivity.
+2025-11-19 09:36:36,028 - StateController - INFO - Global event logout received. Logging out and transitioning to Login.
+2025-11-19 09:36:36,029 - StateController - INFO - State transition: Main -> Login
+2025-11-19 09:38:20,032 - kivy - INFO - Base: Leaving application in progress...
