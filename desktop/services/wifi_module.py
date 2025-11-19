@@ -119,6 +119,10 @@ class WifiModule:
             return None
 
     def _win_fallback_connect(self, ssid: str, password: str):
+        cur = self._current_ssid_windows()
+        if cur == ssid:
+            return True
+
         xml = f'''<?xml version="1.0"?>
     <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
     <name>{ssid}</name>
