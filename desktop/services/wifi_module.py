@@ -95,26 +95,26 @@ class WifiModule:
             # nmcli terse uses ':' as separator. 
             # To be safe against SSIDs containing colons, we split carefully or assume standard naming.
             # A robust regex for nmcli terse output:
-            parts = line.split(':')
+            parts = line.split(':',3)
             if len(parts) < 3: continue
 
             # Handle cases where SSID might have colons (rare but possible)
             # We know the last 3 items are always BSSID (mac), SECURITY, SIGNAL.
             # Actually nmcli order requested was: SSID,SIGNAL,SECURITY,BSSID
             
-            bssid = parts[-1]
-            security = parts[-2]
-            signal = parts[-3]
-            ssid = ":".join(parts[:-3]) # Join back the rest as SSID
+            bssid = parts[3]
+            security = parts[2]
+            signal = parts[1]
+            ssid = parts[0]
 
             # Start normalizing
             # NMCLI security often looks like "WPA2 802.1X" or "WPA3 SAE"
             
             parsed.append({
-                "ssid": ssid.replace('\\:', ':'), # unescape if nmcli escaped it
-                "signal": signal.replace('\\', ''),
-                "security": security.replace('\\', ''),
-                "bssid": bssid.replace('\\', '')
+                "ssid": ssid, # unescape if nmcli escaped it
+                "signal": signal,
+                "security": security,
+                "bssid": bssid
             })
         return parsed
 
