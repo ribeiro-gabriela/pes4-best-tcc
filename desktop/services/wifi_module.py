@@ -47,7 +47,7 @@ class WifiModule:
 
             for profile in parsed_ssids:
                 ssid = profile["ssid"]
-                signal = int(profile["signal"])
+                signal = 0
                 security_type = profile["security"]
                 
                 if not ssid:
