@@ -141,6 +141,10 @@ class WifiModule:
         try:
             # Disconnect current connection first to be clean
             # subprocess.run(['nmcli', 'device', 'disconnect', self._interface], capture_output=True)
+
+            cur = self._get_current_ssid_linux()
+            if cur == ssid:
+                return True
             
             # Connect command
             cmd = ['nmcli', 'device', 'wifi', 'connect', ssid, 'password', password]
