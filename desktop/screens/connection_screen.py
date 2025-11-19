@@ -104,15 +104,7 @@ class ConnectionScreen(Screen):
         if self._service_facade:
             # [BST-306]
             real_networks = self._service_facade.getWifiConnections()
-
-            if not real_networks:
-                self.available_networks_data = [
-                    {"ssid": "WiFi_TestData", "info": {"security": "WPA2", "signal": -50}},
-                    {"ssid": "TestWiFi", "info": {"security": "Open", "signal": -70}},
-                    {"ssid": "WIFI_TEST_3", "info": {"security": "WPA", "signal": -65}},
-                ]
-            else:
-                self.available_networks_data = real_networks
+            self.available_networks_data = real_networks
             
             # [BST-309]
             self.available_networks_data.sort(key=lambda x: x["info"]["signal"], reverse=False)
