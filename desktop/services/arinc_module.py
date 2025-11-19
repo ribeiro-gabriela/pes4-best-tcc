@@ -121,6 +121,25 @@ class ArincModule:
         server.listen()
 
     def _arinc_transfer_thread(self):
+        if self.transfer_status and not self.transfer_status.cancelled and ArincTransferStep.LIST:
+            software_pn = self.transfer_status.fileRecord.softwarePN
+            target = self.transfer_status.currentTarget
+
+            lur_file = ArincLUR(
+                [
+                    ArincLURHeaderFile(
+                        f"{software_pn}.{ArincFileType.LUH.value}",
+                        f"{software_pn}.bin",
+                    )
+                ]
+            )
+            file_path = self._encode_LUR_file(target, lur_file)
+            self._put_file(target, file_path, ArincFileType.LUR)
+
+            self.transfer_status.transferStep = ArincTransferStep.TRANFER
+            self.transfer_status.progressPercent = 20
+
+
         while self.transfer_status and not self.transfer_status.cancelled:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
