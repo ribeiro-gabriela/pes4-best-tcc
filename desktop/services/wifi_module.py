@@ -47,7 +47,7 @@ class WifiModule:
 
             for profile in parsed_ssids:
                 ssid = profile["ssid"]
-                signal = 0
+                signal = int(profile["signal"])
                 security_type = profile["security"]
                 
                 if not ssid:
@@ -143,7 +143,7 @@ class WifiModule:
             # subprocess.run(['nmcli', 'device', 'disconnect', self._interface], capture_output=True)
             
             # Connect command
-            cmd = ['nmcli', 'device', 'wifi', 'connect', ssid, 'password', password, 'key-mgmt','sae']
+            cmd = ['nmcli', 'device', 'wifi', 'connect', ssid, 'password', password]
             result = subprocess.run(cmd, capture_output=True, text=True)
             
             if result.returncode != 0:
