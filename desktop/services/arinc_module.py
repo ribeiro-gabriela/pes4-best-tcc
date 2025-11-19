@@ -125,51 +125,52 @@ class ArincModule:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
 
-            match lus_file:
-                case "0001":
-                    if ArincTransferStep.LIST:
-                        software_pn = self.transfer_status.fileRecord.softwarePN
-                        target = self.transfer_status.currentTarget
+            if lus_file:
+                match lus_file.StatusCode:
+                    case "0001":
+                        if ArincTransferStep.LIST:
+                            software_pn = self.transfer_status.fileRecord.softwarePN
+                            target = self.transfer_status.currentTarget
 
-                        lur_file = ArincLUR(
-                            [
-                                ArincLURHeaderFile(
-                                    f"{software_pn}.{ArincFileType.LUH.value}",
-                                    f"{software_pn}.bin",
-                                )
-                            ]
+                            lur_file = ArincLUR(
+                                [
+                                    ArincLURHeaderFile(
+                                        f"{software_pn}.{ArincFileType.LUH.value}",
+                                        f"{software_pn}.bin",
+                                    )
+                                ]
+                            )
+                            file_path = self._encode_LUR_file(target, lur_file)
+                            self._put_file(target, file_path, ArincFileType.LUR)
+
+                            self.transfer_status.transferStep = ArincTransferStep.TRANFER
+                            self.transfer_status.progressPercent = 20
+
+                    case "0002" | "0004":
+                        if self.transfer_status.progressPercent < 40:
+                            self.transfer_status.progressPercent = 40
+
+                    case "0003":
+                        self.transfer_status.transferStep = (
+                            ArincTransferStep.NOT_IN_TRANSFER
                         )
-                        file_path = self._encode_LUR_file(target, lur_file)
-                        self._put_file(target, file_path, ArincFileType.LUR)
+                        self.transfer_status.progressPercent = 100
+                        self.transfer_status.transferResult = ArincTransferResult.SUCCESS
 
-                        self.transfer_status.transferStep = ArincTransferStep.TRANFER
-                        self.transfer_status.progressPercent = 20
+                    case "1003" | "1004" | "1005":  # operation aborted
+                        self.transfer_status.cancelled = True
+                        self.transfer_status.transferStep = (
+                            ArincTransferStep.NOT_IN_TRANSFER
+                        )
+                        self.transfer_status.progressPercent = 100
+                        self.transfer_status.transferResult = ArincTransferResult.FAILED
 
-                case "0002" | "0004":
-                    if self.transfer_status.progressPercent < 40:
-                        self.transfer_status.progressPercent = 40
-
-                case "0003":
-                    self.transfer_status.transferStep = (
-                        ArincTransferStep.NOT_IN_TRANSFER
-                    )
-                    self.transfer_status.progressPercent = 100
-                    self.transfer_status.transferResult = ArincTransferResult.SUCCESS
-
-                case "1003" | "1004" | "1005":  # operation aborted
-                    self.transfer_status.cancelled = True
-                    self.transfer_status.transferStep = (
-                        ArincTransferStep.NOT_IN_TRANSFER
-                    )
-                    self.transfer_status.progressPercent = 100
-                    self.transfer_status.transferResult = ArincTransferResult.FAILED
-
-                case "1007":  # operation failed
-                    self.transfer_status.transferStep = (
-                        ArincTransferStep.NOT_IN_TRANSFER
-                    )
-                    self.transfer_status.progressPercent = 100
-                    self.transfer_status.transferResult = ArincTransferResult.FAILED
+                    case "1007":  # operation failed
+                        self.transfer_status.transferStep = (
+                            ArincTransferStep.NOT_IN_TRANSFER
+                        )
+                        self.transfer_status.progressPercent = 100
+                        self.transfer_status.transferResult = ArincTransferResult.FAILED
 
             time.sleep(0.1)
 
