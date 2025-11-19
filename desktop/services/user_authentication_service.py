@@ -27,12 +27,13 @@ class UserAuthenticationService:
                 lastActivityAt=now)
             # [BST-285]
             self.logging_service.log(f"User {username} authenticated successfully.")
+            self.logging_service.log(f"currentSession created for user {username} at {now}.")
         else:
             # [BST-284]
             self.currentSession = None
             # [BST-286]
             self.logging_service.log(
-                f"Failed authentication attempt for user {username}."
+                f"Failed authentication attempt for user {username}. currentSession is still {self.currentSession}."
             )
             raise IdentificationError("Invalid username or password. Please try again.")
 
@@ -49,6 +50,10 @@ class UserAuthenticationService:
                 )
                 # [BST-288]
                 self.currentSession = None
+                # [BST-289]
+                self.logging_service.log(
+                    f"currentSession set to {self.currentSession}."
+                )
 
     def isAuthenticated(self) -> bool:
         # [BST-288]
