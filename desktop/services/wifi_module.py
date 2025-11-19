@@ -112,9 +112,9 @@ class WifiModule:
             
             parsed.append({
                 "ssid": ssid.replace('\\:', ':'), # unescape if nmcli escaped it
-                "signal": signal,
-                "security": security,
-                "bssid": bssid
+                "signal": signal.replace('\\', ''),
+                "security": security.replace('\\', ''),
+                "bssid": bssid.replace('\\', '')
             })
         return parsed
 
