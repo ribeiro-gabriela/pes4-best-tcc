@@ -57,7 +57,11 @@ class ArincModule:
 
         hw_id = self.connection_service.getConnectionHardwarePN()
         target = f"{hw_id}_UNDEF"
-        lui_file = self._get_LUI_file(target)
+        lui_file = None
+        try:
+            lui_file = self._get_LUI_file(target)
+        except:
+            return False
 
         if (
             not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
