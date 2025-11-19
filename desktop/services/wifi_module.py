@@ -219,7 +219,7 @@ class WifiModule:
         if (self._tftp_client is None):
             raise Exception("Not connected")
         
-        file_path = f'tftp/client/{int(time.time())}-{file_name}'
+        file_path = f'file_directory/tftp/client/{int(time.time())}-{file_name}'
         self._tftp_client.download(file_name, file_path, timeout=60, retries=3)
 
         return Package(file_name, file_path)
