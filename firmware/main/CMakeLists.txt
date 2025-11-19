@@ -1,4 +1,4 @@
 idf_component_register(SRCS "main.c"
-                    PRIV_REQUIRES spi_flash wifi_core https_port hashing storage_core cli tftp
+                    PRIV_REQUIRES main_core verification_adapter
                     INCLUDE_DIRS "")
-spiffs_create_partition_image(storage ../src/core/storage_core/partition FLASH_IN_PROJECT)                    
+spiffs_create_partition_image(storage ../src/adapters/storage_adapter/partition FLASH_IN_PROJECT)                    
