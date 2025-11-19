@@ -11,6 +11,9 @@ import sys
 from services.logging_service import LoggingService
 from services.service_facade import ServiceFacade
 
+import screens.main_screen
+import screens.top_menu
+
 project_root = Path(__file__).resolve().parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -25,6 +28,9 @@ class UiManager:
         self.logger_app = LoggingService(UiManager.__name__)
         self.logger_app.log("Starting the UiManager configuration...")
         self.service_facade = service_facade
+
+        screens.main_screen.service_facade = self.service_facade
+        screens.top_menu.service_facade = self.service_facade
 
         self.screen_manager = ScreenManager()
         self.screen_manager.service_facade = self.service_facade
