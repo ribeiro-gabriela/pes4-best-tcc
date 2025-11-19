@@ -164,6 +164,7 @@ class WifiModule:
         return False
 
     def _get_target_ip(self) -> str:
+        return "192.168.4.1"
         """
         Retrieves the default gateway IP using 'ip route'.
         This assumes the target device acts as the gateway.
