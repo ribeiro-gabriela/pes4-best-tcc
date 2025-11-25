@@ -319,7 +319,7 @@ class ArincModule:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
 
         with open(file_path, "wb") as file:
-            bytes_to_write = bytearray()
+            bytes_to_write = bytearray(version.encode("ascii"))
 
             bytes_to_write.extend(
                 len(lur_file.HeaderFiles).to_bytes(2, "big", signed=False)
@@ -338,8 +338,7 @@ class ArincModule:
                 bytes_to_write.extend(hf.PartNumberName.encode("ascii"))
                 bytes_to_write.extend(b"\0")
 
-            file.write(version.encode("ascii"))
-            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
@@ -349,7 +348,7 @@ class ArincModule:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
 
         with open(file_path, "wb") as file:
-            bytes_to_write = bytearray()
+            bytes_to_write = bytearray(version.encode("ascii"))
 
             bytes_to_write.extend(
                 (len(luh_file.SoftwarePartNumber) + 1).to_bytes(1, "big", signed=False)
@@ -369,8 +368,7 @@ class ArincModule:
             bytes_to_write.extend(luh_file.DataHash.encode("ascii"))
             bytes_to_write.extend(b"\0")
 
-            file.write(version.encode("ascii"))
-            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
