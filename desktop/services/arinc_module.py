@@ -60,7 +60,8 @@ class ArincModule:
         lui_file = None
         try:
             lui_file = self._get_LUI_file(target)
-        except:
+        except Exception as e:
+            print(e)
             return False
 
         if (
@@ -307,7 +308,8 @@ class ArincModule:
                     status_description = file.read(-1).decode("ascii")[:-1]
 
                 return ArincLUI(status_code, status_description)
-        except:
+        except Exception as e:
+            print(e)
             return None
 
 
