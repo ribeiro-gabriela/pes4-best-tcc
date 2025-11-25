@@ -84,6 +84,7 @@ int verifySHAHandler(int argc, char **argv)
     return 0;
 }
 
+// BST-635
 int parkingBrakeHandler(int argc, char **argv)
 {
     if (argc < 2)
@@ -104,8 +105,6 @@ int parkingBrakeHandler(int argc, char **argv)
             ESP_LOGW(TAG, "Parking brake set to released");
         }
 
-        checkMaintenanceMode();
-
         return 0;
     }
 
@@ -114,6 +113,7 @@ int parkingBrakeHandler(int argc, char **argv)
     return 1;
 }
 
+// BST-635
 int weightOnWheelsHandler(int argc, char **argv)
 {
     if (argc < 2)
@@ -134,8 +134,6 @@ int weightOnWheelsHandler(int argc, char **argv)
             ESP_LOGW(TAG, "Weight on wheels set to false");
         }
 
-        checkMaintenanceMode();
-
         return 0;
     }
 
@@ -144,6 +142,7 @@ int weightOnWheelsHandler(int argc, char **argv)
     return 1;
 }
 
+// BST-635
 int maintenanceModeHandler(int argc, char **argv)
 {
     if (argc < 2)
@@ -166,51 +165,12 @@ int maintenanceModeHandler(int argc, char **argv)
             ESP_LOGW(TAG, "Maintenance lever disabled");
         }
 
-        checkMaintenanceMode();
-
         return 0;
     }
 
     ESP_LOGW(TAG, "Too many arguments");
 
     return 1;
-}
-
-void checkMaintenanceMode()
-{
-    QueueMessage_t msg;
-
-    if (sensors.mntSignal && sensors.parkingBrake && sensors.weightOnWheels)
-    {
-        if (getBCState() != MNT_MODE)
-        {
-            ESP_LOGI(TAG, "All conditions met for maintenance mode. Enabling maintenance mode.");
-
-            msg.eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-            sprintf((char*)msg.logMessage, "%lu: Maintenance mode enabled via sensor conditions", esp_log_early_timestamp());
-
-            if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
-            {
-                ESP_LOGE(TAG, "Failed to send message to BCQueue");
-            }
-        }
-    }
-    else
-    {
-        if (getBCState() == MNT_MODE)
-        {
-            ESP_LOGI(TAG, "Conditions not met for maintenance mode. Disabling maintenance mode.");
-
-            msg.eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-            sprintf((char*)msg.logMessage, "%lu: Maintenance mode disabled via sensor conditions", esp_log_early_timestamp());
-
-            if (xQueueSend(BCQueue, (void*) &msg, portMAX_DELAY) != pdPASS)
-            {
-                ESP_LOGE(TAG, "Failed to send message to BCQueue");
-            }
-        }
-    }
-
 }
 
 #define TEST_COMMAND_ENABLED

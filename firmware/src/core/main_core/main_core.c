@@ -1,12 +1,13 @@
 #include "main_core.h"
 
 TaskHandle_t stateTransitionHandle = NULL;
+TaskHandle_t sensorHandle = NULL;
 
 QueueHandle_t BCQueue = NULL;
 
 extern sensorData_t sensors;
 
-// Inicializa o core do sistema no estado operacional
+// BST-475
 void initializeCore()
 {
     storageInit();
@@ -14,6 +15,8 @@ void initializeCore()
     cliInit();
 
     initializeQueue();
+
+    initSensorPolling();
 
     bool result;
 
@@ -29,6 +32,64 @@ void initializeCore()
     {
         ESP_LOGE("Main Core", "Failed to set BC state to OP_MODE");
         return;
+    }
+}
+
+void initSensorPolling()
+{
+    if (getBCState() != MNT_MODE)
+    {
+        xTaskCreate((void*)sensorPolling, "sensorPolling", 4096, NULL, 5, &sensorHandle);
+    }
+}
+
+// BST-608
+void* sensorPolling()
+{
+    sensorData_t prevValues = sensors;
+    QueueMessage_t* msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+
+    while (1)
+    {
+        if (sensors.mntSignal != prevValues.mntSignal || 
+            sensors.parkingBrake != prevValues.parkingBrake || 
+            sensors.weightOnWheels != prevValues.weightOnWheels)
+        {
+            if (sensors.mntSignal && sensors.parkingBrake && sensors.weightOnWheels)
+            {
+                if (getBCState() != MNT_MODE)
+                {
+                    ESP_LOGI("Sensors", "All conditions met for maintenance mode. Enabling maintenance mode.");
+                    
+                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                    sprintf((char*)msg->logMessage, "%lu: Maintenance mode enabled via sensor conditions", esp_log_early_timestamp());
+
+                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE("Sensors", "Failed to send message to BCQueue");
+                    }
+                }
+            }
+            else
+            {
+                if (getBCState() != OP_MODE)
+                {
+                    ESP_LOGI("Sensors", "Conditions not met for maintenance mode. Disabling maintenance mode.");
+
+                    msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
+                    sprintf((char*)msg->logMessage, "%lu: Maintenance mode disabled via sensor conditions", esp_log_early_timestamp());
+
+                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE("Sensors", "Failed to send message to BCQueue");
+                    }
+                }
+            }
+
+            prevValues = sensors;
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 
@@ -84,8 +145,7 @@ void* stateTransitionHandler()
         {
             if (receivedMessage.eventID == EVENT_ENTER_MAINTENANCE_REQUEST)
             {
-                if (getBCState() != MNT_MODE && sensors.mntSignal && 
-                    sensors.parkingBrake && sensors.weightOnWheels)
+                if (getBCState() != MNT_MODE)
                 {
                     setBCState(MNT_MODE);
                     setMntState(WAITING);
