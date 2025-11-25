@@ -124,7 +124,7 @@ class ArincModule:
         server.listen()
 
     def _arinc_transfer_thread(self):
-        if self.transfer_status and not self.transfer_status.cancelled and ArincTransferStep.LIST:
+        if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
             software_pn = self.transfer_status.fileRecord.softwarePN
             target = self.transfer_status.currentTarget
 
@@ -150,7 +150,7 @@ class ArincModule:
             if lus_file:
                 match lus_file.StatusCode:
                     case "0001":
-                        if ArincTransferStep.LIST:
+                        if self.transfer_status.transferStep == ArincTransferStep.LIST:
                             software_pn = self.transfer_status.fileRecord.softwarePN
                             target = self.transfer_status.currentTarget
 
