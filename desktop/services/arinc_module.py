@@ -64,10 +64,10 @@ class ArincModule:
             print(e)
             return False
 
-        if (
-            not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
-        ):  # request not accepted
-            return False
+        # if (
+        #     not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
+        # ):  # request not accepted
+        #     return False
 
         self.transfer_status = TransferStatus(
             False, target, ArincTransferStep.LIST, file, 0, None
