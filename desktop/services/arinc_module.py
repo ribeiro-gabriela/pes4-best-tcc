@@ -77,6 +77,8 @@ class ArincModule:
             target=self._arinc_transfer_thread, daemon=True
         )
 
+        self.transfer_thread.start()
+
         return True
 
     # [BST-237]
