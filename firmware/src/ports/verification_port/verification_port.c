@@ -62,13 +62,5 @@ void verify(char* fileName, char* recPN, uint8_t* recHash)
         ESP_LOGE("ERROR", "Failed to send SEC_IMG_HASH_OK message to BCQueue");
     }
 
-    msg.eventID = SEC_IMG_FORMAT_OK;
-    sprintf((char*)msg.logMessage, "%lu: test", esp_log_early_timestamp());
-
-    if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
-    {
-        ESP_LOGE("ERROR", "Failed to send SEC_IMG_FORMAT_OK message to BCQueue");
-    }
-
     return;
 }
