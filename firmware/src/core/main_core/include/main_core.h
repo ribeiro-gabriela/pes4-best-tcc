@@ -54,7 +54,9 @@ void initializeCore();
 void initializeQueue();
 void initializeMaintenanceMode();
 void deinitMaintenanceMode();
+void initSensorPolling();
 
 void* stateTransitionHandler();
+void* sensorPolling();
 
 #endif

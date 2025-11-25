@@ -16,8 +16,6 @@ int parkingBrakeHandler(int argc, char **argv);
 int weightOnWheelsHandler(int argc, char **argv);
 int maintenanceModeHandler(int argc, char **argv);
 
-void checkMaintenanceMode();
-
 #define TEST_COMMAND_ENABLED
 #ifdef TEST_COMMAND_ENABLED
 int testHandler(int argc, char **argv);
