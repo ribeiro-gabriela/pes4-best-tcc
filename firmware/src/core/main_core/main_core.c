@@ -43,7 +43,7 @@ void initSensorPolling()
     }
 }
 
-// BST-608
+// [BST-457, BST-608]
 void* sensorPolling()
 {
     sensorData_t prevValues = sensors;
@@ -121,6 +121,7 @@ void deinitMaintenanceMode()
     }
 }
 
+//[BST-469, BST-474]
 void* stateTransitionHandler()
 {
     // Verificar se a fila tem o tamanho correto, podemos reduzir o tamanho da fila se necessário
@@ -165,6 +166,7 @@ void* stateTransitionHandler()
                     }
                 }
             }
+            // BST-474
             else if (receivedMessage.eventID == EVENT_ABORT_MAINTENANCE_IMMEDIATE)
             {
                 if (getBCState() != OP_MODE)
@@ -293,9 +295,9 @@ void* stateTransitionHandler()
                     ESP_LOGW("Main Core", "Received COMM_TRANSFER_COMPLETE event in unexpected state, ignoring");
                 }
             }
+            // BST-469
             else if (receivedMessage.eventID == SEC_IMG_HASH_OK ||
-                     receivedMessage.eventID == SEC_IMG_PN_OK ||
-                     receivedMessage.eventID == SEC_IMG_FORMAT_OK)
+                     receivedMessage.eventID == SEC_IMG_PN_OK)
             {
                 if (receivedMessage.eventID == SEC_IMG_HASH_OK && !verificationHash)
                 {
@@ -305,12 +307,8 @@ void* stateTransitionHandler()
                 {
                     verificationPN = true;
                 }
-                else if (receivedMessage.eventID == SEC_IMG_FORMAT_OK && !verificationFormat)
-                {
-                    verificationFormat = true;
-                }
 
-                if (verificationHash && verificationPN && verificationFormat)
+                if (verificationHash && verificationPN)
                 {
                     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                         getConnState() == IMG_VERIFICATION)
@@ -327,17 +325,14 @@ void* stateTransitionHandler()
 
                     verificationHash = false;
                     verificationPN = false;
-                    verificationFormat = false;
                 }
             }
             else if (receivedMessage.eventID == SEC_ERR_IMG_HASH_MISMATCH ||
-                     receivedMessage.eventID == SEC_ERR_IMG_PN_MISMATCH ||
-                     receivedMessage.eventID == SEC_ERR_IMG_BAD_FORMAT)
+                     receivedMessage.eventID == SEC_ERR_IMG_PN_MISMATCH)
             {
                 // Reset verification flags on any error
                 verificationHash = false;
                 verificationPN = false;
-                verificationFormat = false;
 
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == IMG_VERIFICATION)

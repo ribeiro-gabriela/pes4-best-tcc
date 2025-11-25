@@ -23,9 +23,3 @@ esp_err_t verifyPN(char* receivedPN)
 
     return ESP_OK;
 }
-
-esp_err_t verifyFormat()
-{
-    // Implementação da verificação do formato do hardware
-    return ESP_OK;
-}
