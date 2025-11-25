@@ -113,7 +113,7 @@ class ArincModule:
         return self._parse_LUI_file(pkg.path)
 
     def _put_file(self, target: str, file_path: str, file_type: ArincFileType):
-        pkg = Package(f"{target}.{file_type}", file_path)
+        pkg = Package(f"{target}.{file_type.value}", file_path)
         self.connection_service.sendPackage(pkg)
 
     def _read_LUS_file(self, target: str) -> ArincLUS | None:
