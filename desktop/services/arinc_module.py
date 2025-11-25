@@ -60,13 +60,14 @@ class ArincModule:
         lui_file = None
         try:
             lui_file = self._get_LUI_file(target)
-        except:
+        except Exception as e:
+            print(e)
             return False
 
-        if (
-            not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
-        ):  # request not accepted
-            return False
+        # if (
+        #     not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
+        # ):  # request not accepted
+        #     return False
 
         self.transfer_status = TransferStatus(
             False, target, ArincTransferStep.LIST, file, 0, None
@@ -75,6 +76,8 @@ class ArincModule:
         self.transfer_thread = threading.Thread(
             target=self._arinc_transfer_thread, daemon=True
         )
+
+        self.transfer_thread.start()
 
         return True
 
@@ -110,7 +113,7 @@ class ArincModule:
         return self._parse_LUI_file(pkg.path)
 
     def _put_file(self, target: str, file_path: str, file_type: ArincFileType):
-        pkg = Package(f"{target}.{file_type}", file_path)
+        pkg = Package(f"{target}.{file_type.value}", file_path)
         self.connection_service.sendPackage(pkg)
 
     def _read_LUS_file(self, target: str) -> ArincLUS | None:
@@ -121,6 +124,25 @@ class ArincModule:
         server.listen()
 
     def _arinc_transfer_thread(self):
+        if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
+            software_pn = self.transfer_status.fileRecord.softwarePN
+            target = self.transfer_status.currentTarget
+
+            lur_file = ArincLUR(
+                [
+                    ArincLURHeaderFile(
+                        f"{software_pn}.{ArincFileType.LUH.value}",
+                        f"{software_pn}.bin",
+                    )
+                ]
+            )
+            file_path = self._encode_LUR_file(target, lur_file)
+            self._put_file(target, file_path, ArincFileType.LUR)
+
+            self.transfer_status.transferStep = ArincTransferStep.TRANFER
+            self.transfer_status.progressPercent = 20
+
+
         while self.transfer_status and not self.transfer_status.cancelled:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
@@ -128,7 +150,7 @@ class ArincModule:
             if lus_file:
                 match lus_file.StatusCode:
                     case "0001":
-                        if ArincTransferStep.LIST:
+                        if self.transfer_status.transferStep == ArincTransferStep.LIST:
                             software_pn = self.transfer_status.fileRecord.softwarePN
                             target = self.transfer_status.currentTarget
 
@@ -288,7 +310,8 @@ class ArincModule:
                     status_description = file.read(-1).decode("ascii")[:-1]
 
                 return ArincLUI(status_code, status_description)
-        except:
+        except Exception as e:
+            print(e)
             return None
 
 
@@ -296,7 +319,7 @@ class ArincModule:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUR.value}"
 
         with open(file_path, "wb") as file:
-            bytes_to_write = bytearray()
+            bytes_to_write = bytearray(version.encode("ascii"))
 
             bytes_to_write.extend(
                 len(lur_file.HeaderFiles).to_bytes(2, "big", signed=False)
@@ -315,8 +338,7 @@ class ArincModule:
                 bytes_to_write.extend(hf.PartNumberName.encode("ascii"))
                 bytes_to_write.extend(b"\0")
 
-            file.write(version.encode("ascii"))
-            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
@@ -326,7 +348,7 @@ class ArincModule:
         file_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUH.value}"
 
         with open(file_path, "wb") as file:
-            bytes_to_write = bytearray()
+            bytes_to_write = bytearray(version.encode("ascii"))
 
             bytes_to_write.extend(
                 (len(luh_file.SoftwarePartNumber) + 1).to_bytes(1, "big", signed=False)
@@ -346,8 +368,7 @@ class ArincModule:
             bytes_to_write.extend(luh_file.DataHash.encode("ascii"))
             bytes_to_write.extend(b"\0")
 
-            file.write(version.encode("ascii"))
-            file.write((16 + 32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
+            file.write((32 + len(bytes_to_write) * 8).to_bytes(4, "big", signed=False))
             file.write(bytes_to_write)
 
         return file_path
