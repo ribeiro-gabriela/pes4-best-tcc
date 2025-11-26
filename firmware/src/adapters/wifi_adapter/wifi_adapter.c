@@ -1,24 +1,47 @@
 #include "wifi_adapter.h"
 
-static const char *TAG = "BC AP";
+static const char *TAG = "WiFi";
+
+extern QueueHandle_t BCQueue;
 
 esp_netif_t* netif = NULL;
 
+// [BST-386, BST-387]
 void wifiEventHandler(void* arg, esp_event_base_t event_base,int32_t event_id, 
                         void* event_data)
 {
+    QueueMessage_t* msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+
     if (event_id == WIFI_EVENT_AP_STACONNECTED) {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
         ESP_LOGI(TAG, "station "MACSTR" join, AID=%d",
                  MAC2STR(event->mac), event->aid);
+        
+        msg->eventID = WIFI_CLIENT_CONNECTED;
+        sprintf((char*)msg->logMessage, "(%s) GSE connected", TAG);
+        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+        {
+            ESP_LOGE(TAG, "Failed to send WIFI_CLIENT_CONNECTED message to BCQueue");
+        }
+
     } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
         ESP_LOGI(TAG, "station "MACSTR" leave, AID=%d, reason=%d",
                  MAC2STR(event->mac), event->aid, event->reason);
+
+        msg->eventID = WIFI_CLIENT_DISCONNECTED;
+        sprintf((char*)msg->logMessage, "(%s) GSE disconnected", TAG);
+        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+        {
+            ESP_LOGE(TAG, "Failed to send WIFI_CLIENT_DISCONNECTED message to BCQueue");
+        }
     }
+
+    free(msg);
 }
 
-void wifiInitSoftAP(void)
+// [BST-380, BST-381, BST-382, BST-383, BST-384, BST-385, BST-388]
+void wifiInitSoftAP()
 {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -56,10 +79,30 @@ void wifiInitSoftAP(void)
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
-    ESP_ERROR_CHECK(esp_wifi_start());
+    esp_err_t res = esp_wifi_start();
 
-    ESP_LOGI(TAG, "wifiInitSoftAP finished. SSID: %s password: %s channel: %d",
-             ESP_WIFI_SSID, ESP_WIFI_PASS, ESP_WIFI_CHANNEL);
+    QueueMessage_t* msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+    if (res == ESP_OK)
+    {
+        ESP_LOGI(TAG, "wifiInitSoftAP finished. SSID: %s password: %s channel: %d",
+                 ESP_WIFI_SSID, ESP_WIFI_PASS, ESP_WIFI_CHANNEL);
+
+        msg->eventID = WIFI_AP_STARTED_OK;
+        sprintf((char*)msg->logMessage, "(%s) AP started successfully", TAG);
+        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+        {
+            ESP_LOGE(TAG, "Failed to send WIFI_AP_STARTED_OK message to BCQueue");
+        }
+    }
+    else
+    {
+        msg->eventID = WIFI_AP_START_FAILURE_EVENT;
+        sprintf((char*)msg->logMessage, "(%s) AP did not start", TAG);
+        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+        {
+            ESP_LOGE(TAG, "Failed to send WIFI_AP_START_FAILURE_EVENT message to BCQueue");
+        }
+    }
 }
 
 void wifiDeinitSoftAP()

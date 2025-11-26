@@ -193,232 +193,209 @@ int testHandler(int argc, char **argv)
         if (testInput == COMM_AUTH_FAILURE)
         {
             msg.eventID = COMM_AUTH_FAILURE;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: COMM_AUTH_FAILURE sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) COMM_AUTH_FAILURE sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send COMM_AUTH_FAILURE message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == COMM_TIMEOUT)
         {
             msg.eventID = COMM_TIMEOUT;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: COMM_TIMEOUT sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) COMM_TIMEOUT sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send COMM_TIMEOUT message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == COMM_TRANSFER_COMPLETE)
         {
             msg.eventID = COMM_TRANSFER_COMPLETE;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: COMM_TRANSFER_COMPLETE sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) COMM_TRANSFER_COMPLETE sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send COMM_TRANSFER_COMPLETE message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == CORE_WARN_UNEXPECTED_EVENT)
         {
             msg.eventID = CORE_WARN_UNEXPECTED_EVENT;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: CORE_WARN_UNEXPECTED_EVENT sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) CORE_WARN_UNEXPECTED_EVENT sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send CORE_WARN_UNEXPECTED_EVENT message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == ERR_GSE_PROBE_TIMEOUT)
         {
             msg.eventID = ERR_GSE_PROBE_TIMEOUT;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: ERR_GSE_PROBE_TIMEOUT sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) ERR_GSE_PROBE_TIMEOUT sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send ERR_GSE_PROBE_TIMEOUT message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == ERR_AP_INIT_FAILED)
         {
             msg.eventID = ERR_AP_INIT_FAILED;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: ERR_AP_INIT_FAILED sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) ERR_AP_INIT_FAILED sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send ERR_AP_INIT_FAILED message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == EVENT_ABORT_MAINTENANCE_IMMEDIATE)
         {
             msg.eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: EVENT_ABORT_MAINTENANCE_IMMEDIATE sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) EVENT_ABORT_MAINTENANCE_IMMEDIATE sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send EVENT_ABORT_MAINTENANCE_IMMEDIATE message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == EVENT_ENTER_MAINTENANCE_REQUEST)
         {
             msg.eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: EVENT_ENTER_MAINTENANCE_REQUEST sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) EVENT_ENTER_MAINTENANCE_REQUEST sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send EVENT_ENTER_MAINTENANCE_REQUEST message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == EVENT_SENSORS_LINK_DOWN)
         {
             msg.eventID = EVENT_SENSORS_LINK_DOWN;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: EVENT_SENSORS_LINK_DOWN sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) EVENT_SENSORS_LINK_DOWN sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send EVENT_SENSORS_LINK_DOWN message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == LOAD_REQUEST)
         {
             msg.eventID = LOAD_REQUEST;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: LOAD_REQUEST sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) LOAD_REQUEST sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send LOAD_REQUEST message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == LOG_INFO)
         {
             msg.eventID = LOG_INFO;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: LOG_INFO sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) LOG_INFO sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send LOG_INFO message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_ERR_GSE_AUTH_FAILED)
         {
             msg.eventID = SEC_ERR_GSE_AUTH_FAILED;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_ERR_GSE_AUTH_FAILED sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_ERR_GSE_AUTH_FAILED sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_ERR_GSE_AUTH_FAILED message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_ERR_IMG_BAD_FORMAT)
         {
             msg.eventID = SEC_ERR_IMG_BAD_FORMAT;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_ERR_IMG_BAD_FORMAT sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_ERR_IMG_BAD_FORMAT sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_ERR_IMG_BAD_FORMAT message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_ERR_IMG_HASH_MISMATCH)
         {
             msg.eventID = SEC_ERR_IMG_HASH_MISMATCH;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_ERR_IMG_HASH_MISMATCH sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_ERR_IMG_HASH_MISMATCH sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_ERR_IMG_HASH_MISMATCH message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_ERR_IMG_PN_MISMATCH)
         {
             msg.eventID = SEC_ERR_IMG_PN_MISMATCH;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_ERR_IMG_PN_MISMATCH sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_ERR_IMG_PN_MISMATCH sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_ERR_IMG_PN_MISMATCH message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == WIFI_AP_STARTED_OK)
         {
             msg.eventID = WIFI_AP_STARTED_OK;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: WIFI_AP_STARTED_OK sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) WIFI_AP_STARTED_OK sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send WIFI_AP_STARTED_OK message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == WIFI_AP_START_FAILURE_EVENT)
         {
             msg.eventID = WIFI_AP_START_FAILURE_EVENT;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: WIFI_AP_START_FAILURE_EVENT sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) WIFI_AP_START_FAILURE_EVENT sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send WIFI_AP_START_FAILURE_EVENT message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == WIFI_CLIENT_CONNECTED)
         {
             msg.eventID = WIFI_CLIENT_CONNECTED;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: WIFI_CLIENT_CONNECTED sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) WIFI_CLIENT_CONNECTED sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send WIFI_CLIENT_CONNECTED message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == WIFI_CLIENT_DISCONNECTED)
         {
             msg.eventID = WIFI_CLIENT_DISCONNECTED;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: WIFI_CLIENT_DISCONNECTED sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) WIFI_CLIENT_DISCONNECTED sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send WIFI_CLIENT_DISCONNECTED message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_GSE_AUTH_SUCCESS)
         {
             msg.eventID = SEC_GSE_AUTH_SUCCESS;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_GSE_AUTH_SUCCESS sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_GSE_AUTH_SUCCESS sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_GSE_AUTH_SUCCESS message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_IMG_FORMAT_OK)
         {
             msg.eventID = SEC_IMG_FORMAT_OK;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_IMG_FORMAT_OK sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_IMG_FORMAT_OK sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_IMG_FORMAT_OK message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_IMG_HASH_OK)
         {
             msg.eventID = SEC_IMG_HASH_OK;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_IMG_HASH_OK sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_IMG_HASH_OK sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_IMG_HASH_OK message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else if (testInput == SEC_IMG_PN_OK)
         {
             msg.eventID = SEC_IMG_PN_OK;
-            sprintf((char*)msg.logMessage, "(%lu) TEST: SEC_IMG_PN_OK sent to queue", esp_log_early_timestamp());
+            sprintf((char*)msg.logMessage, "(TEST) SEC_IMG_PN_OK sent to queue");
             if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
             {
                 ESP_LOGE("ERROR", "Failed to send SEC_IMG_PN_OK message to BCQueue");
             }
-            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else
         {
@@ -431,21 +408,5 @@ int testHandler(int argc, char **argv)
     ESP_LOGW(TAG, "Too many arguments");
 
     return 1;
-
-    // ESP_LOGI(TAG, "Test command executed");
-
-    // char recPN[21] = "EMB-HW-002-021-003";
-    // char fileName[21] = "EMB-SW-007-137-045";
-    // //char recHash[65] = "ebfe440301d71a9a65b095c7d9997c6004058256c0ee22ea0650c30655e48e55";
-    // uint8_t recHashBytes[32] = {0xeb, 0xfe, 0x44, 0x03, 0x01, 0xd7, 0x1a, 0x9a,
-    //                             0x65, 0xb0, 0x95, 0xc7, 0xd9, 0x99, 0x7c, 0x60,
-    //                             0x04, 0x05, 0x82, 0x56, 0xc0, 0xee, 0x22, 0xea,
-    //                             0x06, 0x50, 0xc3, 0x06, 0x55, 0xe4, 0x8e, 0x55};
-
-    
-
-    // verify(fileName, recPN, recHashBytes);
-
 }
-
 #endif

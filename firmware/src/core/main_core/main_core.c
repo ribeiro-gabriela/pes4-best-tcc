@@ -35,15 +35,13 @@ void initializeCore()
     }
 }
 
+// [BST-450, BST-458]
 void initSensorPolling()
 {
-    if (getBCState() != MNT_MODE)
-    {
-        xTaskCreate((void*)sensorPolling, "sensorPolling", 4096, NULL, 5, &sensorHandle);
-    }
+    xTaskCreate((void*)sensorPolling, "sensorPolling", 4096, NULL, 5, &sensorHandle);
 }
 
-// [BST-457, BST-608]
+// [BST-450, BST-457, BST-608]
 void* sensorPolling()
 {
     sensorData_t prevValues = sensors;
@@ -51,8 +49,8 @@ void* sensorPolling()
 
     while (1)
     {
-        if (sensors.mntSignal != prevValues.mntSignal || 
-            sensors.parkingBrake != prevValues.parkingBrake || 
+        if (sensors.mntSignal != prevValues.mntSignal ||
+            sensors.parkingBrake != prevValues.parkingBrake ||
             sensors.weightOnWheels != prevValues.weightOnWheels)
         {
             if (sensors.mntSignal && sensors.parkingBrake && sensors.weightOnWheels)
@@ -62,7 +60,7 @@ void* sensorPolling()
                     ESP_LOGI("Sensors", "All conditions met for maintenance mode. Enabling maintenance mode.");
                     
                     msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                    sprintf((char*)msg->logMessage, "%lu: Maintenance mode enabled via sensor conditions", esp_log_early_timestamp());
+                    sprintf((char*)msg->logMessage, "(Sensors) Maintenance mode enabled via sensor conditions");
 
                     if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
                     {
@@ -77,7 +75,7 @@ void* sensorPolling()
                     ESP_LOGI("Sensors", "Conditions not met for maintenance mode. Disabling maintenance mode.");
 
                     msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-                    sprintf((char*)msg->logMessage, "%lu: Maintenance mode disabled via sensor conditions", esp_log_early_timestamp());
+                    sprintf((char*)msg->logMessage, "(Sensors) Maintenance mode disabled via sensor conditions");
 
                     if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
                     {
@@ -85,7 +83,7 @@ void* sensorPolling()
                     }
                 }
             }
-
+            
             prevValues = sensors;
         }
 
@@ -102,7 +100,7 @@ void initializeQueue()
     }
 }
 
-// Inicializa o modo de manutenção com TFTP e WiFi AP
+// BST-388
 void initializeMaintenanceMode()
 {
     if (getBCState() == MNT_MODE)
@@ -121,10 +119,9 @@ void deinitMaintenanceMode()
     }
 }
 
-//[BST-469, BST-474]
+//[BST-461, BST-469, BST-474]
 void* stateTransitionHandler()
 {
-    // Verificar se a fila tem o tamanho correto, podemos reduzir o tamanho da fila se necessário
     BCQueue = xQueueCreate(10, sizeof(QueueMessage_t));
     if (BCQueue == NULL)
     {
@@ -138,7 +135,6 @@ void* stateTransitionHandler()
 
     bool verificationHash = false;
     bool verificationPN = false;
-    bool verificationFormat = false;
 
     while (1)
     {
@@ -146,24 +142,23 @@ void* stateTransitionHandler()
         {
             if (receivedMessage.eventID == EVENT_ENTER_MAINTENANCE_REQUEST)
             {
-                if (getBCState() != MNT_MODE)
+                if (getBCState() != MNT_MODE && sensors.mntSignal && 
+                    sensors.parkingBrake && sensors.weightOnWheels)
                 {
                     setBCState(MNT_MODE);
                     setMntState(WAITING);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "BC State changed to MNT_MODE");
                     initializeMaintenanceMode();
                 }
+                else if (getBCState() != MNT_MODE && (!sensors.mntSignal || 
+                         !sensors.parkingBrake || !sensors.weightOnWheels))
+                {
+                    ESP_LOGW("Main Core", "Conditions not met for maintenance mode");
+                }
                 else
                 {
-                    if (!sensors.mntSignal || !sensors.parkingBrake || !sensors.weightOnWheels)
-                    {
-                        ESP_LOGW("Main Core", "Cannot enter maintenance mode, sensor conditions not met");
-                    }
-                    else
-                    {
-                        ESP_LOGW("Main Core", "Received EVENT_ENTER_MAINTENANCE_REQUEST event in unexpected state, ignoring");
-                    }
+                    ESP_LOGW("Main Core", "Received EVENT_ENTER_MAINTENANCE_REQUEST event in unexpected state, ignoring");
                 }
             }
             // BST-474
@@ -175,7 +170,7 @@ void* stateTransitionHandler()
                     setBCState(OP_MODE);
                     setMntState(NOT_SET_MNT);
                     setConnState(NOT_SET_CONN);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "BC State changed to OP_MODE");
                     deinitMaintenanceMode();
                 }
@@ -190,7 +185,7 @@ void* stateTransitionHandler()
                 {
                     setMntState(CONNECTED);
                     setConnState(WAITING_REQUEST);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "MNT State changed to CONNECTED and Conn State changed to WAITING_REQUEST");
                 }
                 else
@@ -205,7 +200,7 @@ void* stateTransitionHandler()
                 {
                     setMntState(WAITING);
                     setConnState(NOT_SET_CONN);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "MNT State changed to WAITING");
                 }
                 else
@@ -226,7 +221,7 @@ void* stateTransitionHandler()
                     getConnState() == WAITING_REQUEST)
                 {
                     setConnState(RECEIVING_PKTS);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
                 }
                 else
@@ -250,7 +245,7 @@ void* stateTransitionHandler()
                     getConnState() == RECEIVING_PKTS)
                 {
                     setConnState(IMG_VERIFICATION);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
 
                     #define TEST_COMMAND_ENABLED
@@ -308,6 +303,8 @@ void* stateTransitionHandler()
                     verificationPN = true;
                 }
 
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+
                 if (verificationHash && verificationPN)
                 {
                     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
@@ -315,7 +312,6 @@ void* stateTransitionHandler()
                     {
                         setMntState(WAITING_AUTHORIZATION);
                         setConnState(NOT_SET_CONN);
-                        ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
                         ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
                     }
                     else
@@ -340,7 +336,7 @@ void* stateTransitionHandler()
                     // Send message according to mismatch to UDP server about verification failure so it can notify GSE
 
                     setConnState(RECEIVING_PKTS);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGE("Main Core", "Conn State reverted to RECEIVING_PKTS");
                 }
                 else
@@ -355,7 +351,7 @@ void* stateTransitionHandler()
                 {
                     setMntState(WAITING);
                     setConnState(NOT_SET_CONN);
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "MNT State changed to WAITING");
                 }
                 else
@@ -372,17 +368,17 @@ void* stateTransitionHandler()
             }
             else if (receivedMessage.eventID == CORE_WARN_UNEXPECTED_EVENT)
             {
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 ESP_LOGW("Main Core", "Received unexpected event");
             }
             else if (receivedMessage.eventID == LOG_INFO)
             {
                 ESP_LOGI("Main Core", "Info log received");
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
             }
             else if (receivedMessage.eventID == ERR_GSE_PROBE_TIMEOUT)
             {
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 ESP_LOGE("Main Core", "GSE probe timeout exceeded, aborting maintenance mode");
                 setBCState(OP_MODE);
                 setMntState(NOT_SET_MNT);
@@ -391,7 +387,7 @@ void* stateTransitionHandler()
             }
             else if (receivedMessage.eventID == ERR_AP_INIT_FAILED)
             {
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 ESP_LOGE("Main Core", "Access Point initialization failed, reinitializing Maintenance Mode");
                 setBCState(OP_MODE);
                 setMntState(NOT_SET_MNT);
@@ -401,7 +397,7 @@ void* stateTransitionHandler()
                 if (msg != NULL)
                 {
                     msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                    sprintf((char*)msg->logMessage, "%lu: WiFi AP failed to start due to AP init failure", esp_log_early_timestamp());
+                    sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
                     if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
                     {
                         ESP_LOGE("Main Core", "Failed to send message to BCQueue");
@@ -411,14 +407,14 @@ void* stateTransitionHandler()
             }
             else if (receivedMessage.eventID == EVENT_SENSORS_LINK_DOWN)
             {
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 ESP_LOGE("Main Core", "Sensors link down event");
                 
                 msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
                 if (msg != NULL)
                 {
                     msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-                    sprintf((char*)msg->logMessage, "%lu: Sensors link down, aborting maintenance mode", esp_log_early_timestamp());
+                    sprintf((char*)msg->logMessage, "(Main Core) Aborting maintenance mode");
                     if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
                     {
                         ESP_LOGE("Main Core", "Failed to send message to BCQueue");
@@ -428,7 +424,7 @@ void* stateTransitionHandler()
             }
             else if (receivedMessage.eventID == SEC_ERR_GSE_AUTH_FAILED)
             {
-                ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 ESP_LOGE("Main Core", "GSE authentication failed");
                 if (getBCState() == MNT_MODE)
                 {
@@ -445,8 +441,7 @@ void* stateTransitionHandler()
             {
                 if (getBCState() == MNT_MODE && getMntState() == WAITING)
                 {
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "WiFi AP started successfully");
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                 }
                 else
                 {
@@ -457,7 +452,7 @@ void* stateTransitionHandler()
             {
                 if (getBCState() == MNT_MODE && getMntState() == WAITING)
                 {
-                    ESP_LOGI("LOG_INFO", "Log Message: %s\n", receivedMessage.logMessage);
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGE("Main Core", "WiFi AP failed to start, reinitializing Maintenance Mode");
                     setBCState(OP_MODE);
                     setMntState(NOT_SET_MNT);
@@ -467,7 +462,7 @@ void* stateTransitionHandler()
                     if (msg != NULL)
                     {
                         msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                        sprintf((char*)msg->logMessage, "%lu: WiFi AP failed to start", esp_log_early_timestamp());
+                        sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
                         if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
                         {
                             ESP_LOGE("Main Core", "Failed to send message to BCQueue");
@@ -481,6 +476,6 @@ void* stateTransitionHandler()
                 }
             }
         }
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        //vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

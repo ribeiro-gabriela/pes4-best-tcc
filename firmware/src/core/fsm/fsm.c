@@ -7,6 +7,7 @@ enum BC_STATES currentBCState = OP_MODE;
 enum MNT_STATES currentMntState = NOT_SET_MNT;
 enum CONN_STATES currentConnState = NOT_SET_CONN;
 
+// BST-609
 bool initializeFSM() {
     stateMutex = xSemaphoreCreateMutex();
     if (stateMutex == NULL) {
@@ -16,6 +17,7 @@ bool initializeFSM() {
     return true;
 }
 
+// BST-609
 bool setBCState(enum BC_STATES newState) {
     if (xSemaphoreTake(stateMutex, portMAX_DELAY))
     {
@@ -30,6 +32,7 @@ bool setBCState(enum BC_STATES newState) {
     return true;
 }
 
+// BST-609
 bool setMntState(enum MNT_STATES newState) {
     if (xSemaphoreTake(stateMutex, portMAX_DELAY))
     {
@@ -44,6 +47,7 @@ bool setMntState(enum MNT_STATES newState) {
     return true;
 }
 
+// BST-609
 bool setConnState(enum CONN_STATES newState) {
     if (xSemaphoreTake(stateMutex, portMAX_DELAY))
     {
@@ -58,14 +62,17 @@ bool setConnState(enum CONN_STATES newState) {
     return true;
 }
 
+// BST-610
 enum BC_STATES getBCState() {
     return currentBCState;
 }
 
+// BST-610
 enum MNT_STATES getMntState() {
     return currentMntState;
 }
 
+// BST-610
 enum CONN_STATES getConnState() {
     return currentConnState;
 }

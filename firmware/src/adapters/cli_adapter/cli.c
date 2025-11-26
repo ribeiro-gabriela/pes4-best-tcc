@@ -6,6 +6,7 @@
 
 #define PROMPT_STR "BC"
 
+// [BST-441, BST-635]
 esp_err_t initConsole()
 {
     esp_console_repl_t *repl = NULL;
@@ -28,7 +29,8 @@ esp_err_t initConsole()
     #ifdef TEST_COMMAND_ENABLED
     registerTest();
     #endif
-    // default help command
+    
+    // BST-441
     esp_console_register_help_command();
 
     ESP_ERROR_CHECK(esp_console_new_repl_uart(&hw_config, &repl_config, &repl));
