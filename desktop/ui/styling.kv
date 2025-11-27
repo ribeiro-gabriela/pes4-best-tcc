@@ -1,0 +1,768 @@
+#:kivy 2.0.0
+
+# [BST - 330]
+# ----- STYLING CONSTANTS -----
+
+# Color definitions (RGBA values)
+
+#:set PRIMARY_COLOR [0.12, 0.45, 0.82, 1]
+#:set SECONDARY_COLOR [0.3, 0.3, 0.3, 1]
+#:set ACCENT_COLOR [0.9, 0.5, 0.1, 1]
+#:set BACKGROUND_COLOR [0.95, 0.95, 0.95, 1]
+#:set TEXT_COLOR [0.9, 0.9, 0.9, 1]
+#:set TEXT_NORMAL [0.2, 0.2, 0.2, 1]
+#:set SUCCESS_COLOR [0.2, 0.7, 0.3, 1]
+#:set MENU_BACKGROUND_COLOR [0.03, 0.12, 0.22, 1]
+#:set MENU_BUTTON_COLOR [0.05, 0.2, 0.33, 1]
+#:set ACCENT_COLOR_DELETE [0.8, 0.2, 0.2, 1]
+#:set ITEM_NORMAL_BG [0.8, 0.8, 0.8, 1]       
+#:set ITEM_SELECTED_BG [0.7, 0.85, 0.95, 1]    
+#:set ITEM_SELECTED_TEXT [0.1, 0.4, 0.7, 1]    
+
+# Font sizes
+
+#:set FONT_LARGE 24
+#:set FONT_MEDIUM 18
+#:set FONT_NORMAL 16
+#:set FONT_SMALL 14
+
+# Dimensions
+
+#:set MENU_HEIGHT 65
+#:set BUTTON_HEIGHT 60
+#:set TABLE_ROW_HEIGHT 60
+#:set HEADER_HEIGHT 40
+#:set MENU_BUTTON_WIDTH 130
+#:set NAV_BUTTON_WIDTH 200
+
+# Spacing values
+
+#:set SPACING_LARGE 20
+#:set SPACING_MEDIUM 10
+#:set SPACING_SMALL 5
+#:set PADDING_LARGE 50
+#:set PADDING_MEDIUM 20
+#:set PADDING_SMALL 10
+#:set PADDING_XLARGE 70 
+
+# ----- COMPONENTS -----
+
+<MenuButton@Button>:
+    background_color: MENU_BUTTON_COLOR
+    background_normal: ''
+    font_size: FONT_SMALL
+    size_hint_x: None
+    width: MENU_BUTTON_WIDTH
+
+<HelpIconButton>:
+    orientation: 'vertical'
+    spacing: dp(2) 
+    padding: dp(5)
+    background_color: [0,0,0,0] 
+    
+    Image:
+        source: root.source
+        size_hint_y: 0.7 
+        pos_hint: {'center_x': 0.5} 
+        fit_mode: 'contain' 
+    Label:
+        text: root.label_text
+        font_size: FONT_SMALL
+        color: [1,1,1,1]
+        halign: 'center'
+        valign: 'middle'
+        size_hint_y: 0.3 
+        text_size: self.size
+
+<PrimaryButton>:
+    background_color: PRIMARY_COLOR
+    font_size: FONT_MEDIUM
+    size_hint_y: None
+    height: BUTTON_HEIGHT
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),] 
+
+<SecondaryButton@Button>:
+    background_color: [0.3, 0.3, 0.3, 1] 
+    color: [1,1,1,1] # Texto branco
+    font_size: FONT_NORMAL
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+
+<NavButton@Button>:
+    background_color: SECONDARY_COLOR
+    font_size: FONT_NORMAL
+    size_hint_x: None
+    width: NAV_BUTTON_WIDTH
+    size_hint_y: None
+    height: BUTTON_HEIGHT
+
+<ConnectButton@Button>:
+    background_color: SUCCESS_COLOR
+    font_size: FONT_NORMAL
+    size_hint_y: None
+    height: TABLE_ROW_HEIGHT
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+
+<TitleLabel@Label>:
+    font_size: FONT_LARGE
+    color: TEXT_NORMAL
+    text_size: self.size
+    halign: 'center'
+
+<NormalLabel@Label>:
+    font_size: FONT_NORMAL
+    color: TEXT_NORMAL
+    text_size: self.size
+    halign: 'left'
+
+<HeaderLabel@Label>:
+    font_size: FONT_NORMAL
+    bold: True
+    color: TEXT_NORMAL
+    size_hint_y: None
+    height: HEADER_HEIGHT
+    text_size: self.size
+    halign: 'left'
+
+<WiFiLabel@Label>:
+    font_size: FONT_SMALL
+    color: TEXT_NORMAL
+    halign: 'left'
+    valign: 'middle'
+    size_hint_y: None
+    height: TABLE_ROW_HEIGHT
+    text_size: self.size
+
+<ScreenLayout@BoxLayout>: 
+    orientation: 'vertical'
+    spacing: SPACING_LARGE
+    padding: PADDING_XLARGE, PADDING_LARGE, PADDING_XLARGE, PADDING_LARGE
+    
+    canvas.before: 
+        Color:
+            rgba: [1, 1, 1, 1] # Fundo branco
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(15),] 
+
+<CompactLayout@BoxLayout>:
+    orientation: 'vertical'
+    spacing: SPACING_MEDIUM
+    padding: PADDING_MEDIUM
+
+<HorizontalLayout@BoxLayout>:
+    orientation: 'horizontal'
+    spacing: SPACING_MEDIUM
+
+<VerticalLayout@BoxLayout>:
+    orientation: 'vertical'
+
+<TableLayout@GridLayout>:
+    cols: 2
+    spacing: SPACING_SMALL
+    size_hint_y: None
+
+<TopMenuBar>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: MENU_HEIGHT
+    spacing: SPACING_MEDIUM
+    padding: PADDING_SMALL, SPACING_SMALL, PADDING_SMALL, SPACING_SMALL
+    canvas.before:
+        Color:
+            rgba: MENU_BACKGROUND_COLOR 
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<WiFiNetworkItem@BoxLayout>:
+    orientation: 'vertical'
+    padding: PADDING_MEDIUM
+    spacing: SPACING_SMALL
+    size_hint_y: None
+    height: self.minimum_height
+    canvas.before:
+        Color: 
+            rgba: [0.95, 0.95, 0.95, 1] 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: dp(25)
+        WiFiLabel:
+            text: root.ssid 
+            font_size: FONT_MEDIUM
+            bold: True
+            size_hint_x: 0.7
+            halign: 'left'
+            valign: 'middle'
+            color: TEXT_NORMAL
+        WiFiLabel: 
+            text: f'({root.signal}%)' 
+            halign: 'right'
+            size_hint_x: 0.3
+            color: [0.4, 0.4, 0.4, 1] 
+            valign: 'middle'
+            font_size: FONT_SMALL
+    WiFiLabel:
+        text: f'Security: {root.security_type}' 
+        color: [0.4, 0.4, 0.4, 1]
+        size_hint_y: None
+        height: dp(15)
+        halign: 'left' 
+        valign: 'middle'
+        font_size: FONT_SMALL
+    ConnectButton:
+        text: 'Connect' 
+        # [BST-310]
+        on_press: root.connect_action()
+        size_hint_y: None
+        height: dp(40)
+
+<ConnectionScreen>:
+    FloatLayout: 
+        ScreenLayout: 
+            size_hint: (0.7, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+            TitleLabel:
+                text: 'WiFi Connections' 
+                size_hint_y: None
+                height: dp(40)
+
+            BoxLayout: 
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(50)
+                padding: dp(10), 0, dp(10), 0
+                spacing: dp(10)
+                canvas.before: 
+                    Color:
+                        rgba: [0.9, 0.9, 0.9, 1] 
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                HeaderLabel:
+                    text: "SSID"
+                    size_hint_x: 0.7
+                    valign: 'middle'
+                HeaderLabel:
+                    text: "Security (Signal)"
+                    halign: 'right'
+                    size_hint_x: 0.3
+                    valign: 'middle'
+
+            ScrollView:
+                bar_width: dp(10)
+                do_scroll_x: False
+                size_hint_y: 1 
+                
+                BoxLayout:
+                    id: network_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_MEDIUM
+                    padding: SPACING_SMALL
+                    size_hint_y: None 
+                    height: self.minimum_height
+
+            Label: 
+                id: empty_message_label
+                text: root.empty_list_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] 
+                size_hint_y: None
+                height: dp(40) if root.show_empty_message else 0 
+                opacity: 1 if root.show_empty_message else 0 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.size
+
+<SystemImageItem@ToggleButton>:
+    group: 'system_image_selection'
+    size_hint_y: None
+    height: dp(35) 
+    background_normal: ''
+    background_down: ''
+    
+    canvas.before:
+        Color:
+            rgba: ITEM_NORMAL_BG if self.state == 'normal' else ITEM_SELECTED_BG
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    
+    BoxLayout: 
+        orientation: 'horizontal'
+        size_hint: 1, 1 
+        pos: root.pos
+        size: root.size 
+        padding: SPACING_MEDIUM 
+        spacing: SPACING_SMALL 
+        
+        Label: 
+            text: root.image_name
+            font_size: FONT_NORMAL
+            color: TEXT_NORMAL if root.state == 'normal' else ITEM_SELECTED_TEXT
+            bold: True if root.state == 'down' else False
+            halign: 'left'
+            valign: 'middle'
+            text_size: self.width, self.height 
+            size_hint_x: 1 
+
+<PostConnectionScreen>:
+    FloatLayout:
+        ScreenLayout: 
+            size_hint: (0.8, 0.8)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+            TitleLabel:
+                text: 'BC Module Connected'
+                size_hint_y: None
+                height: dp(40)
+                valign: 'top'
+
+            BoxLayout: 
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: dp(50)
+                spacing: SPACING_MEDIUM
+                padding: SPACING_SMALL, 0, SPACING_SMALL, 0
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_x: 0.7
+
+                    Label:
+                        text: 'Hardware PN:'
+                        font_size: FONT_NORMAL
+                        color: TEXT_NORMAL
+                        halign: 'left'
+                        valign: 'top'
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1] + dp(5)
+                    
+                    Label:
+                        text: root.hardware_pn
+                        font_size: FONT_NORMAL
+                        color: TEXT_NORMAL
+                        halign: 'left'
+                        valign: 'top'
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1] + dp(5)
+
+                # [BST-312]    
+                SecondaryButton:
+                    text: 'Disconnect BC Module'
+                    size_hint: None, None
+                    # [BST-315]
+                    on_release: root.on_disconnect_clicked()
+                    size_hint_x: 0.3 
+                    size_hint_y: 1
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, None
+
+            Label:
+                text: ' System Image Compatible:'
+                font_size: FONT_SMALL
+                color: [0.4,0.4,0.4,1]
+                halign: 'left'
+                valign: 'middle'
+                text_size: self.size
+                size_hint_y: None
+                height: dp(30)
+            
+            Label: 
+                text: root.loading_message if not root.error_message and not root.ids.image_list_container.children else root.error_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] if not root.show_error_message else [0.8, 0.2, 0.2, 1] 
+                halign: 'center'
+                valign: 'middle'
+                size_hint_y: None
+                height: dp(40) if (root.show_error_message or not root.ids.image_list_container.children) else 0
+                opacity: 1 if (root.show_error_message or not root.ids.image_list_container.children) else 0
+
+            ScrollView:
+                bar_width: dp(10)
+                do_scroll_x: False
+                size_hint_y: 1
+                
+                BoxLayout:
+                    id: image_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_SMALL
+                    padding: SPACING_SMALL
+                    size_hint_y: None
+                    height: self.minimum_height
+
+            PrimaryButton: 
+                text: 'Load selected image'
+                size_hint_y: None
+                height: BUTTON_HEIGHT
+                disabled: not root.is_load_button_enabled 
+                on_release: root.load_image_clicked()
+
+<LoginCard>:
+    orientation: 'vertical'
+    spacing: SPACING_MEDIUM 
+    padding: PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM
+    minimum_width: dp(400)
+    
+    canvas.before:
+        Color:
+            rgba: [1, 1, 1, 1] 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(15),]
+
+<LoginTextInput>:
+    multiline: False
+    font_size: FONT_MEDIUM
+    size_hint_y: None
+    height: dp(50) 
+    padding: dp(5), dp(5)
+    background_color: [1, 1, 1, 0] 
+    foreground_color: [0.2, 0.2, 0.2, 1] 
+    hint_text_color: [0.4, 0.4, 0.4, 1] 
+    write_tab: False
+    cursor_color: (1, 0, 0, 1)
+    cursor_width: dp(2) 
+    cursor_blink: True 
+    
+    canvas.before:
+        Color:
+            rgba: ([0.95, 0.95, 0.95, 1] if self.focus else [1, 1, 1, 1])
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+            
+        Color:
+            rgba: ([0.4, 0.4, 0.4, 1] if self.focus else [0.6, 0.6, 0.6, 1]) 
+        Line:
+            width: (dp(1.5) if self.focus else dp(1)) 
+            rounded_rectangle: (self.x, self.y, self.width, self.height, dp(5))
+
+<LoginScreen>:
+    FloatLayout: 
+        LoginCard:
+            size_hint: (0.4, 0.6)
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            padding: PADDING_SMALL
+            
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: SPACING_LARGE
+                padding: PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM, PADDING_MEDIUM
+                
+                BoxLayout:
+                    size_hint_y: 0.30 
+                    padding: SPACING_MEDIUM, SPACING_MEDIUM 
+
+                    Image:
+                        source: './uploads/EMB_Logo_RGB_1.png'
+                        size_hint: (1, 1)
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+                        fit_mode: 'contain'
+                
+                LoginTextInput:
+                    id: username_input 
+                    hint_text: 'Username'
+                    on_text_validate: root.focus_password_input(self) 
+                    size_hint_y: 0.15 
+                    
+                LoginTextInput:
+                    id: password_input 
+                    hint_text: 'Password'
+                    password: True
+                    on_text_validate: root.attempt_login(root.username_input.text, self.text)
+                    size_hint_y: 0.15 
+
+                NormalLabel:
+                    text: root.login_message
+                    color: [0.9, 0.2, 0.2, 1]
+                    size_hint_y: 0.10 
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.size[0] * 0.9, None
+
+                PrimaryButton:
+                    text: 'Login'
+                    size_hint_y: 0.20 
+                    on_release: root.attempt_login(root.username_input.text, root.password_input.text)
+
+<MainScreen>: 
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.5, 0.6) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            
+            BoxLayout:
+                size_hint_y: 0.30 
+                padding: SPACING_SMALL, SPACING_SMALL
+
+                Image:
+                    source: './uploads/GSE.png'
+                    size_hint: (1, 1)
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+                    fit_mode: 'contain'
+            
+            BoxLayout: 
+                orientation: 'vertical'
+                spacing: SPACING_LARGE
+                size_hint_y: None
+                height: self.minimum_height 
+
+                PrimaryButton:
+                    text: 'Manage Images'
+                    size_hint_y: None
+                    height: BUTTON_HEIGHT * 0.8 
+                    # [BST-304]
+                    on_release: root.emit_navigate_to_images() 
+
+                PrimaryButton:
+                    text: 'Search BC Modules'
+                    size_hint_y: None
+                    height: BUTTON_HEIGHT * 0.8
+                    # [BST-305]
+                    on_release: root.emit_navigate_to_connections()
+
+<DeleteButton@Button>:
+    background_color: ACCENT_COLOR_DELETE
+    font_size: FONT_SMALL
+    size_hint_x: None
+    width: dp(80) 
+    color: [1,1,1,1] 
+    background_normal: '' 
+    background_down: '' 
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else [x*0.8 for x in self.background_color[:3]] + [1]
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),] 
+
+<ImageListItem@BoxLayout>: 
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: dp(50) 
+    padding: SPACING_MEDIUM
+    spacing: SPACING_SMALL
+    canvas.before:
+        Color:
+            rgba: BACKGROUND_COLOR 
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [dp(5),]
+    
+    Label:
+        text: root.file_name
+        font_size: FONT_NORMAL
+        color: TEXT_NORMAL
+        halign: 'left'
+        valign: 'middle'
+        text_size: self.size
+        size_hint_x: 1 
+    
+    DeleteButton: 
+        text: 'Delete'
+        on_release: root.delete_action(root.file_name) 
+
+<ImagesScreen>:
+    FloatLayout:
+        ScreenLayout: 
+            size_hint: (0.6, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+            TitleLabel:
+                text: 'Image Management'
+                size_hint_y: None
+                height: dp(60)
+
+            ScrollView: 
+                bar_width: dp(10)
+                do_scroll_x: False
+                size_hint_y: 1 
+                
+                BoxLayout:
+                    id: image_list_container 
+                    orientation: 'vertical'
+                    spacing: SPACING_SMALL
+                    padding: SPACING_SMALL
+                    size_hint_y: None 
+                    height: self.minimum_height
+
+            Label: 
+                id: empty_message_label
+                text: root.empty_list_message
+                font_size: FONT_NORMAL
+                color: [0.4, 0.4, 0.4, 1] 
+                size_hint_y: None
+                height: dp(40) if root.show_empty_message else 0 
+                opacity: 1 if root.show_empty_message else 0 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.size
+            
+            PrimaryButton: 
+                text: 'Upload New File'
+                size_hint_y: None
+                height: BUTTON_HEIGHT
+                on_release: root.open_file_chooser()
+
+<FileTransferScreen>:
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.7, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            spacing: SPACING_LARGE 
+            padding: PADDING_LARGE 
+
+            TitleLabel:
+                text: 'TRANSFER STATUS'
+                size_hint_y: None
+                height: dp(40)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: dp(80) 
+                spacing: SPACING_SMALL
+                padding: dp(10), dp(0), dp(10), dp(0) 
+                
+                # [BST-323]
+                Label:
+                    id: selected_file_label
+                    text: root.selected_file_text 
+                    font_size: FONT_NORMAL
+                    color: TEXT_NORMAL
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, self.height
+                    size_hint_y: None
+                    height: dp(30)
+
+                Label:
+                    id: transfer_status_label
+                    text: root.transfer_status_text 
+                    font_size: FONT_NORMAL
+                    color: TEXT_NORMAL
+                    halign: 'center'
+                    valign: 'middle'
+                    text_size: self.width, self.height
+                    size_hint_y: None
+                    height: dp(30)
+            
+            # [BST-325]
+            ProgressBar:
+                id: progress_bar
+                value: root.progress_value 
+                max: 100
+                size_hint_y: None
+                height: dp(10)
+            
+            Label:
+                id: progress_label
+                text: root.progress_text 
+                font_size: FONT_NORMAL
+                color: TEXT_NORMAL
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+                size_hint_y: None
+                height: dp(40)
+            
+            BoxLayout:
+                size_hint_y: 1 
+
+            SecondaryButton:
+                id: btn_cancel_transfer
+                text: 'Cancel Transfer'
+                on_release: root.cancel_transfer() 
+                disabled: not root.transfer_in_progress 
+                size_hint_y: None
+                height: BUTTON_HEIGHT * 0.8 
+
+            PrimaryButton:
+                id: btn_back
+                text: 'Return to Post-Connection'
+                on_release: root.return_clicked()
+                opacity: 1 if not root.transfer_in_progress and root.transfer_started else 0
+                disabled: root.transfer_in_progress 
+                size_hint_y: None
+                height: BUTTON_HEIGHT * 0.8 if not root.transfer_in_progress and root.transfer_started else 0 
+
+<ErrorScreen>:
+    FloatLayout:
+        ScreenLayout:
+            size_hint: (0.8, 0.8) 
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            spacing: SPACING_LARGE 
+            padding: PADDING_LARGE 
+            
+            TitleLabel:
+                text: 'An error occurred!'
+                color: [1, 0, 0, 1] 
+                size_hint_y: None
+                height: dp(40)
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width, self.height
+
+            Label: 
+                id: error_message_label
+                text: root.error_message 
+                font_size: FONT_NORMAL 
+                color: [0.9, 0.2, 0.2, 1] 
+                halign: 'center'
+                valign: 'middle'
+                text_size: self.width * 0.9, None 
+                size_hint_y: None
+                height: self.texture_size[1] + dp(20) 
+            
+            BoxLayout: 
+                size_hint_y: 1
+
+            PrimaryButton:
+                text: 'Dismiss'
+                on_release: root.dismiss_error() 
+                size_hint_y: None
+                height: BUTTON_HEIGHT 
