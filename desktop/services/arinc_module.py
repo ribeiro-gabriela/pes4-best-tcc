@@ -120,8 +120,11 @@ class ArincModule:
         return self._parse_LUS_file(f"{self._SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
 
     def _tftp_server_thread(self):
-        server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
-        server.listen()
+        try:
+            server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
+            server.listen(listenport=6969)
+        except Exception as e:
+            print(e)
 
     def _arinc_transfer_thread(self):
         if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
