@@ -197,6 +197,9 @@ class ArincModule:
             time.sleep(0.1)
 
     def _server_callback(self, filename: str, **args):
+        print('RECEIVED GET REQUEST')
+        print(filename)
+
         if self.transfer_status is None:
             return None
 
@@ -207,6 +210,9 @@ class ArincModule:
             return None
 
         if filename == self.transfer_status.fileRecord.file.fileName:
+            return open(self.transfer_status.fileRecord.file.path, "rb")
+        
+        if filename == f'{self.transfer_status.fileRecord}.bin':
             return open(self.transfer_status.fileRecord.file.path, "rb")
 
         if filename == f"{target}.{ArincFileType.LUH.value}":
