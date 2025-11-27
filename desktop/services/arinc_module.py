@@ -206,8 +206,8 @@ class ArincModule:
             # return canceled status file
             return None
 
-        # if filename == self.transfer_status.fileRecord.file.fileName:
-        #     return open(self.transfer_status.fileRecord.file.path, "rb")
+        if filename == self.transfer_status.fileRecord.file.fileName:
+            return open(self.transfer_status.fileRecord.file.path, "rb")
 
         if filename == f"{target}.{ArincFileType.LUH.value}":
             file_record = self.transfer_status.fileRecord
