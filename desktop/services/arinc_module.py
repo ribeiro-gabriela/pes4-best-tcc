@@ -25,9 +25,11 @@ from services.connection_service import ConnectionService
 from services.logging_service import LoggingService
 from tftpy import TftpServer
 
+from interfaces.transfer_protocol import ITransferProtocol
+
 version: Literal["A4"] = "A4"
 
-class ArincModule:
+class ArincModule(ITransferProtocol):
     transfer_status: TransferStatus | None = None
     transfer_thread: threading.Thread | None = None
 

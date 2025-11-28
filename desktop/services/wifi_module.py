@@ -7,8 +7,9 @@ import subprocess, tempfile, os
 
 from data.classes import Connection, Package, Request, Response
 from data.errors import RequestTimeoutError, ConnectionAuthenticationError
+from interfaces.connection_transport import IConnectionTransport
 
-class WifiModule:
+class WifiModule(IConnectionTransport):
     _PASSWORD = "bcappassword"
     _tftp_client: TftpClient | None = None
 

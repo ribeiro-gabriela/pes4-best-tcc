@@ -4,15 +4,14 @@ from typing import Optional, List
 
 from data.classes import Connection, Package, Request, Response
 from data.errors import ConnectionAuthenticationError, DisconnectedError, RequestTimeoutError
+from interfaces.connection_transport import IConnectionTransport
 from services.logging_service import LoggingService
-from services.wifi_module import WifiModule
 
 from ui.event_router import emit_event
 from data.events import Event
-from data.enums import AppState
 
 class ConnectionService:
-    def __init__(self, wifi_module: WifiModule, test_mode: bool = True):
+    def __init__(self, wifi_module: IConnectionTransport, test_mode: bool = True):
         self.logging_service = LoggingService(ConnectionService.__name__)
         self.wifi_module = wifi_module
         self.test_mode = test_mode  # Flag para modo de teste com hardware PN simulado

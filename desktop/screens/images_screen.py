@@ -1,17 +1,15 @@
 from typing import Callable
 from kivy.uix.screenmanager import Screen
-from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty
+from kivy.properties import ListProperty, StringProperty, BooleanProperty
 from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
-from kivy.metrics import dp
-import shutil
 import os
 import platform
 
 from data.enums import ScreenName
-from data.classes import File, FileRecord
+from data.classes import File
 from screens.components import ImageListItem
 from data.events import Event
 from services.service_facade import ServiceFacade
@@ -44,16 +42,6 @@ class ImagesScreen(Screen):
         self.load_image_files()
 
     def load_image_files(self):
-        # # SIMULAÇÃO APENAS
-        # if not os.path.exists(UPLOAD_DIR):
-        #     os.makedirs(UPLOAD_DIR) 
-
-        # current_files = []
-        # for file_name in os.listdir(UPLOAD_DIR):
-        #     full_path = os.path.join(UPLOAD_DIR, file_name)
-        #     if os.path.isfile(full_path):
-        #         current_files.append({'name': file_name, 'path': full_path})
-
         # [BST-307]
         current_files = self._service_facade.listImportedFiles()
         
@@ -69,8 +57,6 @@ class ImagesScreen(Screen):
             for img_file in self.image_files:
                 item = ImageListItem(
                     file_name=img_file.softwarePN,
-                    # delete_action=self.delete_file 
-                    #SIMULAÇÃO, TROCAR A LINHA COMENTADA
                     delete_action=lambda pn=img_file.softwarePN: self.on_delete_clicked(pn)
                 )
                 list_container.add_widget(item)
@@ -80,7 +66,7 @@ class ImagesScreen(Screen):
     def open_file_chooser(self):
         # [BST-308]
         if platform.system() == "Windows":
-            start_path = "C:\\"
+            start_path = "C:\\Users"
         else:
             start_path = os.path.expanduser("~") 
 
@@ -123,13 +109,7 @@ class ImagesScreen(Screen):
         # [BST-333]
         self._service_facade.importFile(file_object)
         self.load_image_files()
-
-        # SIMULAÇÃO APENAS 
-        # filename = os.path.basename(file_path)
-        # dest_path = os.path.join(UPLOAD_DIR, filename)
-        # shutil.copy(file_path, dest_path)
-        # self.load_image_files()
-
+        
     def on_delete_clicked(self, software_pn: str):
         # [BST-332]
         check_authentication(self, self.delete_file, software_pn)

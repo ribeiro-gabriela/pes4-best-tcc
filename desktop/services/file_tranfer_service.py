@@ -6,17 +6,17 @@ from data.errors import (
     IntegrityError,
 )
 from data.enums import ArincTransferResult
-from services.arinc_module import ArincModule
 from services.connection_service import ConnectionService
 from services.file_validator_service import FileValidatorService
 from services.logging_service import LoggingService
+from interfaces.transfer_protocol import ITransferProtocol
 
 class FileTransferService:
     def __init__(
         self,
         file_validator: FileValidatorService,
         connection_service: ConnectionService,
-        arinc_module: ArincModule,
+        arinc_module: ITransferProtocol,
     ):
         self.logging_service = LoggingService(FileTransferService.__name__)
         self.file_validator = file_validator
