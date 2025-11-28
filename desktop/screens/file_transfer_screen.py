@@ -6,10 +6,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.metrics import dp
-import threading
 from typing import Callable, Optional
 
-from data.enums import ScreenName
+from data.enums import ArincTransferResult, ScreenName
 from data.classes import FileRecord
 from ui.event_router import emit_event, event_router
 from data.events import Event
@@ -115,23 +114,24 @@ class FileTransferScreen(Screen):
             
         try:
             # [BST-320]
-            status = self._service_facade.file_transfer_service.getProgress()
+            status = self._service_facade.getProgress()
             
             # [BST-325]
-            if isinstance(status, dict) and 'percentage' in status:
-                percentage = status['percentage']
-                self.progress_value = percentage
-                self.progress_text = f'{percentage:.1f}% - Transferring via ARINC 615-A...'
-                self.transfer_status_text = 'Transfer in progress...'
+            if status:
+                if not status.transferResult:
+                    percentage = status.progressPercent
+                    self.progress_value = percentage
+                    self.progress_text = f'{percentage:.1f}% - Transferring via ARINC 615-A...'
+                    self.transfer_status_text = 'Transfer in progress...'
 
-            # [BST-324]    
-            elif status == "TransferFinished":
-                self.transfer_finished(success=True)
+                # [BST-324]    
+                elif status.transferResult == ArincTransferResult.SUCCESS:
+                    self.transfer_finished(success=True)
 
-            #[BST-324]     
-            elif status in ["TransferFailed", "TransferCancelled"]:
-                self.transfer_finished(success=False)
-                return False  
+                #[BST-324]     
+                elif status.transferResult == ArincTransferResult.FAILED or status.cancelled:
+                    self.transfer_finished(success=False)
+                    return False  
                 
         except Exception as e:
             # [BST-321]
