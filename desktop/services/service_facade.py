@@ -1,4 +1,4 @@
-from data.classes import File, FileRecord
+from data.classes import File, FileRecord, TransferStatus
 from services.connection_service import ConnectionService
 from services.file_tranfer_service import FileTransferService
 from services.imported_files_service import ImportedFilesService
@@ -60,7 +60,7 @@ class ServiceFacade:
         # [BST-319]
         return self.file_transfer_service.startTransfer(file_record)
 
-    def getProgress(self) -> Any:
+    def getProgress(self) -> TransferStatus:
         # [BST-320, BST-321, BST-324]
         return self.file_transfer_service.getProgress()
 

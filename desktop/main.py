@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import platform
 from kivy.resources import resource_add_path, resource_find
 
 from services.arinc_module import ArincModule
@@ -10,6 +11,7 @@ from services.imported_files_service import ImportedFilesService
 from services.service_facade import ServiceFacade
 from services.user_authentication_service import UserAuthenticationService
 from services.wifi_module import WifiModule
+from services.wifi_module_linux import WifiModuleLinux
 
 BASE = Path(__file__).resolve().parent
 resource_add_path(str(BASE / "ui"))
@@ -24,7 +26,12 @@ from services.user_database_module import UserDatabase
 from ui.ui_manager import UiManager
 
 user_database = UserDatabase() 
-wifi_module = WifiModule() 
+
+if platform.system() == "Windows":
+    wifi_module = WifiModule() 
+else:
+    wifi_module = WifiModuleLinux()
+
 file_validator_service = FileValidatorService() 
 
 user_authentication_service = UserAuthenticationService(
