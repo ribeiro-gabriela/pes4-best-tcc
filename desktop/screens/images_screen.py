@@ -135,7 +135,5 @@ class ImagesScreen(Screen):
         check_authentication(self, self.delete_file, software_pn)
 
     def delete_file(self, filename):
-        # SIMULAÇÃO APENAS
-        os.remove(os.path.join(UPLOAD_DIR, filename))
-        #self._service_facade.deleteImportedFile(software_pn)
+        self._service_facade.deleteImportedFile(filename)
         self.load_image_files()
