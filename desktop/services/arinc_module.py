@@ -122,8 +122,11 @@ class ArincModule(ITransferProtocol):
         return self._parse_LUS_file(f"{self._SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
 
     def _tftp_server_thread(self):
-        server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
-        server.listen(listenport=6969)
+        try:
+            server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
+            server.listen(listenport=6969)
+        except Exception as e:
+            print(e)
 
     def _arinc_transfer_thread(self):
         if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
@@ -199,6 +202,9 @@ class ArincModule(ITransferProtocol):
             time.sleep(0.1)
 
     def _server_callback(self, filename: str, **args):
+        print('RECEIVED GET REQUEST')
+        print(filename)
+
         if self.transfer_status is None:
             return None
 
@@ -208,8 +214,11 @@ class ArincModule(ITransferProtocol):
             # return canceled status file
             return None
 
-        # if filename == self.transfer_status.fileRecord.file.fileName:
-        #     return open(self.transfer_status.fileRecord.file.path, "rb")
+        if filename == self.transfer_status.fileRecord.file.fileName:
+            return open(self.transfer_status.fileRecord.file.path, "rb")
+        
+        if filename == f'{self.transfer_status.fileRecord}.bin':
+            return open(self.transfer_status.fileRecord.file.path, "rb")
 
         if filename == f"{target}.{ArincFileType.LUH.value}":
             file_record = self.transfer_status.fileRecord
