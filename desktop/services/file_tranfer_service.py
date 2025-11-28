@@ -1,5 +1,4 @@
-from typing import Any
-from data.classes import FileRecord
+from data.classes import FileRecord, TransferStatus
 from data.errors import (
     CompatibilityError,
     DisconnectedError,
@@ -77,7 +76,7 @@ class FileTransferService:
         # [BST-238]
         return result
 
-    def getProgress(self) -> Any:
+    def getProgress(self) -> TransferStatus:
         # [BST-244]
         if not self.connection_service.isConnected():
             # [BST-242]

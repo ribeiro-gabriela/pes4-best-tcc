@@ -121,7 +121,7 @@ class ArincModule:
 
     def _tftp_server_thread(self):
         server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
-        server.listen()
+        server.listen(listenport=6969)
 
     def _arinc_transfer_thread(self):
         if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
@@ -382,16 +382,17 @@ class ArincModule:
         FOOTER_SIZE = 32
         
         with open(image_input_path, 'rb') as image_file:
-            image_file.seek(0, 2)
-            total_size = image_file.tell()
+            # image_file.seek(0, 2)
+            # total_size = image_file.tell()
             
-            bytes_to_copy = total_size - HEADER_SIZE - FOOTER_SIZE
+            # bytes_to_copy = total_size - HEADER_SIZE - FOOTER_SIZE
 
-            if bytes_to_copy <= 0:
-                raise Exception("Malformed sofware image file")
+            # if bytes_to_copy <= 0:
+            #     raise Exception("Malformed sofware image file")
 
-            image_file.seek(HEADER_SIZE)
-            data_to_copy = image_file.read(bytes_to_copy)
+            # image_file.seek(HEADER_SIZE)
+            # data_to_copy = image_file.read(bytes_to_copy)
+            data_to_copy = image_file.read(-1)
 
         with open(data_output_path, 'wb') as data_file:
             data_file.write(data_to_copy)
