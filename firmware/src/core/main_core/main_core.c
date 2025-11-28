@@ -136,6 +136,8 @@ void* stateTransitionHandler()
     bool verificationHash = false;
     bool verificationPN = false;
 
+    bool imgReceived = false;
+
     while (1)
     {
         if (xQueueReceive(BCQueue, &receivedMessage, 100 / portTICK_PERIOD_MS) == pdPASS)
@@ -145,6 +147,7 @@ void* stateTransitionHandler()
                 if (getBCState() != MNT_MODE && sensors.mntSignal && 
                     sensors.parkingBrake && sensors.weightOnWheels)
                 {
+                    imgReceived = false;
                     setBCState(MNT_MODE);
                     setMntState(WAITING);
                     ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
@@ -182,11 +185,21 @@ void* stateTransitionHandler()
             else if (receivedMessage.eventID == WIFI_CLIENT_CONNECTED)
             {
                 if (getBCState() == MNT_MODE && getMntState() == WAITING)
-                {
-                    setMntState(CONNECTED);
-                    setConnState(WAITING_REQUEST);
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "MNT State changed to CONNECTED and Conn State changed to WAITING_REQUEST");
+                {   
+                    if (!imgReceived)
+                    {
+                        setMntState(CONNECTED);
+                        setConnState(WAITING_REQUEST);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "MNT State changed to CONNECTED and Conn State changed to WAITING_REQUEST");
+                    }
+                    else
+                    {
+                        setMntState(WAITING_AUTHORIZATION);
+                        setConnState(NOT_SET_CONN);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
+                    }
                 }
                 else
                 {
@@ -196,7 +209,7 @@ void* stateTransitionHandler()
             else if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED ||
                      receivedMessage.eventID == COMM_AUTH_FAILURE)
             {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED)
+                if (getBCState() == MNT_MODE)
                 {
                     setMntState(WAITING);
                     setConnState(NOT_SET_CONN);
@@ -309,7 +322,8 @@ void* stateTransitionHandler()
                 {
                     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                         getConnState() == IMG_VERIFICATION)
-                    {
+                    {   
+                        imgReceived = true;
                         setMntState(WAITING_AUTHORIZATION);
                         setConnState(NOT_SET_CONN);
                         ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
@@ -329,6 +343,8 @@ void* stateTransitionHandler()
                 // Reset verification flags on any error
                 verificationHash = false;
                 verificationPN = false;
+
+                imgReceived = false;
 
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == IMG_VERIFICATION)
