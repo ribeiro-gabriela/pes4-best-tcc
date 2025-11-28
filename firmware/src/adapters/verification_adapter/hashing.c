@@ -1,7 +1,11 @@
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include "hashing.h"
 
 static const char* TAG = "SHA-256";
+
+extern size_t ratalina;
 
 esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
 {
@@ -15,6 +19,7 @@ esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
     mbedtls_sha256_context ctx;
 
     uint8_t* buf = (uint8_t*) malloc(READ_BUFFER_SIZE);
+    /* uint8_t buf[READ_BUFFER_SIZE]; */
     if (!buf)
     {
         ESP_LOGE(TAG, "Failed to allocate memory for read buffer");
@@ -25,21 +30,34 @@ esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
     mbedtls_sha256_init(&ctx);
     int mbed_r = mbedtls_sha256_starts(&ctx, 0);
 
+    size_t dataLen = ratalina - 40 - 32;
+    ratalina -= 40;
+
     size_t bytes_read = 1;
-    while (bytes_read > 0) 
+    while (bytes_read > 0)
     {
-        bytes_read = fread(buf, 1, READ_BUFFER_SIZE, rec_file);
-        if (bytes_read > 0)
-        {
-            mbed_r = mbedtls_sha256_update(&ctx, buf, bytes_read);
-            if (mbed_r != 0)
-            {
-                ESP_LOGE(TAG, "Failed to update SHA256 context, error: %d", mbed_r);
-                fclose(rec_file);
-                free(buf);
-                return ESP_FAIL;
+	if (ratalina > 32)
+	{
+	    bytes_read = fread(buf + 40, 1, READ_BUFFER_SIZE, rec_file);
+	    if (bytes_read > 0)
+	    {
+		mbed_r = mbedtls_sha256_update(&ctx, buf, bytes_read);
+		if (mbed_r != 0)
+		{
+		    ESP_LOGE(TAG,
+			     "Failed to update SHA256 context, error: %d",
+			     mbed_r);
+		    fclose(rec_file);
+		    free(buf);
+		    return ESP_FAIL;
+		}
             }
-        }
+	    ratalina -= READ_BUFFER_SIZE;
+	}
+	else
+	{
+	    bytes_read = 0;
+	}
     }
     fclose(rec_file);
     free(buf);

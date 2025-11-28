@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "storage_adapter.h"
 
-const char* TAG = "STORAGE";
+static const char* TAG = "STORAGE";
 
 void partitionSetup()
 {
