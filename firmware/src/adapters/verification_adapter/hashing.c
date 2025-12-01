@@ -5,12 +5,10 @@
 
 static const char* TAG = "SHA-256";
 
-extern size_t ratalina;
-
 esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
 {
-    FILE* rec_file = fopen(filepath, "rb");
-    if (rec_file == NULL)
+    FILE* recFile = fopen(filepath, "rb");
+    if (recFile == NULL)
     {
         ESP_LOGE(TAG, "Failed to open given file: %s", filepath);
         return ESP_FAIL;
@@ -23,43 +21,58 @@ esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
     if (!buf)
     {
         ESP_LOGE(TAG, "Failed to allocate memory for read buffer");
-        fclose(rec_file);
+        fclose(recFile);
         return ESP_FAIL;
     }
 
     mbedtls_sha256_init(&ctx);
     int mbed_r = mbedtls_sha256_starts(&ctx, 0);
 
-    size_t dataLen = ratalina - 40 - 32;
-    ratalina -= 40;
+    //size_t fileLen = getFileSize() - 40 - 32;
+    int fileLen = 1024000;
+
+    if (fseek(recFile, 40, SEEK_SET) != 0)
+    {
+        ESP_LOGE(TAG, "Error seeking in file");
+        fclose(recFile);
+        free(buf);
+        return ESP_FAIL;
+    }
 
     size_t bytes_read = 1;
-    while (bytes_read > 0)
+    while (bytes_read > 0 && fileLen > 0)
     {
-	if (ratalina > 32)
-	{
-	    bytes_read = fread(buf + 40, 1, READ_BUFFER_SIZE, rec_file);
-	    if (bytes_read > 0)
-	    {
-		mbed_r = mbedtls_sha256_update(&ctx, buf, bytes_read);
-		if (mbed_r != 0)
-		{
-		    ESP_LOGE(TAG,
-			     "Failed to update SHA256 context, error: %d",
-			     mbed_r);
-		    fclose(rec_file);
-		    free(buf);
-		    return ESP_FAIL;
-		}
+        if (READ_BUFFER_SIZE <= fileLen)
+        {
+            bytes_read = fread(buf, 1, READ_BUFFER_SIZE, recFile);
+            fileLen -= READ_BUFFER_SIZE;
+        }
+        else
+        {
+            memset(buf, 0, READ_BUFFER_SIZE);
+            bytes_read = fread(buf, 1, fileLen, recFile);
+            fileLen -= fileLen;
+        }
+        
+        if (bytes_read > 0)
+        {   
+            mbed_r = mbedtls_sha256_update(&ctx, buf, bytes_read);
+            if (mbed_r != 0)
+            {
+                ESP_LOGE(TAG,
+                        "Failed to update SHA256 context, error: %d",
+                        mbed_r);
+                fclose(recFile);
+                free(buf);
+                return ESP_FAIL;
             }
-	    ratalina -= READ_BUFFER_SIZE;
-	}
-	else
-	{
-	    bytes_read = 0;
-	}
+        }
+        else
+        {
+            bytes_read = 0;
+        }
     }
-    fclose(rec_file);
+    fclose(recFile);
     free(buf);
 
     uint8_t sha_result[SHA256_HASH_LEN];

@@ -169,7 +169,7 @@ void* stateTransitionHandler()
             {
                 if (getBCState() != OP_MODE)
                 {
-                    sensors.mntSignal = false;
+                    //sensors.mntSignal = false;
                     setBCState(OP_MODE);
                     setMntState(NOT_SET_MNT);
                     setConnState(NOT_SET_CONN);

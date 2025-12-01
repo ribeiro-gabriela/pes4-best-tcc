@@ -59,8 +59,10 @@ void tftpDecoderTask(void* params)
 
     ESP_LOGI(TAG, "packet decoder running. waiting for packets . . .");
 
+    size_t received;
+
     for (;;) {
-        size_t received = udpAdapterReceivePacket(&currentPacket, portMAX_DELAY);
+        received = udpAdapterReceivePacket(&currentPacket, portMAX_DELAY);
 
         if (received > 0) {
             if (currentPacket.len >= 2) {
@@ -87,12 +89,12 @@ void tftpDecoderTask(void* params)
                 ESP_LOGW(TAG, "packet too short");
             }
         }
-	vTaskDelay( 10 / portTICK_PERIOD_MS);
+	    vTaskDelay( 10 / portTICK_PERIOD_MS);
     }
 }
 
 
-#define DECODER_TASK_STACK_SIZE 2048
+#define DECODER_TASK_STACK_SIZE 4096
 StackType_t decoderTaskStack[DECODER_TASK_STACK_SIZE];
 StaticTask_t decoderTaskStaticBuffer;
 
