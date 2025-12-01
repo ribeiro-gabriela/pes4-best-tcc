@@ -25,7 +25,7 @@ char imageFilename[21];
 
 extern QueueHandle_t BCQueue;
 
-#define MESSAGE_BUFFER_SIZE (4096)
+#define MESSAGE_BUFFER_SIZE (2 * 4096)
 
 StaticMessageBuffer_t messageBufferStruct;
 uint8_t messageBuffer[MESSAGE_BUFFER_SIZE];
