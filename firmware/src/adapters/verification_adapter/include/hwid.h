@@ -6,7 +6,6 @@
 #include "esp_err.h"
 #include "storage_adapter.h"
 
-esp_err_t verifyPN();
-esp_err_t verifyFormat();
+esp_err_t verifyPN(char* filepath);
 
 #endif

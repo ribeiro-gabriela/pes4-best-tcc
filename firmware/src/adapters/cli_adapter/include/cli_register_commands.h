@@ -37,7 +37,7 @@ void registerLs(void)
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
 
-void registerVerifySHA(void)
+/* void registerVerifySHA(void)
 {
     const esp_console_cmd_t cmd = {
         .command = "versha",
@@ -46,7 +46,7 @@ void registerVerifySHA(void)
         .func = &verifySHAHandler
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
-}
+} */
 
 void registerParkingBrake(void)
 {

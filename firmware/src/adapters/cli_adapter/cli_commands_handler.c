@@ -50,7 +50,7 @@ int lsHandler(int argc, char **argv)
     return 0;
 }
 
-int verifySHAHandler(int argc, char **argv)
+/* int verifySHAHandler(int argc, char **argv)
 {
     if (argc < 3)
     {
@@ -92,11 +92,11 @@ int verifySHAHandler(int argc, char **argv)
             hash_value[i] = (uint8_t)value;
         }
 
-        verifyFileIntegrity(filepath, hash_value);
+        verifyFileIntegrity(filepath);
     }
 
     return 0;
-}
+} */
 
 // BST-635
 int parkingBrakeHandler(int argc, char **argv)

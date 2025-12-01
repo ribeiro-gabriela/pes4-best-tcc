@@ -11,7 +11,7 @@
 
 int restartHandler(int argc, char **argv);
 int lsHandler(int argc, char **argv);
-int verifySHAHandler(int argc, char **argv);
+//int verifySHAHandler(int argc, char **argv);
 int parkingBrakeHandler(int argc, char **argv);
 int weightOnWheelsHandler(int argc, char **argv);
 int maintenanceModeHandler(int argc, char **argv);

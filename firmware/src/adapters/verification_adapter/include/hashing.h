@@ -13,6 +13,6 @@
 void func();
 #endif
 
-esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash);
+esp_err_t verifyFileIntegrity(char* filepath);
 
 #endif
