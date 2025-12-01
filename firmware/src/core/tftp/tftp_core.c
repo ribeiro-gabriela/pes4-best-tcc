@@ -92,7 +92,7 @@ void tftpDecoderTask(void* params)
 }
 
 
-#define DECODER_TASK_STACK_SIZE 2048
+#define DECODER_TASK_STACK_SIZE 4096
 StackType_t decoderTaskStack[DECODER_TASK_STACK_SIZE];
 StaticTask_t decoderTaskStaticBuffer;
 

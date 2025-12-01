@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "esp_spiffs.h"
 #include "esp_log.h"
+#include "main_core.h"
 
 #define TFTP_TIMEOUT_MS 2000
 #define MAX_RETRIES 3
@@ -18,6 +19,9 @@
 uint8_t recv_buf[516];
 
 size_t ratalina = 0;
+
+
+extern QueueHandle_t BCQueue;
 
 #define MESSAGE_BUFFER_SIZE (4096)
 
@@ -114,16 +118,27 @@ int tftpClientGet(const char* ip_addr, const char* filename)
                 total_received += data_len;
                 retry = 0;
 
-                if (data_len < 512) {
-                    ESP_LOGI(TAG,
-                             "download finished. received: %d bytes",
-                             total_received);
+		if (data_len < 512)
+		{
+		    ESP_LOGI(TAG,
+			     "download finished. received: %d bytes",
+			     total_received);
 
-		    
-		    ratalina = total_received;
-                    
+                    QueueMessage_t eventMessage;
+                    eventMessage.eventID = COMM_TRANSFER_COMPLETE;
+                    sprintf((char*)eventMessage.logMessage,
+                            "received image. %u bytes received", (unsigned) total_received);
+
+                    if (xQueueSend(BCQueue,
+                                   (void*)&eventMessage,
+                                   portMAX_DELAY) != pdPASS)
+                    {
+                        ESP_LOGE(TAG, "failed to send message to BCQueue");
+                    }
+
+                    ratalina = total_received;
+
                     break;
-		    
                 }
             }
         } 
