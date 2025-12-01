@@ -11,4 +11,6 @@ int tftpClientPut(const char* ip_addr, const char* filename, uint8_t* payload, s
 void initTaskSendLus(void);
 void deinitTaskSendLus();
 
+size_t getImageFileSize(void);
+
 #endif
