@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "hashing.h"
+#include "tftp_client.h"
 
 static const char* TAG = "SHA-256";
 
@@ -28,9 +29,9 @@ esp_err_t verifyFileIntegrity(char* filepath)
     mbedtls_sha256_init(&ctx);
     int mbed_r = mbedtls_sha256_starts(&ctx, 0);
 
-    //size_t fileLen = getFileSize() - 40 - 32;
-    int fileLen = 1024000;
-
+    size_t fileLen = getImageFileSize() - 40 - 32;
+    printf("filesize: %zu\n", fileLen);
+    
     if (fseek(recFile, 40, SEEK_SET) != 0)
     {
         ESP_LOGE(TAG, "Error seeking in file");
@@ -77,7 +78,9 @@ esp_err_t verifyFileIntegrity(char* filepath)
     uint8_t receivedHash[33];
     fseek(recFile, -32, SEEK_END);
     fread(receivedHash, 1, 32, recFile);
-    receivedHash[33] = '\0';
+    receivedHash[32] = '\0';
+
+    fclose(recFile);
 
     uint8_t shaResult[SHA256_HASH_LEN];
     mbed_r = mbedtls_sha256_finish(&ctx, shaResult);
@@ -103,7 +106,6 @@ esp_err_t verifyFileIntegrity(char* filepath)
     ESP_LOGI(TAG, "File integrity is fine");
 
     mbedtls_sha256_free(&ctx);
-    fclose(recFile);
 
     return ESP_OK;
 }  

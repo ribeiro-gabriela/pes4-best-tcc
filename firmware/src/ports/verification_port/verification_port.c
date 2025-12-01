@@ -1,11 +1,14 @@
 #include "verification_port.h"
 #include "main_core.h"
+#include "tftp_client.h"
 
 extern QueueHandle_t BCQueue;
 
-void verify(char* fileName, char* recPN, uint8_t* recHash)
+void verify()
 {
     char filepath[64];
+    char fileName[21];
+    getImageFileName(fileName);
     QueueMessage_t msg;
 
     sprintf(filepath, "/spiffs/%s.bin", fileName);

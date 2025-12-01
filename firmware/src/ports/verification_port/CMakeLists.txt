@@ -1,3 +1,3 @@
 idf_component_register(SRCS "verification_port.c"
-                    REQUIRES verification_adapter main_core
+                    REQUIRES verification_adapter main_core tftp
                     INCLUDE_DIRS "include")

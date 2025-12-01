@@ -20,8 +20,7 @@
 uint8_t recv_buf[516];
 
 size_t imageTotalLen = 0;
-char imageFilename[64];
-
+char imageFilename[21];
 
 extern QueueHandle_t BCQueue;
 
@@ -125,7 +124,7 @@ int tftpClientGet(const char* ip_addr, const char* filename)
 
                     imageTotalLen = total_received;
                     strncpy(imageFilename, filename, sizeof(imageFilename));
-		    imageFilename[63] = '\0';
+		    imageFilename[21] = '\0';
 
                     break;
                 }

@@ -140,7 +140,7 @@ void* stateTransitionHandler()
 
     while (1)
     {
-        if (xQueueReceive(BCQueue, &receivedMessage, 100 / portTICK_PERIOD_MS) == pdPASS)
+        if (xQueueReceive(BCQueue, &receivedMessage, 10 / portTICK_PERIOD_MS) == pdPASS)
         {
             if (receivedMessage.eventID == EVENT_ENTER_MAINTENANCE_REQUEST)
             {
@@ -261,42 +261,7 @@ void* stateTransitionHandler()
                     ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
                     ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
 
-                    #define TEST_COMMAND_ENABLED
-                    #ifdef TEST_COMMAND_ENABLED
-
-                    FILE* recHeaderFile = fopen("/spiffs/test_file.bin", "rb");
-                    if (recHeaderFile == NULL)
-                    {
-                        ESP_LOGE("Main Core", "Failed to open received header file for reading");
-                        continue;
-                    }
-                    else
-                    {
-                        char recSWPN[21], recHWPN[21];
-                        uint8_t recHash[32];
-
-                        for (size_t i = 0; i < 20; i++)
-                        {
-                            recSWPN[i] = (char)fgetc(recHeaderFile);
-                        }
-                        recSWPN[20] = '\0';
-                        for (size_t i = 0; i < 20; i++)
-                        {
-                            recHWPN[i] = (char)fgetc(recHeaderFile);
-                        }
-                        recHWPN[20] = '\0';
-                        for (size_t i = 0; i < 32; i++)
-                        {
-                            recHash[i] = (uint8_t)fgetc(recHeaderFile);
-                        }
-
-                        fclose(recHeaderFile);
-
-                        verify(recSWPN, recHWPN, recHash);
-                    }
-
-                    #endif
-
+                    verify();
                 }
                 else
                 {
