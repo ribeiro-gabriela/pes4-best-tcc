@@ -1,5 +1,12 @@
 .vscode
 *.venv
 /firmware/.devcontainer
-*.vscode
+/firmware/.vscode
 /firmware/build
+/firmware/sdkconfig
+/firmware/sdkconfig.old
+/firmware/.vscode
+/firmware/build
+*.vscode
+.clang-format
+.cache
