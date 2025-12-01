@@ -25,6 +25,7 @@ esp_err_t initConsole()
     registerParkingBrake();
     registerWeightOnWheels();
     registerMaintenanceMode();
+    registerFormat();
     
     #ifdef TEST_COMMAND_ENABLED
     registerTest();
