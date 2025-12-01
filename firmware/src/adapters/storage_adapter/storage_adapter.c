@@ -16,7 +16,7 @@ void partitionSetup()
 
     esp_vfs_spiffs_conf_t conf = {
       .base_path = "/spiffs",
-      .partition_label = NULL,
+      .partition_label = "storage",
       .max_files = 5,
       .format_if_mount_failed = true
     };
@@ -26,11 +26,24 @@ void partitionSetup()
         ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
         return;
     }
+
+    esp_vfs_spiffs_conf_t pn_conf = {
+      .base_path = "/pn",
+      .partition_label = "pn",
+      .max_files = 1,
+      .format_if_mount_failed = true
+    };
+
+    ret = esp_vfs_spiffs_register(&pn_conf);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+        return;
+    }
 }
 
 char* readHWPNFromStorage()
 {
-    FILE* filePN = fopen("/spiffs/PN.txt", "r");
+    FILE* filePN = fopen("/pn/PN.txt", "r");
     if (filePN == NULL)
     {
         ESP_LOGE(TAG, "Failed to open PN file for reading");
