@@ -12,6 +12,6 @@ void initTaskSendLus(void);
 void deinitTaskSendLus();
 
 size_t getImageFileSize(void);
-char* getImageFileName(void);
+void getImageFileName(char* out);
 
 #endif
