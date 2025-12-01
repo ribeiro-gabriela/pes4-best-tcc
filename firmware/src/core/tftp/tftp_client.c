@@ -124,8 +124,9 @@ int tftpClientGet(const char* ip_addr, const char* filename)
                     }
 
                     imageTotalLen = total_received;
+		    memset(imageFilename, '\0', sizeof(imageFilename));
                     strncpy(imageFilename, filename, sizeof(imageFilename));
-		    imageFilename[21] = '\0';
+		    /* imageFilename[63] = '\0'; */
 
                     break;
                 }
