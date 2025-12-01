@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include "esp_spiffs.h"
 #include "esp_log.h"
 #include "main_core.h"
@@ -18,7 +19,8 @@
 #define TFTP_DATA_SIZE 512
 uint8_t recv_buf[516];
 
-static size_t imageTotalLen = 0;
+size_t imageTotalLen = 0;
+char imageFilename[64];
 
 
 extern QueueHandle_t BCQueue;
@@ -122,6 +124,8 @@ int tftpClientGet(const char* ip_addr, const char* filename)
                     }
 
                     imageTotalLen = total_received;
+                    strncpy(imageFilename, filename, sizeof(imageFilename));
+		    imageFilename[63] = '\0';
 
                     break;
                 }
@@ -409,4 +413,9 @@ void deinitTaskSendLus()
 size_t getImageFileSize(void)
 {
   return imageTotalLen;
+}
+
+char* getImageFileName(void)
+{
+  return imageFilename;
 }    
