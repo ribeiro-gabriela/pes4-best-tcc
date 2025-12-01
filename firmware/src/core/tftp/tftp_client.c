@@ -18,7 +18,7 @@
 #define TFTP_DATA_SIZE 512
 uint8_t recv_buf[516];
 
-size_t ratalina = 0;
+static size_t imageTotalLen = 0;
 
 
 extern QueueHandle_t BCQueue;
@@ -121,7 +121,7 @@ int tftpClientGet(const char* ip_addr, const char* filename)
                         ESP_LOGE(TAG, "failed to send message to BCQueue");
                     }
 
-                    ratalina = total_received;
+                    imageTotalLen = total_received;
 
                     break;
                 }
@@ -156,7 +156,6 @@ abort:
 
 int tftpClientPut(const char* ip_addr, const char* filename, uint8_t* payload, size_t payload_size)
 {
-// 1. Setup do Socket
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (sock < 0) return -1;
 
@@ -404,4 +403,10 @@ void initTaskSendLus(void)
 void deinitTaskSendLus()
 {
   vTaskDelete(arincSendLusTaskHandle);
+}
+
+
+size_t getImageFileSize(void)
+{
+  return imageTotalLen;
 }    
