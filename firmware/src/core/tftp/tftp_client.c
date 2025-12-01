@@ -20,7 +20,7 @@
 uint8_t recv_buf[516];
 
 size_t imageTotalLen = 0;
-char imageFilename[64];
+char imageFilename[21];
 
 
 extern QueueHandle_t BCQueue;
@@ -415,7 +415,8 @@ size_t getImageFileSize(void)
   return imageTotalLen;
 }
 
-char* getImageFileName(void)
+void getImageFileName(char* out)
 {
-  return imageFilename;
+    strncpy(out, imageFilename, 19);
+    out[20] = '\0';
 }    
