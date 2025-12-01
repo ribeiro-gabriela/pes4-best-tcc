@@ -1,7 +1,12 @@
 #include "tftp_core.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/FreeRTOSConfig_arch.h"
+#include "freertos/idf_additions.h"
+#include "portmacro.h"
 #include "udp.h"
 #include "esp_log.h"
 #include "lwip/def.h"
+#include <stdint.h>
 #include <string.h>
 
 static const char *TAG = "tftp_decoder";
@@ -47,12 +52,12 @@ static void dispatch_session_task(UdpPacket_t *packet, uint16_t opcode)
     }
 }
 
-void tftp_decoder_task(void)
+void tftpDecoderTask(void* params)
 {
     UdpPacket_t currentPacket;
     uint16_t opcode;
 
-    ESP_LOGI(TAG, "Decoder TFTP Iniciado. Aguardando pacotes...");
+    ESP_LOGI(TAG, "packet decoder running. waiting for packets . . .");
 
     for (;;) {
         size_t received = udpAdapterReceivePacket(&currentPacket, portMAX_DELAY);
@@ -82,5 +87,31 @@ void tftp_decoder_task(void)
                 ESP_LOGW(TAG, "packet too short");
             }
         }
+	vTaskDelay( 10 / portTICK_PERIOD_MS);
     }
+}
+
+
+#define DECODER_TASK_STACK_SIZE 2048
+StackType_t decoderTaskStack[DECODER_TASK_STACK_SIZE];
+StaticTask_t decoderTaskStaticBuffer;
+
+int8_t initDecoderTask(void)
+{
+    TaskHandle_t isDecoderTaskCreated =
+	xTaskCreateStaticPinnedToCore(tftpDecoderTask,
+				      "decoder task",
+				      DECODER_TASK_STACK_SIZE,
+				      NULL,
+				      5,
+				      decoderTaskStack,
+				      &decoderTaskStaticBuffer,
+				      1);
+
+    if (!isDecoderTaskCreated)
+    {
+        ESP_LOGE(TAG, "could not create tftp decoder task");
+        return -1;
+    }
+    return 0;
 }

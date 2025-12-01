@@ -15,14 +15,9 @@ void commInit()
     initArinc();
     udpAdapterInit();
     initTaskSendLus();
-    tftp_decoder_task();
+    /* tftpDecoderTask(); */
+    initDecoderTask();
     
-    /* server = tftp_server_create("/spiffs", 69); */
-    /* tftp_server_write_set(server, 1); */
-    
-    /* // Task para servidor tftp */
-    /* xTaskCreate((void*)tftp_server_run, "tftp_server_run", 4096, (void*)server, 5, &tftpTaskHandle); */
-
     return;
 }
 

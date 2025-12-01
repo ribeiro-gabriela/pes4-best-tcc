@@ -1,4 +1,5 @@
 #include "freertos/idf_additions.h"
+#include "portmacro.h"
 #include "tftp_core.h"
 #include "esp_log.h"
 #include "lwip/sockets.h"
@@ -8,10 +9,13 @@
 
 #include "arinc_core.h"
 #include "tftp_client.h"
+#include "main_core.h"
 
 static const char *TAG = "tftp_session";
 
-#define TFTP_PACKET_BUFFER_SIZE 516 
+#define TFTP_PACKET_BUFFER_SIZE 516
+
+extern QueueHandle_t BCQueue;
 
 static int sendAck(int sock, struct sockaddr_storage *destAddr, socklen_t addrLen, uint16_t blockNumber)
 {
@@ -176,13 +180,21 @@ void tftp_session_task(void *pvParameters)
 
                             if (isFileValid == ARINC_ERR_OK)
                             {
-                                ESP_LOGW(TAG, "RECEBI WRQ DO LUR MEU DEUS");
-				
+                                // sending queue event
+                                QueueMessage_t eventMessage;
+                                eventMessage.eventID = LOAD_REQUEST;
+                                sprintf((char*)eventMessage.logMessage,
+					"received Load Uploading Request");
 
-                                ESP_LOGW(TAG, "tamanho %lu", fLen);
-                            }
+				if (xQueueSend(BCQueue,
+					       (void*)&eventMessage,
+					       portMAX_DELAY) != pdPASS)
+				    {
+				      ESP_LOGE(TAG, "failed to send message to BCQueue");
+				    }
+			    }
 
-			    lurFilesDescriptionHeader_t filesList[MAX_FILE_PER_TRANSFER] = {0};
+                            lurFilesDescriptionHeader_t filesList[MAX_FILE_PER_TRANSFER] = {0};
 
                             uint16_t parsedCount = 0;
 

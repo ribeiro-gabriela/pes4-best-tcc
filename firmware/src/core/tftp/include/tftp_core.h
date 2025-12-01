@@ -23,6 +23,7 @@ typedef struct {
 } TftpSessionConfig_t;
 
 void tftp_session_task(void *pvParameters);
-void tftp_decoder_task(void);
+void tftpDecoderTask(void* params);
+int8_t initDecoderTask(void);
 
 #endif // TFTP_PROTOCOL_H

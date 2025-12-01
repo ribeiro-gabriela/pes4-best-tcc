@@ -8,27 +8,21 @@
 
 static const char *TAG = "udp_adapter";
 
-// --- Configuração do Socket ---
 static int serverSocket = -1;
 
-// --- Configuração do Stream Buffer  ---
-// Tamanho suficiente para segurar ~2 pacotes completos na fila 
-#define STREAM_BUFFER_SIZE (sizeof(UdpPacket_t) * 2)
-#define TRIGGER_LEVEL 1 // acorda o decoder com qualquer dado
+#define UDP_RECV_PKG_SIZE (sizeof(UdpPacket_t) * 2)
+#define TRIGGER_LEVEL 1 
 
-static uint8_t streamBuffer[STREAM_BUFFER_SIZE];
-static StaticStreamBuffer_t streamBufferStruct;
-static StreamBufferHandle_t streamBufferHandle = NULL;
+static uint8_t udpReceivedPacketsBuf[UDP_RECV_PKG_SIZE];
+static StaticStreamBuffer_t udpReceivedPacketsStruct;
+static StreamBufferHandle_t udpReceivedPacketsHandle = NULL;
 
-// --- Configuração da Task (Alocação Estática) ---
+
 #define LISTENER_STACK_SIZE 4096
 static StackType_t listenerStack[LISTENER_STACK_SIZE];
 static StaticTask_t listenerTaskBuffer;
 
 
-/**
- * @brief Task Privada: Ouve a rede e joga no Stream Buffer.
- */
 static void udpListenTask(void *params)
 {
     UdpPacket_t tempPacket;
@@ -55,7 +49,7 @@ static void udpListenTask(void *params)
         if (len > 0) {
             tempPacket.len = (size_t)len;
 
-            size_t bytesSent = xStreamBufferSend(streamBufferHandle,
+            size_t bytesSent = xStreamBufferSend(udpReceivedPacketsHandle,
                                                  (void *)&tempPacket,
                                                  sizeof(UdpPacket_t),
                                                  0);
@@ -72,12 +66,11 @@ static void udpListenTask(void *params)
 
 int8_t udpAdapterInit(void)
 {
-    // 1. Criar Stream Buffer Estático
-    streamBufferHandle = xStreamBufferCreateStatic(STREAM_BUFFER_SIZE,
+    udpReceivedPacketsHandle = xStreamBufferCreateStatic(UDP_RECV_PKG_SIZE,
                                               TRIGGER_LEVEL,
-                                              streamBuffer,
-                                              &streamBufferStruct);
-    if (streamBufferHandle == NULL) {
+                                              udpReceivedPacketsBuf,
+                                              &udpReceivedPacketsStruct);
+    if (udpReceivedPacketsHandle == NULL) {
         ESP_LOGE(TAG, "could not create stream buffer");
         return -1;
     }
@@ -113,16 +106,16 @@ int8_t udpAdapterInit(void)
                                   5, 
                                   listenerStack,
                                   &listenerTaskBuffer,
-                                  0); 
+                                  1); 
 
     return 0;
 }
 
 size_t udpAdapterReceivePacket(UdpPacket_t *packet, TickType_t wait)
 {
-    if (streamBufferHandle == NULL || packet == NULL) return 0;
+    if (udpReceivedPacketsHandle == NULL || packet == NULL) return 0;
 
-    return xStreamBufferReceive(streamBufferHandle, (void *)packet, sizeof(UdpPacket_t), wait);
+    return xStreamBufferReceive(udpReceivedPacketsHandle, (void *)packet, sizeof(UdpPacket_t), wait);
 }
 
 int8_t udpAdapterSend(const struct sockaddr_storage *destAddr, socklen_t addrLen, const uint8_t *data, size_t len)

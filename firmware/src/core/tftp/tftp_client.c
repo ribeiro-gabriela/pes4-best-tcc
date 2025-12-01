@@ -370,7 +370,6 @@ void taskArincSendLus(void* params)
 
 void initTaskSendLus(void)
 {
-    
   messageBufferHandle = xMessageBufferCreateStatic(MESSAGE_BUFFER_SIZE, messageBuffer, &messageBufferStruct);
 
   if (messageBufferHandle == NULL)
@@ -383,5 +382,4 @@ void initTaskSendLus(void)
     }
   
     xTaskCreate(taskArincSendLus, "LUS sender", 9000, NULL, 5, NULL);
-
 }
