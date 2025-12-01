@@ -13,9 +13,8 @@ void commInit()
     wifiInitSoftAP();
 
     initArinc();
-    udpAdapterInit();
+    initUdpAdapter();
     initTaskSendLus();
-    /* tftpDecoderTask(); */
     initDecoderTask();
     
     return;
@@ -24,6 +23,10 @@ void commInit()
 void commDeinit()
 {
     wifiDeinitSoftAP();
+    deinitArinc();
+    deinitUdpAdapter();
+    deinitTaskSendLus();
+    deinitTftpDecoderTask();
     /* tftp_server_destroy(server); */
 
     return;

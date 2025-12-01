@@ -99,21 +99,6 @@ int tftpClientGet(const char* ip_addr, const char* filename)
                 filesList[0].headerFileName[MAX_DESCRIPTION_LEN] = '\0';
 
 
-
-                /* size_t bytesSent = xMessageBufferSend(messageBufferHandle, */
-                /*                                       (void*)filesList, */
-                /*                                       sizeof(arincStatusFileScheme_t), */
-                /*                                       portMAX_DELAY); */
-
-		/* if (bytesSent == sizeof(arincStatusFileScheme_t)) */
-		/* { */
-		/*     ESP_LOGI(TAG, "sending LUS file to server"); */
-		/* } */
-		/* else */
-		/* { */
-		/*     ESP_LOGE(TAG, "could not send LUS. buffer full"); */
-		/* } */
-
                 expected_block++;
                 total_received += data_len;
                 retry = 0;
@@ -349,6 +334,10 @@ abort:
     return -1;
 }
 
+#define DEFAULT_TASK_STACK_SIZE 4096
+StaticTask_t arincSendLusTaskBuffer;
+StackType_t arincSendLusTaskStack[DEFAULT_TASK_STACK_SIZE];
+TaskHandle_t arincSendLusTaskHandle;
 
 void taskArincSendLus(void* params)
 {
@@ -396,5 +385,23 @@ void initTaskSendLus(void)
     ESP_LOGI(TAG, "message buffer created");
     }
   
-    xTaskCreate(taskArincSendLus, "LUS sender", 9000, NULL, 5, NULL);
+    arincSendLusTaskHandle =
+        xTaskCreateStaticPinnedToCore(taskArincSendLus,
+                                      "send LUS task",
+                                      DEFAULT_TASK_STACK_SIZE,
+                                      NULL,
+                                      5,
+                                      arincSendLusTaskStack,
+                                      &arincSendLusTaskBuffer,
+                                      1);
+
+    if (arincSendLusTaskHandle == NULL)
+    {
+	ESP_LOGE(TAG, "could not create send lus task");
+    }
 }
+
+void deinitTaskSendLus()
+{
+  vTaskDelete(arincSendLusTaskHandle);
+}    

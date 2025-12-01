@@ -17,7 +17,7 @@
 
 typedef struct {
     uint16_t opcode;
-    char filename[128]; // Tamanho seguro para nome de arquivo
+    char filename[128];
     struct sockaddr_storage clientAddr;
     socklen_t addrLen;
 } TftpSessionConfig_t;
@@ -25,5 +25,6 @@ typedef struct {
 void tftp_session_task(void *pvParameters);
 void tftpDecoderTask(void* params);
 int8_t initDecoderTask(void);
-
+void deinitTftpDecoderTask(void);
+  
 #endif // TFTP_PROTOCOL_H

@@ -9,17 +9,23 @@
 #include <stdint.h>
 #include <string.h>
 
+
+#define DECODER_TASK_STACK_SIZE 4096
+static StackType_t decoderTaskStack[DECODER_TASK_STACK_SIZE];
+static StaticTask_t decoderTaskStaticBuffer;
+static TaskHandle_t tftpDecoderTaskHandle;
+
 static const char *TAG = "tftp_decoder";
 
-static void extract_filename(const uint8_t *payload, size_t len, char *dest, size_t max_dest_len)
+static void extractFilename(const uint8_t *payload, size_t len, char *dest, size_t maxDestLen)
 {
     if (len <= 2) {
         dest[0] = '\0';
         return;
     }
     
-    strncpy(dest, (char *)(payload + 2), max_dest_len - 1);
-    dest[max_dest_len - 1] = '\0';
+    strncpy(dest, (char *)(payload + 2), maxDestLen - 1);
+    dest[maxDestLen - 1] = '\0';
 }
 
 static void dispatch_session_task(UdpPacket_t *packet, uint16_t opcode)
@@ -27,7 +33,7 @@ static void dispatch_session_task(UdpPacket_t *packet, uint16_t opcode)
     TftpSessionConfig_t *session_config = (TftpSessionConfig_t *)pvPortMalloc(sizeof(TftpSessionConfig_t));
     
     if (session_config == NULL) {
-        ESP_LOGE(TAG, "Sem memória para criar sessão TFTP");
+        ESP_LOGE(TAG, "no mem to create session task");
         return;
     }
 
@@ -35,7 +41,7 @@ static void dispatch_session_task(UdpPacket_t *packet, uint16_t opcode)
     session_config->clientAddr = packet->sourceAddr;
     session_config->addrLen = packet->addrLen;
     
-    extract_filename(packet->payload, packet->len, session_config->filename, sizeof(session_config->filename));
+    extractFilename(packet->payload, packet->len, session_config->filename, sizeof(session_config->filename));
 
     ESP_LOGI(TAG, "starting session: %s (Opcode: %d)", session_config->filename, opcode);
 
@@ -92,13 +98,10 @@ void tftpDecoderTask(void* params)
 }
 
 
-#define DECODER_TASK_STACK_SIZE 4096
-StackType_t decoderTaskStack[DECODER_TASK_STACK_SIZE];
-StaticTask_t decoderTaskStaticBuffer;
 
 int8_t initDecoderTask(void)
 {
-    TaskHandle_t isDecoderTaskCreated =
+    tftpDecoderTaskHandle =
 	xTaskCreateStaticPinnedToCore(tftpDecoderTask,
 				      "decoder task",
 				      DECODER_TASK_STACK_SIZE,
@@ -108,10 +111,15 @@ int8_t initDecoderTask(void)
 				      &decoderTaskStaticBuffer,
 				      1);
 
-    if (!isDecoderTaskCreated)
+    if (!tftpDecoderTaskHandle)
     {
         ESP_LOGE(TAG, "could not create tftp decoder task");
         return -1;
     }
     return 0;
 }
+
+void deinitTftpDecoderTask(void)
+{
+  vTaskDelete(tftpDecoderTaskHandle);
+}    

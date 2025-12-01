@@ -137,6 +137,9 @@ typedef struct arincStatusFileScheme
  */
 
 arincErr_t initArinc(void);
+void deinitArinc(void);
+
+
 arincErr_t loadUploadingInitialization(ARINC_STATUS_CODE_t opStatusCode,
                                        uint8_t* description,
                                        uint8_t buf[MAX_LUI_FILE],

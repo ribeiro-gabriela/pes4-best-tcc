@@ -4,8 +4,11 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
+
 int tftpClientGet(const char* ip_addr, const char* filename);
 int tftpClientPut(const char* ip_addr, const char* filename, uint8_t* payload, size_t payload_size);
 void initTaskSendLus(void);
+void deinitTaskSendLus();
 
 #endif

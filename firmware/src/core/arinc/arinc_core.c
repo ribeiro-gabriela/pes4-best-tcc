@@ -38,6 +38,12 @@ arincErr_t initArinc(void)
     return ARINC_ERR_OK;
 }
 
+void deinitArinc(void)
+{
+  vSemaphoreDelete(arincBufferSemaphoreHandle);
+}    
+
+
 arincErr_t loadUploadingInitialization(ARINC_STATUS_CODE_t opStatusCode,
                                        uint8_t* description,
                                        uint8_t buf[MAX_LUI_FILE],
