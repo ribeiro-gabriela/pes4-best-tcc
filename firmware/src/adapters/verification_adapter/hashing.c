@@ -5,7 +5,7 @@
 
 static const char* TAG = "SHA-256";
 
-esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
+esp_err_t verifyFileIntegrity(char* filepath)
 {
     FILE* recFile = fopen(filepath, "rb");
     if (recFile == NULL)
@@ -72,33 +72,38 @@ esp_err_t verifyFileIntegrity(char* filepath, uint8_t* received_hash)
             bytes_read = 0;
         }
     }
-    fclose(recFile);
     free(buf);
 
-    uint8_t sha_result[SHA256_HASH_LEN];
-    mbed_r = mbedtls_sha256_finish(&ctx, sha_result);
+    uint8_t receivedHash[33];
+    fseek(recFile, -32, SEEK_END);
+    fread(receivedHash, 1, 32, recFile);
+    receivedHash[33] = '\0';
 
-    if (memcmp(sha_result, received_hash, SHA256_HASH_LEN) != 0)
+    uint8_t shaResult[SHA256_HASH_LEN];
+    mbed_r = mbedtls_sha256_finish(&ctx, shaResult);
+
+    if (memcmp(shaResult, receivedHash, SHA256_HASH_LEN) != 0)
     {
         mbedtls_sha256_free(&ctx);
         ESP_LOGW(TAG, "File integrity violated, no match");
         return ESP_FAIL;
     }
 
-    char hash_str[SHA256_HASH_LEN * 2 + 1];
-    char rec_hash_str[SHA256_HASH_LEN * 2 + 1];
+    char hashStr[SHA256_HASH_LEN * 2 + 1];
+    char recHashStr[SHA256_HASH_LEN * 2 + 1];
     for (int i = 0; i < SHA256_HASH_LEN; i++)
     {
-        sprintf(&hash_str[i*2], "%02x", sha_result[i]);
-        sprintf(&rec_hash_str[i*2], "%02x", received_hash[i]);
+        sprintf(&hashStr[i*2], "%02x", shaResult[i]);
+        sprintf(&recHashStr[i*2], "%02x", receivedHash[i]);
     }
-    hash_str[SHA256_HASH_LEN*2] = '\0';
-    ESP_LOGI(TAG, "Hash result: %s", hash_str);
-    ESP_LOGI(TAG, "Received hash: %s", rec_hash_str);
+    hashStr[SHA256_HASH_LEN*2] = '\0';
+    ESP_LOGI(TAG, "Hash result: %s", hashStr);
+    ESP_LOGI(TAG, "Received hash: %s", recHashStr);
 
     ESP_LOGI(TAG, "File integrity is fine");
 
     mbedtls_sha256_free(&ctx);
+    fclose(recFile);
 
     return ESP_OK;
 }  

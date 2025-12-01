@@ -21,7 +21,7 @@ esp_err_t initConsole()
     // Register commands 
     registerRestart();
     registerLs();
-    registerVerifySHA();
+    // registerVerifySHA();
     registerParkingBrake();
     registerWeightOnWheels();
     registerMaintenanceMode();

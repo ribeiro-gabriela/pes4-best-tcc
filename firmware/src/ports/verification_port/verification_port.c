@@ -18,7 +18,7 @@ void verify(char* fileName, char* recPN, uint8_t* recHash)
     }
 
     esp_err_t res;
-    res = verifyPN(recPN);
+    res = verifyPN(filepath);
     if (res != ESP_OK)
     {
         ESP_LOGE("ERROR", "Part Number verification failed");
@@ -41,7 +41,7 @@ void verify(char* fileName, char* recPN, uint8_t* recHash)
         ESP_LOGE("ERROR", "Failed to send SEC_IMG_PN_OK message to BCQueue");
     }
 
-    res = verifyFileIntegrity(filepath, recHash);
+    res = verifyFileIntegrity(filepath);
     if (res != ESP_OK)
     {
         msg.eventID = SEC_ERR_IMG_HASH_MISMATCH;
