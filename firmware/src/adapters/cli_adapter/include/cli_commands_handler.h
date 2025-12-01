@@ -15,6 +15,7 @@ int verifySHAHandler(int argc, char **argv);
 int parkingBrakeHandler(int argc, char **argv);
 int weightOnWheelsHandler(int argc, char **argv);
 int maintenanceModeHandler(int argc, char **argv);
+int formatHandler(int argc, char **argv);
 
 #define TEST_COMMAND_ENABLED
 #ifdef TEST_COMMAND_ENABLED

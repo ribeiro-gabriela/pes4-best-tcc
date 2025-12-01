@@ -101,6 +101,6 @@ class ArincLUR:
 @dataclass
 class ArincLUH:
     FileType = ArincFileType.LUH
-    DataHash: str
     SoftwarePartNumber: str
     HardwarePartNumber: str
+    DataHash: str

@@ -18,6 +18,20 @@ int restartHandler(int argc, char **argv)
     esp_restart();
 }
 
+int formatHandler(int argc, char **argv)
+{
+    if (argc != 1)
+    {
+        ESP_LOGW(TAG, "Too many arguments");
+        return 1;
+    }
+    
+    ESP_LOGI(TAG, "Formatting storage partition...");
+    esp_spiffs_format("storage");
+
+    return 0;
+}
+
 int lsHandler(int argc, char **argv)
 {
     DIR* dir = opendir("/spiffs");

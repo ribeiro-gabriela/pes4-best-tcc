@@ -15,6 +15,17 @@ void registerRestart(void)
     ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
 }
 
+void registerFormat(void)
+{
+    const esp_console_cmd_t cmd = {
+        .command = "format",
+        .help = "Format data partition with software image",
+        .hint = NULL,
+        .func = &formatHandler
+    };
+    ESP_ERROR_CHECK(esp_console_cmd_register(&cmd));
+}
+
 void registerLs(void)
 {
     const esp_console_cmd_t cmd = {
