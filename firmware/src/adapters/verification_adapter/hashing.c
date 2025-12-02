@@ -30,7 +30,6 @@ esp_err_t verifyFileIntegrity(char* filepath)
     int mbed_r = mbedtls_sha256_starts(&ctx, 0);
 
     size_t fileLen = getImageFileSize() - 40 - 32;
-    printf("filesize: %zu\n", fileLen);
     
     if (fseek(recFile, 40, SEEK_SET) != 0)
     {
@@ -109,40 +108,3 @@ esp_err_t verifyFileIntegrity(char* filepath)
 
     return ESP_OK;
 }  
-
-#ifdef DEBUG
-void func() 
-{
-    const char *filepath = "/spiffs/my_file.txt";
-    FILE* f = fopen(filepath, "r");
-    if (f == NULL) {
-        ESP_LOGI(TAG, "File not found. Creating a dummy file...");
-        f = fopen(filepath, "w");
-        if (f == NULL) {
-            ESP_LOGE(TAG, "Failed to create dummy file.");
-            return;
-        }
-        fprintf(f, "Teste");
-        fclose(f);
-    } else {
-        ESP_LOGI(TAG, "Found existing file.");
-        fclose(f);
-    }
-
-    const uint8_t hash[32] = {
-    0x89, 0xf3, 0x08, 0x21, 0x0c, 0x7c, 0x78, 0x20,
-    0xba, 0xd0, 0x97, 0x4f, 0x31, 0xe7, 0x51, 0xbf,
-    0xa4, 0x33, 0xd2, 0x06, 0x6a, 0x93, 0xe8, 0x08,
-    0x94, 0x7c, 0x31, 0x88, 0xde, 0xdb, 0xa6, 0xe3
-    };
-
-    if (verifyFileIntegrity(filepath, hash))
-    {
-        ESP_LOGW("TESTE", "Hash ok");
-    }
-    else
-    {
-        ESP_LOGW("TESTE", "Hash not ok");
-    }
-}
-#endif
