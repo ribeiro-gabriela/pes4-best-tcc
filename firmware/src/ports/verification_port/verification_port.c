@@ -7,14 +7,14 @@ extern QueueHandle_t BCQueue;
 void verify()
 {
     char filepath[64];
-    char fileName[21];
+    char fileName[25];
     getImageFileName(fileName);
     QueueMessage_t msg;
 
-    sprintf(filepath, "/spiffs/%s.bin", fileName);
+    sprintf(filepath, "/spiffs/%s", fileName);
     
     msg.eventID = LOG_INFO;
-    sprintf((char*)msg.logMessage, "Starting verification for file %s.bin", fileName);
+    sprintf((char*)msg.logMessage, "Starting verification for file %s", fileName);
     if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
     {
         ESP_LOGE("ERROR", "Failed to send LOG_INFO message to BCQueue");
@@ -48,7 +48,7 @@ void verify()
     if (res != ESP_OK)
     {
         msg.eventID = SEC_ERR_IMG_HASH_MISMATCH;
-        sprintf((char*)msg.logMessage, "SHA-256 hash mismatch detected for file %s.bin", fileName);
+        sprintf((char*)msg.logMessage, "SHA-256 hash mismatch detected for file %s", fileName);
 
         if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
         {
@@ -58,7 +58,7 @@ void verify()
     }
 
     msg.eventID = SEC_IMG_HASH_OK;
-    sprintf((char*)msg.logMessage, "SHA-256 hash verified successfully for file %s.bin", fileName);
+    sprintf((char*)msg.logMessage, "SHA-256 hash verified successfully for file %s", fileName);
 
     if (xQueueSend(BCQueue, (void*)&msg, portMAX_DELAY) != pdPASS)
     {
