@@ -6,8 +6,8 @@ extern QueueHandle_t BCQueue;
 
 void verify()
 {
-    char filepath[64];
-    char fileName[25];
+    char filepath[FILEPATH_MAX_LEN];
+    char fileName[FILENAME_MAX_LEN];
     getImageFileName(fileName);
     QueueMessage_t msg;
 

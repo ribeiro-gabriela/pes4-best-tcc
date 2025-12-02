@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #define SHA256_HASH_LEN 32
+#define PN_BYTES 40
 #define READ_BUFFER_SIZE 1024
 
 #ifdef DEBUG

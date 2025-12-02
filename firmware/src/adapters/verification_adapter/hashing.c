@@ -29,9 +29,9 @@ esp_err_t verifyFileIntegrity(char* filepath)
     mbedtls_sha256_init(&ctx);
     int mbed_r = mbedtls_sha256_starts(&ctx, 0);
 
-    size_t fileLen = getImageFileSize() - 40 - 32;
+    size_t fileLen = getImageFileSize() - PN_BYTES - SHA256_HASH_LEN;
     
-    if (fseek(recFile, 40, SEEK_SET) != 0)
+    if (fseek(recFile, PN_BYTES, SEEK_SET) != 0)
     {
         ESP_LOGE(TAG, "Error seeking in file");
         fclose(recFile);
@@ -74,10 +74,10 @@ esp_err_t verifyFileIntegrity(char* filepath)
     }
     free(buf);
 
-    uint8_t receivedHash[33];
-    fseek(recFile, -32, SEEK_END);
-    fread(receivedHash, 1, 32, recFile);
-    receivedHash[32] = '\0';
+    uint8_t receivedHash[SHA256_HASH_LEN + 1];
+    fseek(recFile, -SHA256_HASH_LEN, SEEK_END);
+    fread(receivedHash, 1, SHA256_HASH_LEN, recFile);
+    receivedHash[SHA256_HASH_LEN] = '\0';
 
     fclose(recFile);
 

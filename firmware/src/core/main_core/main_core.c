@@ -114,8 +114,6 @@ void deinitMaintenanceMode()
     if (getBCState() == OP_MODE)
     {
         commDeinit();
-
-        //vTaskSuspend(stateTransitionHandle);
     }
 }
 
@@ -169,7 +167,6 @@ void* stateTransitionHandler()
             {
                 if (getBCState() != OP_MODE)
                 {
-                    //sensors.mntSignal = false;
                     setBCState(OP_MODE);
                     setMntState(NOT_SET_MNT);
                     setConnState(NOT_SET_CONN);
@@ -310,6 +307,8 @@ void* stateTransitionHandler()
                 verificationPN = false;
 
                 imgReceived = false;
+
+                esp_spiffs_format("storage");
 
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == IMG_VERIFICATION)

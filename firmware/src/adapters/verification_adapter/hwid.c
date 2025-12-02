@@ -5,7 +5,7 @@ static const char* TAG = "HWID";
 esp_err_t verifyPN(char* filepath)
 {
     char* storedPN = readHWPNFromStorage();
-    char receivedPN[21];
+    char receivedPN[SW_PN_LEN + 1];
 
     FILE* filePtr = fopen(filepath, "rb");
     if (filePtr == NULL)
@@ -14,14 +14,14 @@ esp_err_t verifyPN(char* filepath)
         return ESP_FAIL;
     }
 
-    if (fseek(filePtr, 20, SEEK_SET) != 0)
+    if (fseek(filePtr, HW_PN_LEN, SEEK_SET) != 0)
     {
         ESP_LOGE(TAG, "Received file format does not match expected structure");
         return ESP_FAIL;
     }
 
-    fread(receivedPN, 1, 20, filePtr);
-    receivedPN[21] = '\0';
+    fread(receivedPN, 1, HW_PN_LEN, filePtr);
+    receivedPN[HW_PN_LEN] = '\0';
 
 
     ESP_LOGI(TAG, "Stored PN: %s\n", storedPN);
