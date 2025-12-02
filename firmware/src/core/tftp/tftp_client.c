@@ -19,8 +19,11 @@
 #define TFTP_DATA_SIZE 512
 uint8_t recv_buf[516];
 
+
+
+#define MAX_FILENAME_LEN 25
 size_t imageTotalLen = 0;
-char imageFilename[25];
+char imageFilename[MAX_FILENAME_LEN];
 
 
 extern QueueHandle_t BCQueue;
@@ -423,6 +426,6 @@ size_t getImageFileSize(void)
 
 void getImageFileName(char* out)
 {
-    strncpy(out, imageFilename, 19);
-    out[20] = '\0';
+    strncpy(out, imageFilename, MAX_FILENAME_LEN - 1);
+    out[MAX_FILENAME_LEN - 1] = '\0';
 }    
