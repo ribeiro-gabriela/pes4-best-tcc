@@ -174,8 +174,8 @@ class ArincModule(ITransferProtocol):
                             self.transfer_status.progressPercent = 20
 
                     case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
-                        if self.transfer_status.progressPercent < 40:
-                            self.transfer_status.progressPercent = 40
+                        if(lus_file.counter):
+                            self.transfer_status.progressPercent = 20 + min(80,int(80*(lus_file.counter*512/self.transfer_status.fileRecord.sizeBytes)))
 
                     case LoadProtocolStatusCode.COMPLETED:
                         self.transfer_status.transferStep = (
