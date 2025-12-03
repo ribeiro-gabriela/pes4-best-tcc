@@ -66,10 +66,10 @@ class ArincModule(ITransferProtocol):
             print(e)
             return False
 
-        # if (
-        #     not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
-        # ):  # request not accepted
-        #     return False
+        if (
+            not lui_file or lui_file.StatusCode != LoadProtocolStatusCode.ACCEPTED
+        ):  # request not accepted
+            return False
 
         lus_path = f"{self._SERVER_PATH}/{target}.{ArincFileType.LUS.value}"
         if os.path.exists(lus_path):
@@ -158,28 +158,9 @@ class ArincModule(ITransferProtocol):
             # print(f"current LUS {lus_file}")
             if lus_file:
                 match lus_file.StatusCode:
-                    # case LoadProtocolStatusCode.ACCEPTED:
-                    #     if self.transfer_status.transferStep == ArincTransferStep.LIST:
-                    #         software_pn = self.transfer_status.fileRecord.softwarePN
-                    #         target = self.transfer_status.currentTarget
-
-                    #         lur_file = ArincLUR(
-                    #             [
-                    #                 ArincLURHeaderFile(
-                    #                     f"{software_pn}.{ArincFileType.LUH.value}",
-                    #                     f"{software_pn}.bin",
-                    #                 )
-                    #             ]
-                    #         )
-                    #         file_path = self._encode_LUR_file(target, lur_file)
-                    #         self._put_file(target, file_path, ArincFileType.LUR)
-
-                    #         self.transfer_status.transferStep = ArincTransferStep.TRANFER
-                    #         self.transfer_status.progressPercent = 20
-
                     case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
                         if(lus_file.Counter):
-                            self.transfer_status.progressPercent = 20 + min(80,int(80*(lus_file.Counter*512/self.transfer_status.fileRecord.sizeBytes)))
+                            self.transfer_status.progressPercent = 7 + min(93,int(93*(lus_file.Counter*512/self.transfer_status.fileRecord.sizeBytes)))
 
                     case LoadProtocolStatusCode.COMPLETED:
                         print(f"operation completed")
