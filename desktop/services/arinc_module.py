@@ -154,7 +154,7 @@ class ArincModule(ITransferProtocol):
 
             if lus_file:
                 match lus_file.StatusCode:
-                    case "0001":
+                    case LoadProtocolStatusCode.ACCEPTED:
                         if self.transfer_status.transferStep == ArincTransferStep.LIST:
                             software_pn = self.transfer_status.fileRecord.softwarePN
                             target = self.transfer_status.currentTarget
@@ -173,18 +173,18 @@ class ArincModule(ITransferProtocol):
                             self.transfer_status.transferStep = ArincTransferStep.TRANFER
                             self.transfer_status.progressPercent = 20
 
-                    case "0002" | "0004":
+                    case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
                         if self.transfer_status.progressPercent < 40:
                             self.transfer_status.progressPercent = 40
 
-                    case "0003":
+                    case LoadProtocolStatusCode.COMPLETED:
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.SUCCESS
 
-                    case "1003" | "1004" | "1005":  # operation aborted
+                    case LoadProtocolStatusCode.ABORTED_BY_TARGET | LoadProtocolStatusCode.ABORTED_BY_DATA_LOADER | LoadProtocolStatusCode.ABORTED_BY_OPERATOR:  # operation aborted
                         self.transfer_status.cancelled = True
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
@@ -192,7 +192,7 @@ class ArincModule(ITransferProtocol):
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
 
-                    case "1007":  # operation failed
+                    case LoadProtocolStatusCode.FAILED:  # operation failed
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
                         )
@@ -259,7 +259,6 @@ class ArincModule(ITransferProtocol):
                 number_of_header_files = int.from_bytes(file.read(2), "big", signed=False)
 
                 header_files = []
-                header_files = header_files
                 for _ in range(number_of_header_files):
                     header_file_name_lenght = int.from_bytes(
                         file.read(1), "big", signed=False
