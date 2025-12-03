@@ -155,27 +155,27 @@ class ArincModule(ITransferProtocol):
         while self.transfer_status and not self.transfer_status.cancelled:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
-
+            print(f"current LUS {lus_file}")
             if lus_file:
                 match lus_file.StatusCode:
-                    case LoadProtocolStatusCode.ACCEPTED:
-                        if self.transfer_status.transferStep == ArincTransferStep.LIST:
-                            software_pn = self.transfer_status.fileRecord.softwarePN
-                            target = self.transfer_status.currentTarget
+                    # case LoadProtocolStatusCode.ACCEPTED:
+                    #     if self.transfer_status.transferStep == ArincTransferStep.LIST:
+                    #         software_pn = self.transfer_status.fileRecord.softwarePN
+                    #         target = self.transfer_status.currentTarget
 
-                            lur_file = ArincLUR(
-                                [
-                                    ArincLURHeaderFile(
-                                        f"{software_pn}.{ArincFileType.LUH.value}",
-                                        f"{software_pn}.bin",
-                                    )
-                                ]
-                            )
-                            file_path = self._encode_LUR_file(target, lur_file)
-                            self._put_file(target, file_path, ArincFileType.LUR)
+                    #         lur_file = ArincLUR(
+                    #             [
+                    #                 ArincLURHeaderFile(
+                    #                     f"{software_pn}.{ArincFileType.LUH.value}",
+                    #                     f"{software_pn}.bin",
+                    #                 )
+                    #             ]
+                    #         )
+                    #         file_path = self._encode_LUR_file(target, lur_file)
+                    #         self._put_file(target, file_path, ArincFileType.LUR)
 
-                            self.transfer_status.transferStep = ArincTransferStep.TRANFER
-                            self.transfer_status.progressPercent = 20
+                    #         self.transfer_status.transferStep = ArincTransferStep.TRANFER
+                    #         self.transfer_status.progressPercent = 20
 
                     case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
                         if(lus_file.Counter):
@@ -202,8 +202,9 @@ class ArincModule(ITransferProtocol):
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
+            print(f"current status {self.transfer_status}")
 
-            time.sleep(0.1)
+            time.sleep(0.5)
 
     def _server_callback(self, filename: str, **args):
         print('RECEIVED GET REQUEST')
