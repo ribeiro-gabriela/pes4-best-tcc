@@ -71,6 +71,8 @@ class ArincModule(ITransferProtocol):
         # ):  # request not accepted
         #     return False
 
+        os.remove(f"{self._SERVER_PATH}/{target}.{ArincFileType.LUS.value}")
+
         self.transfer_status = TransferStatus(
             False, target, ArincTransferStep.LIST, file, 0, None
         )
