@@ -149,7 +149,7 @@ class ArincModule(ITransferProtocol):
             self._put_file(target, file_path, ArincFileType.LUR)
 
             self.transfer_status.transferStep = ArincTransferStep.TRANFER
-            self.transfer_status.progressPercent = 20
+            self.transfer_status.progressPercent = 7
 
 
         while self.transfer_status and not self.transfer_status.cancelled and not self.transfer_status.transferResult:
