@@ -137,8 +137,9 @@ class ConnectionService:
             else:
                 # Modo real: tenta obter hardware PN do dispositivo
                 try:
-                    hardware_pn_response = self.sendRequest(Request(command="GET_HARDWARE_PN"))
-                    hardware_pn = hardware_pn_response.data
+                    # hardware_pn_response = self.sendRequest(Request(command="GET_HARDWARE_PN"))
+                    # hardware_pn = hardware_pn_response.data
+                    hardware_pn = "EMB-" + self.currentConnection.device.split("EMB-", 1)[1]
                 except Exception as hw_error:
                     hardware_pn = f"HW-PN-FALLBACK-{target.upper().replace(' ', '-')}"
                     self.logging_service.log(f"Hardware PN request failed, using fallback: {hardware_pn}. Error: {hw_error}")

@@ -74,7 +74,7 @@ class PostConnectionScreen(Screen):
 
         try:
             # [BST-313]
-            self.hardware_pn = self._service_facade.connection_service.getConnectionHardwarePN()
+            self.hardware_pn = self._service_facade.getConnectionHardwarePN()
             print(f"Hardware PN received: {self.hardware_pn}")
             # [BST-314]
             self._load_compatible_images()
@@ -235,7 +235,7 @@ class PostConnectionScreen(Screen):
         popup.dismiss()
         if self._service_facade:
             try:
-                self._service_facade.connection_service.disconnect()
+                self._service_facade.disconnect()
                 # [BST-317]
                 emit_event(Event(Event.EventType.NAVIGATE, properties={'target': ScreenName.MAIN.value}))
             except Exception as e:

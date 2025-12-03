@@ -161,7 +161,7 @@ class FileTransferScreen(Screen):
             return
             
         try:
-            self._service_facade.file_transfer_service.cancel() 
+            self._service_facade.cancelTransfer() 
             Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
         except Exception as e:
             self.handle_transfer_error(e)

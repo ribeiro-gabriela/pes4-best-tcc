@@ -42,9 +42,6 @@ class ServiceFacade:
     def logout(self) -> None:
         return self.authentication_service.logout()
 
-    def connect(self, target: str) -> None:
-        return self.connection_service.connect(target)
-
     def disconnect(self) -> None:
         # [BST-316]
         return self.connection_service.disconnect()
