@@ -155,7 +155,7 @@ class ArincModule(ITransferProtocol):
         while self.transfer_status and not self.transfer_status.cancelled:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
-            print(f"current LUS {lus_file}")
+            # print(f"current LUS {lus_file}")
             if lus_file:
                 match lus_file.StatusCode:
                     # case LoadProtocolStatusCode.ACCEPTED:
@@ -202,9 +202,9 @@ class ArincModule(ITransferProtocol):
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
-            print(f"current status {self.transfer_status}")
+            # print(f"current status {self.transfer_status}")
 
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     def _server_callback(self, filename: str, **args):
         print('RECEIVED GET REQUEST')
