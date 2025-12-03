@@ -275,7 +275,7 @@ class ArincModule(ITransferProtocol):
                     )[:-1]
 
                     load_ratio = int(file.read(3).decode("ascii"))
-                    load_status = LoadProtocolStatusCode(file.read(4).hex())
+                    load_status = LoadProtocolStatusCode(file.read(2).hex())
 
                     load_status_description_lenght = int.from_bytes(
                         file.read(1), "big", signed=False
