@@ -234,18 +234,21 @@ class ArincModule(ITransferProtocol):
 
 
     def _parse_LUS_file(self, file_path: str) -> ArincLUS | None:
+        if not os.path.exists(file_path):
+            return None
+
         try:
             with open(file_path, "rb") as file:
                 file_lenght = int.from_bytes(file.read(4), "big", signed=False)
                 protocol_version = file.read(2).decode("ascii")
                 status_code = LoadProtocolStatusCode(file.read(2).hex())
                 status_description_lenght = int.from_bytes(
-                    file.read(2), "big", signed=False
+                    file.read(1), "big", signed=False
                 )
 
                 status_description = None
                 if status_description_lenght > 0:
-                    status_description = file.read(status_description_lenght).decode(
+                    status_description = file.read(status_description_lenght+1).decode(
                         "ascii"
                     )[:-1]
 
@@ -261,14 +264,14 @@ class ArincModule(ITransferProtocol):
                     header_file_name_lenght = int.from_bytes(
                         file.read(1), "big", signed=False
                     )
-                    header_file_name = file.read(header_file_name_lenght).decode("ascii")[
+                    header_file_name = file.read(header_file_name_lenght+1).decode("ascii")[
                         :-1
                     ]
 
                     load_part_number_name_lenght = int.from_bytes(
                         file.read(1), "big", signed=False
                     )
-                    load_part_number_name = file.read(load_part_number_name_lenght).decode(
+                    load_part_number_name = file.read(load_part_number_name_lenght+1).decode(
                         "ascii"
                     )[:-1]
 
@@ -276,7 +279,7 @@ class ArincModule(ITransferProtocol):
                     load_status = LoadProtocolStatusCode(file.read(4).hex())
 
                     load_status_description_lenght = int.from_bytes(
-                        file.read(2), "big", signed=False
+                        file.read(1), "big", signed=False
                     )
                     load_status_description = None
                     if load_status_description_lenght > 0:
@@ -303,7 +306,8 @@ class ArincModule(ITransferProtocol):
                     load_list_ratio,
                     header_files,
                 )
-        except:
+        except Exception as e:
+            print(e)
             return None
 
 
