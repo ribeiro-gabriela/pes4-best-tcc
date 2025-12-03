@@ -128,7 +128,7 @@ class ArincModule(ITransferProtocol):
     def _tftp_server_thread(self):
         try:
             server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
-            server.listen(listenport=6969, timeout=30)
+            server.listen(listenport=6969, timeout=10)
         except Exception as e:
             print(e)
 
