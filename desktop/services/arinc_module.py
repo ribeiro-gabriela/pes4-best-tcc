@@ -152,7 +152,7 @@ class ArincModule(ITransferProtocol):
             self.transfer_status.progressPercent = 20
 
 
-        while self.transfer_status and not self.transfer_status.cancelled:
+        while self.transfer_status and not self.transfer_status.cancelled and not self.transfer_status.transferResult:
             # periodically check for status
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
             # print(f"current LUS {lus_file}")
@@ -182,27 +182,41 @@ class ArincModule(ITransferProtocol):
                             self.transfer_status.progressPercent = 20 + min(80,int(80*(lus_file.Counter*512/self.transfer_status.fileRecord.sizeBytes)))
 
                     case LoadProtocolStatusCode.COMPLETED:
+                        print(f"operation completed")
+                        print(f"{lus_file}")
+                        self.transfer_status.transferStep = (
+                            ArincTransferStep.NOT_IN_TRANSFER
+                        )
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.SUCCESS
+                        return
 
                     case LoadProtocolStatusCode.ABORTED_BY_TARGET | LoadProtocolStatusCode.ABORTED_BY_DATA_LOADER | LoadProtocolStatusCode.ABORTED_BY_OPERATOR:  # operation aborted
+                        print(f"operation aborted")
+                        print(f"{lus_file}")
+                        self.transfer_status.transferStep = (
+                            ArincTransferStep.NOT_IN_TRANSFER
+                        )
                         self.transfer_status.cancelled = True
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
+                        return
 
                     case LoadProtocolStatusCode.FAILED:  # operation failed
+                        print(f"operation failed")
+                        print(f"{lus_file}")
                         self.transfer_status.transferStep = (
                             ArincTransferStep.NOT_IN_TRANSFER
                         )
                         self.transfer_status.progressPercent = 100
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
-            # print(f"current status {self.transfer_status}")
+                        return
 
             time.sleep(0.1)
 

@@ -121,7 +121,7 @@ class FileTransferScreen(Screen):
                 if not status.transferResult:
                     percentage = status.progressPercent
                     self.progress_value = percentage
-                    self.progress_text = f'{percentage:.1f}% - Transferring via ARINC 615-A...'
+                    self.progress_text = f'{percentage}% - Transferring via ARINC 615-A...'
                     self.transfer_status_text = 'Transfer in progress...'
 
                 # [BST-324]    
