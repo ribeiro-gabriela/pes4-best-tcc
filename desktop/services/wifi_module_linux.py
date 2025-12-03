@@ -76,7 +76,7 @@ class WifiModuleLinux(IConnectionTransport):
             
         # Filter for WPA3 if required, or general WPA. 
         # Note: nmcli returns strings like "WPA2 WPA3". 
-        networks = [n for n in networks if "WPA3" in n.get("info", {}).get("security", "").upper()]
+        networks = [n for n in networks if ("WPA3" in n.get("info", {}).get("security", "").upper() and "EMB-" in n.get("ssid", ""))]
         
         # Sort by signal strength descending
         networks.sort(key=lambda x: int(x['info']['signal'].split(' ')[0]), reverse=True)
