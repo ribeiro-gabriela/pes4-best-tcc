@@ -18,7 +18,7 @@ class WifiModule(IConnectionTransport):
         networks = []
         try:
             subprocess.run(['netsh', 'wlan', 'disconnect'])
-            time.sleep(0.2)
+            time.sleep(0.1)
             result = str(subprocess.check_output(
                 ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'],
                 text=True

@@ -149,7 +149,7 @@ class ArincModule(ITransferProtocol):
             self._put_file(target, file_path, ArincFileType.LUR)
 
             self.transfer_status.transferStep = ArincTransferStep.TRANFER
-            self.transfer_status.progressPercent = 7
+            self.transfer_status.progressPercent = 1
 
 
         while self.transfer_status and not self.transfer_status.cancelled and not self.transfer_status.transferResult:
@@ -160,7 +160,7 @@ class ArincModule(ITransferProtocol):
                 match lus_file.StatusCode:
                     case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
                         if(lus_file.Counter):
-                            self.transfer_status.progressPercent = 7 + min(93,int(93*(lus_file.Counter*512/self.transfer_status.fileRecord.sizeBytes)))
+                            self.transfer_status.progressPercent = 1 + min(98,int(98*(lus_file.Counter*512/self.transfer_status.fileRecord.sizeBytes)))
 
                     case LoadProtocolStatusCode.COMPLETED:
                         print(f"operation completed")
