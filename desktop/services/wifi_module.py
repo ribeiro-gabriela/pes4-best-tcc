@@ -45,7 +45,7 @@ class WifiModule(IConnectionTransport):
             print(f"Error scanning for WiFi networks: {traceback.format_exc()}")
             return [{"ssid": "Scan Error", "info":{"signal": "N/A", "security": str(e)}}]
             
-        # networks = [n for n in networks if n.get("info", {}).get("security") == "WPA3-Personal" and "EMB-" in n.get("ssid", "")]
+        networks = [n for n in networks if n.get("info", {}).get("security") == "WPA3-Personal" and "EMB-" in n.get("ssid", "")]
         networks.sort(key=lambda x: int(x['info']['signal'].split(' ')[0]) if 'dBm' in x['info']['signal'] else -100)
         
         return networks
@@ -233,6 +233,7 @@ class WifiModule(IConnectionTransport):
         ok = self._win_fallback_connect(target, password)
         if ok:
             print(f"Successfully connected to {target} (via NETSH fallback).")
+            time.sleep(0.2)
             ip = self._get_target_ip()
             self._tftp_client = TftpClient(ip, 69)
             return Connection(
