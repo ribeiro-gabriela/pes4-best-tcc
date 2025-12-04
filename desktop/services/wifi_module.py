@@ -264,7 +264,7 @@ class WifiModule(IConnectionTransport):
         if (self._tftp_client is None):
             raise Exception("Not connected")
         
-        file_path = f'file_directory/file_directory/tftp/client/{int(time.time())}-{file_name}'
+        file_path = f'file_directory/tftp/client/{int(time.time())}-{file_name}'
         # Ensure directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         
