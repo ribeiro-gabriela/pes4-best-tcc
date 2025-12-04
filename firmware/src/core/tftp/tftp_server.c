@@ -211,7 +211,7 @@ void tftp_session_task(void *pvParameters)
                                          "arquivos encontrados.",
                                          parsedCount);
 
-				tftpClientGet("192.168.4.2", filesList[0].loadPartNumberName);
+				tftpClientGet("192.168.4.2", (lurFilesDescriptionHeader_t) filesList[0]);
 
 				
                             }

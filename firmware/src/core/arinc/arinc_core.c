@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "tftp_client.h"
+
+
 static uint8_t arincDataBuffer[MAX_LUR_SIZE] = {0}; // here to save stack mem
 static size_t arincDataBufferOffset = 0;
 StaticSemaphore_t arincBufferSemaphore;
@@ -41,6 +44,7 @@ arincErr_t initArinc(void)
 void deinitArinc(void)
 {
   vSemaphoreDelete(arincBufferSemaphoreHandle);
+  ESP_LOGI(TAG, "deinitializing arinc");
 }    
 
 
@@ -122,7 +126,6 @@ arincErr_t readLoadUploadingRequest(size_t fileSize,
         memcpy(&filesList[i].headerFileNameLength,
                content + offset,
                sizeof(uint8_t));
-	printf("\n\n %d", filesList[i].headerFileNameLength);
 
         offset++;
 
@@ -131,7 +134,6 @@ arincErr_t readLoadUploadingRequest(size_t fileSize,
                 MAX_DESCRIPTION_LEN - 1);
         filesList[i].headerFileName[MAX_DESCRIPTION_LEN] = '\0';
 
-	printf("\n\n\n %s", filesList[i].headerFileName);
 
         offset += filesList[i].headerFileNameLength; // null byte
 
@@ -139,7 +141,6 @@ arincErr_t readLoadUploadingRequest(size_t fileSize,
                content + offset,
                sizeof(uint8_t));
 
-	printf("\n\n %d", filesList[i].loadPartNumberNameLength);
 	
 
         offset++;
@@ -166,94 +167,79 @@ genLoadUploadingStatus(ARINC_STATUS_CODE_t uploadOperationStatusCode,
                        uint16_t numberOfHeaderFiles,
                        arincStatusFileScheme_t* files,
                        uint8_t* arincDataBuffer,
-                       size_t maxBufferSize, // Não usado
+                       size_t maxBufferSize,
                        size_t* bytesWritten)
 {
-    // O offset começa APÓS o campo de Length (4 bytes), que será preenchido no final.
     size_t currentOffset = sizeof(uint32_t); // Começa em 4
 
-    // Variáveis que precisam ser definidas no seu código globalmente:
-    // extern const uint8_t protocolVersion[2];
-    // extern const size_t MAX_DESCRIPTION_LEN;
-
-    // --- 1. Serialização do Status Header de Comprimento Variável ---
-
-    // A) Campos Fixos do Header
-    // 1. protocolVersion (2 bytes)
+    // protocolVersion (2 bytes)
     if (currentOffset + 2 > maxBufferSize) return ARINC_ERR_NO_MEM;
     memcpy(arincDataBuffer + currentOffset, protocolVersion, 2);
     currentOffset += 2;
 
-    // 2. uploadOperationStatusCode (1 byte)
+    // uploadOperationStatusCode (1 byte)
     if (currentOffset + 1 > maxBufferSize) return ARINC_ERR_NO_MEM;
     arincDataBuffer[currentOffset++] = (uint8_t)uploadOperationStatusCode;
 
-    // 3. uploadStatusDescriptionLength (1 byte)
+    // uploadStatusDescriptionLength (1 byte)
     if (currentOffset + 1 > maxBufferSize) return ARINC_ERR_NO_MEM;
     arincDataBuffer[currentOffset++] = uploadStatusDescriptionLength;
 
-    // 4. counter (2 bytes, Big Endian)
+    //  counter (2 bytes, Big Endian)
     if (currentOffset + 2 > maxBufferSize) return ARINC_ERR_NO_MEM;
     uint16_t net_counter = htons(counter);
     memcpy(arincDataBuffer + currentOffset, &net_counter, sizeof(uint16_t));
     currentOffset += sizeof(uint16_t);
 
-    // 5. exceptionTimer (2 bytes, Big Endian)
+    // exceptionTimer (2 bytes, Big Endian)
     if (currentOffset + 2 > maxBufferSize) return ARINC_ERR_NO_MEM;
     uint16_t net_exceptionTimer = htons(exceptionTimer);
     memcpy(arincDataBuffer + currentOffset, &net_exceptionTimer, sizeof(uint16_t));
     currentOffset += sizeof(uint16_t);
 
-    // 6. numberOfHeaderFiles (2 bytes, Big Endian)
+    // numberOfHeaderFiles (2 bytes, Big Endian)
     if (currentOffset + 2 > maxBufferSize) return ARINC_ERR_NO_MEM;
     uint16_t net_numberOfHeaderFiles = htons(numberOfHeaderFiles);
     memcpy(arincDataBuffer + currentOffset, &net_numberOfHeaderFiles, sizeof(uint16_t));
     currentOffset += sizeof(uint16_t);
 
-    // B) Dados Variáveis do Header
-    // 7. uploadStatusDescription (uploadStatusDescriptionLength bytes)
+    // Dados Variáveis do Header
+    // uploadStatusDescription (uploadStatusDescriptionLength bytes)
     if (currentOffset + uploadStatusDescriptionLength > maxBufferSize) return ARINC_ERR_NO_MEM;
     memcpy(arincDataBuffer + currentOffset, uploadStatusDescription, uploadStatusDescriptionLength);
     currentOffset += uploadStatusDescriptionLength;
 
-
-    // --- 2. Serialização dos Itens de Arquivo (Files) ---
+    // itens do arquivo
     for (int i = 0; i < numberOfHeaderFiles; i++)
     {
 	const arincStatusFileScheme_t *file = &files[i];
 
-        // 1. headerFileIdentifier (4 bytes, Big Endian)
-        /* if (currentOffset + 4 > maxBufferSize) return ARINC_ERR_NO_MEM; */
-        /* uint32_t net_headerFileIdentifier = htonl(file->headerFileIdentifier); */
-        /* memcpy(arincDataBuffer + currentOffset, &net_headerFileIdentifier, sizeof(uint32_t)); */
-        /* currentOffset += sizeof(uint32_t); */
-
-        // 2. headerFileNameLength (1 byte) e headerFileName (Variável)
+        // headerFileNameLength (1 byte) e headerFileName (Variável)
         size_t file_name_size = 1 + file->headerFileNameLength;
         if (currentOffset + file_name_size > maxBufferSize) return ARINC_ERR_NO_MEM;
         arincDataBuffer[currentOffset++] = file->headerFileNameLength;
         memcpy(arincDataBuffer + currentOffset, file->headerFileName, file->headerFileNameLength);
         currentOffset += file->headerFileNameLength;
 
-        // 3. loadPartNumberLength (1 byte) e loadPartNumber (Variável)
+        //  loadPartNumberLength (1 byte) e loadPartNumber (Variável)
         size_t part_num_size = 1 + file->loadPartNumberLength;
         if (currentOffset + part_num_size > maxBufferSize) return ARINC_ERR_NO_MEM;
         arincDataBuffer[currentOffset++] = file->loadPartNumberLength;
         memcpy(arincDataBuffer + currentOffset, file->loadPartNumber, file->loadPartNumberLength);
         currentOffset += file->loadPartNumberLength;
 
-        // 4. loadStatusDescriptionLength (1 byte) e loadStatusDescription (Variável)
+        // loadStatusDescriptionLength (1 byte) e loadStatusDescription (Variável)
         size_t desc_size = 1 + file->loadStatusDescriptionLength;
         if (currentOffset + desc_size > maxBufferSize) return ARINC_ERR_NO_MEM;
         arincDataBuffer[currentOffset++] = file->loadStatusDescriptionLength;
         memcpy(arincDataBuffer + currentOffset, file->loadStatusDescription, file->loadStatusDescriptionLength);
         currentOffset += file->loadStatusDescriptionLength;
 
-        // 5. loadStatusCode (1 byte)
+        //  loadStatusCode (1 byte)
         if (currentOffset + 1 > maxBufferSize) return ARINC_ERR_NO_MEM;
         arincDataBuffer[currentOffset++] = (uint8_t)file->loadStatus;
 
-        // 6. loadStatusCounter (3 bytes + NULL, char)
+        //  loadStatusCounter (3 bytes + NULL, char)
         if (currentOffset + 4 > maxBufferSize) return ARINC_ERR_NO_MEM;
         memcpy(arincDataBuffer + currentOffset, (uint8_t*) file->loadRatio, 3);
 
@@ -263,16 +249,12 @@ genLoadUploadingStatus(ARINC_STATUS_CODE_t uploadOperationStatusCode,
 	currentOffset += 1;
     }
 
-    // --- 3. Preenchimento do Campo Length (Primeiros 4 bytes) ---
 
-    // O comprimento final é o offset atual menos os 4 bytes do próprio campo Length.
     uint32_t finalFileLength = (uint32_t)(currentOffset - sizeof(uint32_t));
     uint32_t network_fileLength = htonl(finalFileLength);
     
-    // Escreve o comprimento total (Big Endian) no início do buffer (offset 0)
     memcpy(arincDataBuffer, &network_fileLength, sizeof(uint32_t));
     
-    // Define o número de bytes escritos
     if (bytesWritten) {
         *bytesWritten = currentOffset;
     }
@@ -351,4 +333,118 @@ void arinc_get_raw_buffer(const uint8_t** outPtr, size_t* outSize)
 {
     *outPtr = arincDataBuffer;
     *outSize = arincDataBufferOffset;
+}
+
+
+#define MAX_LUS_DATA_BUF_LEN 1042
+void sendStatusToClient(uint16_t bytesReceived,
+			uint16_t uploadOperationStatusCode,
+			uint8_t uploadStatusDescriptionLength,
+			char* uploadStatusDescription,
+			uint16_t counter,
+			uint8_t headerFileNameLength,
+			char* headerFileName,
+			uint8_t loadPartNumberLength,
+			char* loadPartNumberName)
+{
+    uint8_t dataBuf[MAX_LUS_DATA_BUF_LEN];
+    uint32_t offset = 0;
+
+    /* // bytes received */
+    /* memcpy(dataBuf + offset, &bytesReceived, sizeof(uint16_t)); */
+    /* offset += sizeof(uint16_t); */
+    
+    // jump offset for file length
+    offset += sizeof(uint32_t);
+
+    memcpy(dataBuf + offset, protocolVersion, 2);
+    offset += 2;
+
+    // upload operarion status code
+    uploadOperationStatusCode = htons(uploadOperationStatusCode);
+    memcpy(dataBuf + offset, &uploadOperationStatusCode, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // upload status description len
+    memcpy(dataBuf + offset, &uploadStatusDescriptionLength, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+
+    // upload status description
+    memcpy(dataBuf + offset, (uint8_t*)uploadStatusDescription, uploadStatusDescriptionLength);
+    offset += uploadStatusDescriptionLength;
+    dataBuf[offset] = '\0';
+    offset++;
+
+    // counter
+    counter = htons(counter);
+    memcpy(dataBuf + offset, &counter, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // exception timer
+    uint16_t exceptionTimer = 30; // sec
+    exceptionTimer = htons(exceptionTimer);
+    memcpy(dataBuf + offset, &exceptionTimer, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // estimated time
+    uint16_t estimatedTime = 0;
+    estimatedTime = htons(estimatedTime);
+    memcpy(dataBuf + offset, &estimatedTime, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // load list ratio
+    memcpy(dataBuf + offset, "000", 3);
+    offset += 3;
+
+    // number of header files
+    uint16_t noHeaderFiles = 1;
+    noHeaderFiles = htons(noHeaderFiles);
+    memcpy(dataBuf + offset, &noHeaderFiles, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // header file name length
+    memcpy(dataBuf + offset, &headerFileNameLength, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+
+    // header file name
+    memcpy(dataBuf + offset, (uint8_t*)headerFileName, headerFileNameLength);
+    offset += headerFileNameLength;
+    dataBuf[offset] = '\0';
+    offset++;
+
+    // load part number name length
+    memcpy(dataBuf + offset, &loadPartNumberLength, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+
+    // load part number name
+    memcpy(dataBuf + offset, (uint8_t*)loadPartNumberName, loadPartNumberLength);
+    offset += loadPartNumberLength;
+    dataBuf[offset] = '\0';
+    offset++;
+
+    // load ratio
+    memcpy(dataBuf + offset, "000", 3);
+    offset += 3;
+
+    // load status
+    memcpy(dataBuf + offset, &uploadOperationStatusCode, sizeof(uint16_t));
+    offset += sizeof(uint16_t);
+
+    // load status description length
+    memcpy(dataBuf + offset, &uploadStatusDescriptionLength, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+
+    // load status description
+    memcpy(dataBuf + offset, (uint8_t*)uploadStatusDescription, uploadStatusDescriptionLength);
+    offset += uploadStatusDescriptionLength;
+    dataBuf[offset] = '\0';
+    offset++;
+
+
+    // add file length to buf
+    uint32_t offsetNetf = htonl(offset);
+    memcpy(dataBuf, &offsetNetf, sizeof(uint32_t));
+
+    // sending data to message buffer
+    sendMessageToTftpClientBuffer(dataBuf, offset);
 }

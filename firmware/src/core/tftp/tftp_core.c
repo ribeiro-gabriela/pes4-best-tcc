@@ -124,4 +124,5 @@ int8_t initDecoderTask(void)
 void deinitTftpDecoderTask(void)
 {
   vTaskDelete(tftpDecoderTaskHandle);
+  ESP_LOGI(TAG, "deinitializing tftp decoder");
 }    

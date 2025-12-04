@@ -129,6 +129,7 @@ void deinitUdpAdapter(void)
     {
 	close(serverSocket);
     }
+    ESP_LOGI(TAG, "deinitializing udp adapter");
 }
 
 size_t udpAdapterReceivePacket(UdpPacket_t* packet, TickType_t wait)

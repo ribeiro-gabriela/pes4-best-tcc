@@ -105,15 +105,13 @@ typedef struct lurFileHeader
 #pragma pack(push,1)
 typedef struct arincStatusScheme
 {
-    uint32_t fileLength;
-    uint16_t protocolVersion;
     uint16_t uploadOperationStatusCode;
     uint8_t uploadStatusDescriptionLength;
     char uploadStatusDescription[MAX_DESCRIPTION_LEN];
     uint16_t counter;
     uint16_t exceptionTimer;
-    uint16_t estimatedTime;
-    char loadListRatio[3];
+    /* uint16_t estimatedTime; */
+    /* char loadListRatio[3]; */
     uint16_t numberOfHeaderFiles;
 } arincStatusScheme_t;
 #pragma pack(pop)
@@ -168,5 +166,16 @@ arincErr_t arincValidateFileAndGetName(const char* filename, ARINC_DATA_TYPE_t o
 void arinc_reset_buffer(void);
 arincErr_t arinc_append_data(const uint8_t* data, size_t len);
 void arinc_get_raw_buffer(const uint8_t** outPtr, size_t* outSize);
+
+
+void sendStatusToClient(uint16_t bytesReceived,
+			uint16_t uploadOperationStatusCode,
+			uint8_t uploadStatusDescriptionLength,
+			char* uploadStatusDescription,
+			uint16_t counter,
+			uint8_t headerFileNameLength,
+			char* headerFileName,
+			uint8_t loadPartNumberLength,
+			char* loadPartNumberName);
 
 #endif
