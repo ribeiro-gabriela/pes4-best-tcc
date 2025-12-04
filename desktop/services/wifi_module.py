@@ -1,3 +1,4 @@
+import re
 from typing import List
 import time
 import traceback
@@ -44,16 +45,40 @@ class WifiModule(IConnectionTransport):
             print(f"Error scanning for WiFi networks: {traceback.format_exc()}")
             return [{"ssid": "Scan Error", "info":{"signal": "N/A", "security": str(e)}}]
             
-        networks = [n for n in networks if n.get("info", {}).get("security") == "WPA3-Personal" and "EMB-" in n.get("ssid", "")]
+        # networks = [n for n in networks if n.get("info", {}).get("security") == "WPA3-Personal" and "EMB-" in n.get("ssid", "")]
         networks.sort(key=lambda x: int(x['info']['signal'].split(' ')[0]) if 'dBm' in x['info']['signal'] else -100)
         
         return networks
 
     def _parse_netsh_output(self, result):
-        ssids = []
-        current_ssid = None
+        # 1. Define the standard order of properties for Windows Netsh
+        # CAUTION: If Windows updates the netsh output format, this order might shift.
+        SSID_PROPERTIES = [
+            'network_type',
+            'authentication',
+            'encryption'
+        ]
+        
+        BSSID_PROPERTIES = [
+            'signal',
+            'radio_type',
+            'channel',
+            'basic_rates',
+            'other_rates'
+        ]
+
+        networks = []
+        current_network = None
         current_bssid = None
-            
+        
+        # Counters to track which position we are at within a block
+        ssid_prop_index = 0
+        bssid_prop_index = 0
+
+        # Regex to catch "SSID 1 :" or "BSSID 1 :"
+        # These terms are technical acronyms and usually persistent across languages
+        header_pattern = re.compile(r'^\s*(SSID|BSSID)\s+(\d+)\s*:\s*(.*)$')
+
         lines = result.splitlines()
 
         for line in lines:
@@ -61,46 +86,65 @@ class WifiModule(IConnectionTransport):
             if not line:
                 continue
 
-                # Split key and value
-            if ':' in line:
-                key_part, value_part = line.split(':', 1)
-                key = key_part.strip()
-                value = value_part.strip()
+            # Check for Headers (SSID/BSSID)
+            header_match = header_pattern.match(line)
+            
+            if header_match:
+                header_type = header_match.group(1) # SSID or BSSID
+                value = header_match.group(3).strip()
 
-                    # Case A: New Network (SSID) detected
-                if key.startswith('SSID'):
-                        # Save the previous network if it exists
-                    if current_ssid:
-                        ssids.append(current_ssid)
-                        
-                        # Initialize new network dict
-                    current_ssid = {
-                            'ssid': value, 
-                            'bssids': []
-                        }
-                    current_bssid = None # Reset BSSID context
+                if header_type == 'SSID':
+                    # Save previous network
+                    if current_network:
+                        networks.append(current_network)
                     
-                    # Case B: New BSSID detected
-                elif key.startswith('BSSID'):
-                    if current_ssid is not None:
+                    # Start new Network
+                    current_network = {
+                        'ssid': value if value else 'Hidden Network',
+                        'bssids': []
+                    }
+                    current_bssid = None
+                    ssid_prop_index = 0 # Reset counter for new SSID block
+
+                elif header_type == 'BSSID':
+                    # Start new BSSID
+                    if current_network is not None:
                         current_bssid = {'bssid': value}
-                        current_ssid['bssids'].append(current_bssid)
-                    
-                    # Case C: Property (Signal, Radio type, Authentication, etc.)
-                else:
-                        # Logic: If we are inside a BSSID context, add property there.
-                        # Otherwise, add it to the main Network context.
-                    clean_key = key.lower().replace(' ', '_')
-                        
-                    if current_bssid is not None:
-                        current_bssid[clean_key] = value
-                    elif current_ssid is not None:
-                        current_ssid[clean_key] = value
+                        current_network['bssids'].append(current_bssid)
+                        bssid_prop_index = 0 # Reset counter for new BSSID block
 
-            # Append the final network after the loop finishes
-        if current_ssid:
-            ssids.append(current_ssid)
-        return ssids
+                continue
+
+            # Process Properties (Lines with :)
+            if ':' in line:
+                # We ignore the key (left side) entirely to avoid language issues
+                _, value = line.split(':', 1)
+                value = value.strip()
+
+                # Decide where to map this value based on context
+                if current_bssid is not None:
+                    # We are inside a BSSID block
+                    if bssid_prop_index < len(BSSID_PROPERTIES):
+                        key_name = BSSID_PROPERTIES[bssid_prop_index]
+                        current_bssid[key_name] = value
+                        bssid_prop_index += 1
+                    else:
+                        # Capture overflow properties just in case
+                        current_bssid[f'extra_prop_{bssid_prop_index}'] = value
+                        bssid_prop_index += 1
+
+                elif current_network is not None:
+                    # We are inside an SSID block (but not yet in a BSSID)
+                    if ssid_prop_index < len(SSID_PROPERTIES):
+                        key_name = SSID_PROPERTIES[ssid_prop_index]
+                        current_network[key_name] = value
+                        ssid_prop_index += 1
+
+        # Append the final network
+        if current_network:
+            networks.append(current_network)
+
+        return networks
 
     def _current_ssid_windows(self) -> str | None:
             try:
@@ -172,17 +216,12 @@ class WifiModule(IConnectionTransport):
 
     def _get_target_ip(self) -> str:
         # Retrieves subnet using wmic, filtering for IPEnabled adapters
-        cmd = 'wmic nicconfig where IPEnabled=True get DefaultIPGateway /format:csv'
+        cmd = ["powershell", "-Command", "(Get-WmiObject -Class Win32_NetworkAdapterConfiguration -Filter 'IPEnabled=True').DefaultIPGateway"]
         result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
         
         for line in result.stdout.splitlines():
-            if ',' in line and '{' in line: # Look for data lines with curly braces
-                # wmic returns subnets as {"255.255.255.0", "64"} (IPv4, IPv6)
-                # We strip the braces and take the first one
-                parts = line.split(',')
-                if len(parts) > 1:
-                    raw_subnet = parts[1].strip('{}').replace('"', '')
-                    return raw_subnet.split(';')[0] # Return just the first IPv4 mask
+            if '192' in line:
+                return line.strip()
         raise ConnectionError("Cannot get target IP")
 
     def connect(self, target: str, password: str|None = None) -> Connection:
