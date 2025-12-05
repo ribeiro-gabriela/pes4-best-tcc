@@ -26,7 +26,8 @@ class ScreenManager(App):
 
     def build(self):
         # [BST - 330]
-        logging.getLogger('pywifi').setLevel(logging.WARNING) 
+        self.title = 'WI-FLY'
+        self.icon = './uploads/icon.png'
 
         if path_to_dat.exists():
             Builder.load_file(str(path_to_dat))

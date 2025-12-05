@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import os
 import platform
@@ -13,11 +14,12 @@ from services.user_authentication_service import UserAuthenticationService
 from services.wifi_module import WifiModule
 from services.wifi_module_linux import WifiModuleLinux
 
+logging.getLogger('kivy').setLevel(logging.ERROR) 
+
+
 BASE = Path(__file__).resolve().parent
 resource_add_path(str(BASE))
 resource_add_path(str(BASE / "ui"))
-
-print("KV encontrado?", resource_find("styling.kv"))
 
 FILE_DIRECTORY = "file_directory"
 if not os.path.exists(FILE_DIRECTORY):
