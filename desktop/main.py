@@ -14,6 +14,7 @@ from services.wifi_module import WifiModule
 from services.wifi_module_linux import WifiModuleLinux
 
 BASE = Path(__file__).resolve().parent
+resource_add_path(str(BASE))
 resource_add_path(str(BASE / "ui"))
 
 print("KV encontrado?", resource_find("styling.kv"))
