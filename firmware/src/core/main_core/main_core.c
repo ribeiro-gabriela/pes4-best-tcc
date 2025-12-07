@@ -7,6 +7,8 @@ QueueHandle_t BCQueue = NULL;
 
 extern sensorData_t sensors;
 
+bool imgReceived = false;
+
 // BST-475
 void initializeCore()
 {
@@ -133,8 +135,6 @@ void* stateTransitionHandler()
 
     bool verificationHash = false;
     bool verificationPN = false;
-
-    bool imgReceived = false;
 
     while (1)
     {
