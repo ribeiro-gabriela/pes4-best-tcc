@@ -202,6 +202,11 @@ class StateController:
             self.current_state = new_state
             self.logging_service.log(f"State transition: {self.previous_state.value} -> {new_state.value}")
             
+            is_authenticated = (self.service_facade.isAuthenticated())
+            if not is_authenticated and new_state != AppState.LOGIN:
+                self._transition_to(AppState.LOGIN)
+                return
+            
             menu_visible = (new_state != AppState.LOGIN)
             self.screen_manager.toggle_menu_bar_visibility(menu_visible)
 

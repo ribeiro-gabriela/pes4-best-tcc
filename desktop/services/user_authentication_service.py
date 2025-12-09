@@ -1,19 +1,25 @@
-import uuid
+import threading
+import time
 from datetime import datetime, timedelta
 from typing import Optional
+from data.events import Event
 from services.logging_service import LoggingService
-from data.classes import Session, User
+from data.classes import Session
 from services.user_database_module import UserDatabase
 from data.errors import IdentificationError
+from ui.event_router import emit_event
 
 # [BST-288]
-INACTIVITY_TIMEOUT_MINUTES = 10
+INACTIVITY_TIMEOUT_MINUTES = 1
 
 class UserAuthenticationService:
     def __init__(self, user_database: UserDatabase):
         self.user_database = user_database
         self.logging_service = LoggingService(UserAuthenticationService.__name__)
         self.currentSession: Optional[Session] = None
+        # [BST-288]
+        self._health_check_thread: threading.Thread = threading.Thread(target=self._check_inactivity_loop, daemon=True)
+        self._health_check_thread.start()
 
     def login(self, username: str, password: str) -> None:
         # [BST-282]
@@ -54,6 +60,17 @@ class UserAuthenticationService:
                 self.logging_service.log(
                     f"currentSession set to {self.currentSession}."
                 )
+                raise Exception("Logout due to inactivity")
+    
+    # [BST-288]   
+    def _check_inactivity_loop(self) -> None:
+        while True:
+            if self.currentSession:
+                try:
+                    self._check_inactivity()
+                except Exception as e:
+                    emit_event(Event(Event.EventType.ERROR, error=e))
+            time.sleep(30)
 
     def isAuthenticated(self) -> bool:
         # [BST-288]

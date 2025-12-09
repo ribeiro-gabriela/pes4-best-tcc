@@ -1,4 +1,3 @@
-import logging
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
@@ -8,7 +7,7 @@ from kivy.uix.image import Image
 import sys 
 
 from data.enums import ScreenName
-from screens.components import VerticalLayout, HelpIconButton
+from screens.components import HelpIconButton
 from screens.top_menu import TopMenuBar
 from screens.navigator import ScreenNavigator
 from screens.actions import action_show_help
