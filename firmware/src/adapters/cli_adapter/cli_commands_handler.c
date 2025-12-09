@@ -11,6 +11,8 @@ extern QueueHandle_t BCQueue;
 
 sensorData_t sensors = {false, false, false};
 
+extern bool imgReceived;
+
 int restartHandler(int argc, char **argv)
 {
     ESP_LOGI(TAG, "Rebooting system");
@@ -27,6 +29,7 @@ int formatHandler(int argc, char **argv)
     }
     
     ESP_LOGI(TAG, "Formatting storage partition...");
+    imgReceived = false;
     esp_spiffs_format("storage");
 
     return 0;
@@ -187,7 +190,6 @@ int maintenanceModeHandler(int argc, char **argv)
     return 1;
 }
 
-#define TEST_COMMAND_ENABLED
 #ifdef TEST_COMMAND_ENABLED
 int testHandler(int argc, char **argv)
 {
