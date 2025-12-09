@@ -10,7 +10,7 @@ from data.errors import IdentificationError
 from ui.event_router import emit_event
 
 # [BST-288]
-INACTIVITY_TIMEOUT_MINUTES = 1
+INACTIVITY_TIMEOUT_MINUTES = 10
 
 class UserAuthenticationService:
     def __init__(self, user_database: UserDatabase):
