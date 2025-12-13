@@ -32,6 +32,7 @@ version: Literal["A4"] = "A4"
 class ArincModule(ITransferProtocol):
     transfer_status: TransferStatus | None = None
     transfer_thread: threading.Thread | None = None
+    tftp_server: TftpServer | None = None
 
     def __init__(self, connection_service: ConnectionService, base_path: str):
         self.logging_service = LoggingService(ConnectionService.__name__)
@@ -44,11 +45,6 @@ class ArincModule(ITransferProtocol):
             os.makedirs(self._SERVER_PATH)
         if not os.path.exists(self._CLIENT_PATH):
             os.makedirs(self._CLIENT_PATH)
-        
-        self.tftp_server_thread = threading.Thread(
-            target=self._tftp_server_thread, daemon=True
-        )
-        self.tftp_server_thread.start()
 
     # [BST-235]
     def startTransfer(self, file: FileRecord) -> bool:
@@ -83,6 +79,11 @@ class ArincModule(ITransferProtocol):
             target=self._arinc_transfer_thread, daemon=True
         )
 
+        self.tftp_server_thread = threading.Thread(
+            target=self._tftp_server_thread, daemon=True
+        )
+        self.tftp_server_thread.start()
+
         self.transfer_thread.start()
 
         return True
@@ -99,6 +100,8 @@ class ArincModule(ITransferProtocol):
                 self.transfer_thread = None
             self.transfer_status = None
 
+            self._stop_tftpy_server()
+
         return status
 
     # [BST-245]
@@ -109,6 +112,8 @@ class ArincModule(ITransferProtocol):
 
         self.transfer_status.cancelled = True
         self.transfer_status.transferResult = ArincTransferResult.FAILED
+
+        self._stop_tftpy_server()
 
         if self.transfer_thread is not None:
             self.transfer_thread.join()
@@ -127,10 +132,17 @@ class ArincModule(ITransferProtocol):
 
     def _tftp_server_thread(self):
         try:
-            server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
-            server.listen(listenport=6969, timeout=5, retries=3)
+            self.tftp_server = TftpServer(f"{self._SERVER_PATH}/", self._server_callback)
+            self.tftp_server.listen(listenport=6969, timeout=5, retries=3)
         except Exception as e:
             print(e)
+    
+    def _stop_tftpy_server(self):
+        if self.tftp_server_thread is not None:
+            if self.tftp_server is not None:
+                self.tftp_server.stop(True)
+            self.tftp_server_thread.join()
+            self.tftp_server_thread = None
 
     def _arinc_transfer_thread(self):
         if self.transfer_status and not self.transfer_status.cancelled and self.transfer_status.transferStep == ArincTransferStep.LIST:
