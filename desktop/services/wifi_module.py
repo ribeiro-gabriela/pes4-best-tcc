@@ -273,13 +273,24 @@ class WifiModule(IConnectionTransport):
 
         return Package(file_name, file_path)
     
-    def sendRequest(self, req: Request, timeout: int) -> Response: 
+    def sendRequest(self, req: Request, target: str, timeout: int) -> Response: 
         print(f"Sending request (mock): {req.command} with timeout {timeout}")
         if req.command == "GET_HARDWARE_PN":
             return Response(status="SUCCESS", data="EMB-HW-002-021-003") 
         if req.command == "HEALTH_CHECK":
+            result = self._ping_target(target, timeout)
+            if not result:
+                raise TimeoutError("Target is unreacheable")
+
             return Response(status="SUCCESS", data="STATUS_OK") 
         if req.command == "TIMEOUT_REQ":
             time.sleep(timeout + 1)
             raise RequestTimeoutError("Request timed out")
         return Response(status="ERROR", data="DEFAULT_RESPONSE_MOCK") 
+    
+    def _ping_target(self, target: str, timeout: int) -> bool:
+        for i in range(timeout):
+            output = subprocess.run(['ping', '-n', '1', '-w', '1', target], capture_output=True, text=True, check=False)
+            if "TTL=" in output.stdout.upper():
+                return True
+        return False

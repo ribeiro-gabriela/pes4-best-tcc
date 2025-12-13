@@ -4,6 +4,7 @@ from kivy.properties import ObjectProperty
 from kivy.metrics import dp
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
+from kivy.clock import mainthread
 import sys 
 
 from data.enums import ScreenName
@@ -84,6 +85,7 @@ class ScreenManager(App):
 
         return root_float_layout
 
+    @mainthread
     def navigate(self, screen_name: str):
         assert self.navigator is not None
 

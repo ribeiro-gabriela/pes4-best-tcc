@@ -12,6 +12,7 @@ from data.classes import (
     ArincLUSHeaderFile,
     FileRecord,
     Package,
+    Request,
     TransferStatus,
 )
 
@@ -163,6 +164,8 @@ class ArincModule(ITransferProtocol):
             self.transfer_status.transferStep = ArincTransferStep.TRANFER
             self.transfer_status.progressPercent = 1
 
+        last_progress_percent = 0
+        counter = 0
 
         while self.transfer_status and not self.transfer_status.cancelled and not self.transfer_status.transferResult:
             # periodically check for status
@@ -211,6 +214,15 @@ class ArincModule(ITransferProtocol):
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
                         return
 
+            if(last_progress_percent == self.transfer_status.progressPercent):
+                counter += 1
+                if counter > 30:
+                    self.connection_service.sendRequest(Request('HEALTH_CHECK'))
+                    counter = 0
+            else:
+                counter = 0
+
+            last_progress_percent = self.transfer_status.progressPercent
             time.sleep(0.1)
 
     def _server_callback(self, filename: str, **args):

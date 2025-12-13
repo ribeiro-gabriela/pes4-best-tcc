@@ -175,6 +175,8 @@ class StateController:
                 # [E13] Loading > PostConnection
                 # [BST-334]
                 self._transition_to(AppState.POST_CONNECTION)
+            case Event.EventType.RECONNECTION:
+                self._transition_to(AppState.CONNECTION)
             case _:
                 self._handle_global_events(event)
 

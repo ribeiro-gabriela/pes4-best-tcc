@@ -135,7 +135,8 @@ class FileTransferScreen(Screen):
                 
         except Exception as e:
             # [BST-321]
-            Clock.schedule_once(lambda dt: self.handle_transfer_error(e), 0)
+            error = e
+            Clock.schedule_once(lambda dt: self.handle_transfer_error(error), 0)
             return False 
             
         return True 
@@ -164,7 +165,8 @@ class FileTransferScreen(Screen):
             self._service_facade.cancelTransfer() 
             Clock.schedule_once(lambda dt: self.transfer_finished(success=False), 0)
         except Exception as e:
-            self.handle_transfer_error(e)
+            error = e
+            self.handle_transfer_error(error)
 
     def cancel_transfer(self):
         self.cancel_transfer_internal()
@@ -188,8 +190,7 @@ class FileTransferScreen(Screen):
         self.progress_text = 'Transfer interrupted by error'
         self.progress_value = 0 
         # [BST-321]
-        emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
-        emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
+        #emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
 
     def confirm_transfer(self, file_name: str):
         # [BST-322]
