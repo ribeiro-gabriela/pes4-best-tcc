@@ -190,7 +190,7 @@ class FileTransferScreen(Screen):
         self.progress_text = 'Transfer interrupted by error'
         self.progress_value = 0 
         # [BST-321]
-        #emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
+        emit_event(Event(Event.EventType.NAVIGATE,properties={'target': ScreenName.ERROR.value,'error_message': str(error)}))
 
     def confirm_transfer(self, file_name: str):
         # [BST-322]
