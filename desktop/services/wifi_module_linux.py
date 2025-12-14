@@ -189,7 +189,7 @@ class WifiModuleLinux(IConnectionTransport):
         raise ConnectionError("Cannot get target IP (Gateway)")
 
     def connect(self, target: str, password: str|None = None) -> Connection:
-        print(f"Attempting to connect to {target}" + (f" with password: {'*' * len(password)}" if password else " (no password)"))
+        print(f"Attempting to connect to {target}")
         
         if not password:
             password = self._PASSWORD

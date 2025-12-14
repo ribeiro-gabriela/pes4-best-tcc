@@ -19,10 +19,10 @@ class WifiModule(IConnectionTransport):
         try:
             subprocess.run(['netsh', 'wlan', 'disconnect'])
             time.sleep(0.1)
-            result = str(subprocess.check_output(
+            result = subprocess.check_output(
                 ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'],
                 text=True
-            ))
+            )
 
             ssids = self._parse_netsh_output(result)
 
@@ -168,6 +168,19 @@ class WifiModule(IConnectionTransport):
         cur = self._current_ssid_windows()
         if cur == ssid:
             return True
+        
+        ssids = []
+        try:
+            scan = subprocess.check_output(
+                ['netsh', 'wlan', 'show', 'networks', 'mode=bssid'],
+                text=True
+            )
+            ssids = [net['ssid'] for net in self._parse_netsh_output(scan)]
+        except:
+            pass
+
+        if ssid not in ssids:
+            return False
 
         xml = f'''<?xml version="1.0"?>
     <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
@@ -226,7 +239,7 @@ class WifiModule(IConnectionTransport):
         raise ConnectionError("Cannot get target IP")
 
     def connect(self, target: str, password: str|None = None) -> Connection:
-        print(f"Attempting to connect to {target}" + (f" with password: {'*' * len(password)}" if password else " (no password)"))
+        print(f"Attempting to connect to {target}")
         
         if not password:
             password = self._PASSWORD
@@ -290,7 +303,7 @@ class WifiModule(IConnectionTransport):
     
     def _ping_target(self, target: str, timeout: int) -> bool:
         for i in range(timeout):
-            output = subprocess.run(['ping', '-n', '1', '-w', '1', target], capture_output=True, text=True, check=False)
+            output = subprocess.run(['ping', '-n', '1', '-w', '1000', target], capture_output=True, text=True, check=False)
             if "TTL=" in output.stdout.upper():
                 return True
         return False

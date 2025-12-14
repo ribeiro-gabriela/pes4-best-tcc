@@ -164,14 +164,16 @@ class ArincModule(ITransferProtocol):
             self.transfer_status.transferStep = ArincTransferStep.TRANFER
             self.transfer_status.progressPercent = 1
 
-        last_progress_percent = 0
+        last_lus_counter = 0
         counter = 0
 
         while self.transfer_status and not self.transfer_status.cancelled and not self.transfer_status.transferResult:
             # periodically check for status
+            current_lus_counter = 0
             lus_file = self._read_LUS_file(self.transfer_status.currentTarget)
-            # print(f"current LUS {lus_file}")
+            
             if lus_file:
+                current_lus_counter = lus_file.Counter
                 match lus_file.StatusCode:
                     case LoadProtocolStatusCode.IN_PROGRESS | LoadProtocolStatusCode.IN_PROGRESS_INFO:
                         if(lus_file.Counter):
@@ -214,7 +216,7 @@ class ArincModule(ITransferProtocol):
                         self.transfer_status.transferResult = ArincTransferResult.FAILED
                         return
 
-            if(last_progress_percent == self.transfer_status.progressPercent):
+            if(last_lus_counter == current_lus_counter):
                 counter += 1
                 if counter > 30:
                     self.connection_service.sendRequest(Request('HEALTH_CHECK'))
@@ -222,13 +224,10 @@ class ArincModule(ITransferProtocol):
             else:
                 counter = 0
 
-            last_progress_percent = self.transfer_status.progressPercent
+            last_lus_counter = current_lus_counter
             time.sleep(0.1)
 
     def _server_callback(self, filename: str, **args):
-        print('RECEIVED GET REQUEST')
-        print(filename)
-
         if self.transfer_status is None:
             return None
 

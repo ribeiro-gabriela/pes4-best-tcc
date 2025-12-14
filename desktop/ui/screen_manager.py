@@ -105,7 +105,8 @@ class ScreenManager(App):
             self.menu_bar_widget.set_images_button_visibility(not is_connection_screen)
 
         self.navigator.navigate_to(screen_name)
-
+    
+    @mainthread
     def toggle_menu_bar_visibility(self, visible: bool):
         if self.menu_bar_widget:
             self.menu_bar_widget.opacity = 1 if visible else 0

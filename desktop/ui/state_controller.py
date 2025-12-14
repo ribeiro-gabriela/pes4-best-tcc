@@ -189,6 +189,7 @@ class StateController:
             case Event.EventType.ERROR:
                 # [BST-335]
                 self.logging_service.error(f"New error received in error state: {event.error}", context=event.error)
+                self._transition_to_error(event)
             case _:
                 pass
 
