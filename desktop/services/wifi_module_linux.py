@@ -243,7 +243,7 @@ class WifiModuleLinux(IConnectionTransport):
         return Package(file_name, file_path)
     
     def sendRequest(self, req: Request, target: str, timeout: int) -> Response: 
-        print(f"Sending request (mock): {req.command} with timeout {timeout}")
+        print(f"Sending request: {req.command} with timeout {timeout}")
         if req.command == "GET_HARDWARE_PN":
             return Response(status="SUCCESS", data="EMB-HW-002-021-003") 
         if req.command == "HEALTH_CHECK":
