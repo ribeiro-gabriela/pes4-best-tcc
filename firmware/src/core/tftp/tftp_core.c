@@ -2,6 +2,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/FreeRTOSConfig_arch.h"
 #include "freertos/idf_additions.h"
+#include "fsm.h"
 #include "portmacro.h"
 #include "udp.h"
 #include "esp_log.h"
@@ -70,7 +71,8 @@ void tftpDecoderTask(void* params)
     for (;;) {
         received = udpAdapterReceivePacket(&currentPacket, portMAX_DELAY);
 
-        if (received > 0) {
+	
+        if ((received > 0) && (getBCState() == MNT_MODE) && (getMntState() == CONNECTED)) {
             if (currentPacket.len >= 2) {
                 memcpy(&opcode, currentPacket.payload, sizeof(uint16_t)); 
                 opcode = ntohs(opcode); 
