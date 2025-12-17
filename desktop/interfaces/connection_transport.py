@@ -25,5 +25,5 @@ class IConnectionTransport(ABC):
         pass
     
     @abstractmethod
-    def sendRequest(self, req: Request, timeout: int) -> Response: 
+    def sendRequest(self, req: Request, target: str, timeout: int) -> Response: 
         pass

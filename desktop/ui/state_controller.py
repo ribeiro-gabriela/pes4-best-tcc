@@ -175,6 +175,8 @@ class StateController:
                 # [E13] Loading > PostConnection
                 # [BST-334]
                 self._transition_to(AppState.POST_CONNECTION)
+            case Event.EventType.RECONNECTION:
+                self._transition_to(AppState.CONNECTION)
             case _:
                 self._handle_global_events(event)
 
@@ -187,6 +189,7 @@ class StateController:
             case Event.EventType.ERROR:
                 # [BST-335]
                 self.logging_service.error(f"New error received in error state: {event.error}", context=event.error)
+                self._transition_to_error(event)
             case _:
                 pass
 
@@ -201,6 +204,11 @@ class StateController:
             self.previous_state = self.current_state
             self.current_state = new_state
             self.logging_service.log(f"State transition: {self.previous_state.value} -> {new_state.value}")
+            
+            is_authenticated = (self.service_facade.isAuthenticated())
+            if not is_authenticated and new_state != AppState.LOGIN:
+                self._transition_to(AppState.LOGIN)
+                return
             
             menu_visible = (new_state != AppState.LOGIN)
             self.screen_manager.toggle_menu_bar_visibility(menu_visible)

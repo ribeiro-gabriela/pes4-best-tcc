@@ -7,7 +7,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.metrics import dp 
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty 
+from kivy.properties import ListProperty, StringProperty, BooleanProperty, ObjectProperty
+from kivy.clock import mainthread
 
 from data.enums import ScreenName
 from screens.components import WifiNetworkItem
@@ -41,6 +42,7 @@ class ConnectionScreen(Screen):
         self.name = ScreenName.CONNECTION.value
         event_router.register_callback(self._handle_event)
 
+    @mainthread
     def _show_wait_popup(self, title: str, message: str):
         if self._reconnection_popup:
             return
@@ -63,6 +65,7 @@ class ConnectionScreen(Screen):
         )
         self._reconnection_popup.open()
 
+    @mainthread
     def _dismiss_wait_popup(self):
         if self._reconnection_popup:
             self._reconnection_popup.dismiss()
@@ -189,6 +192,7 @@ class ConnectionScreen(Screen):
         else:
             print(f"WARNING: ServiceFacade not injected. Could not connect to {network_name}.")
 
+    @mainthread
     def _show_error_popup(self, message: str):
         popup_content = BoxLayout(orientation='vertical', padding='10dp', spacing='10dp')
         popup_content.add_widget(Label(text=message, halign='center', valign='middle'))

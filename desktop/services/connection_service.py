@@ -50,11 +50,12 @@ class ConnectionService:
             
             # [BST-206]
             emit_event(Event(Event.EventType.RECONNECTION))
-            
             retry_attempts = 3
             success = False
 
             for i in range(retry_attempts):
+                emit_event(Event(Event.EventType.ERROR, error=ConnectionError(f"Connection Lost. Attempting Reconnection... (Try #{i+1})")))
+
                 try:
                     self.connect(device) 
                     if self.isConnected():
@@ -72,7 +73,7 @@ class ConnectionService:
                 # [BST-207]
                 self.currentConnection = None
                 emit_event(Event(Event.EventType.DISCONNECT))
-                raise ConnectionError("Reconnection failed.")
+                emit_event(Event(Event.EventType.ERROR, error=ConnectionError("Connection Lost and Reconnection failed.")))
         finally:
             self._retry_lock.release()
 
@@ -91,7 +92,7 @@ class ConnectionService:
                     break 
             
             # [BST-210]
-            self._stop_health_check.wait(60)
+            self._stop_health_check.wait(10)
 
     def _start_health_check(self):
         # [BST-210]
@@ -250,7 +251,7 @@ class ConnectionService:
     def sendRequest(self, request: Request) -> Response:
         # [BST-224]
         self.logging_service.log(f"Sending request: {request.command}")
-        if not self.isConnected():
+        if not self.isConnected() or self.currentConnection is None:
             err = ConnectionError(f"Cannot send request '{request.command}': Not connected.")
             self.logging_service.error("SendRequest failed", err)
             raise err
@@ -258,7 +259,7 @@ class ConnectionService:
         try:
             # [BST-211]
             timeout = 60
-            response = self.wifi_module.sendRequest(request, timeout=timeout)
+            response = self.wifi_module.sendRequest(request, target=self.currentConnection.address,timeout=timeout)
             # [BST-224]
             self.logging_service.log(f"SendRequest successful. Response: {response.status}")
             return response

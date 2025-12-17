@@ -1,14 +1,14 @@
-import logging
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty
 from kivy.metrics import dp
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
+from kivy.clock import mainthread
 import sys 
 
 from data.enums import ScreenName
-from screens.components import VerticalLayout, HelpIconButton
+from screens.components import HelpIconButton
 from screens.top_menu import TopMenuBar
 from screens.navigator import ScreenNavigator
 from screens.actions import action_show_help
@@ -85,6 +85,7 @@ class ScreenManager(App):
 
         return root_float_layout
 
+    @mainthread
     def navigate(self, screen_name: str):
         assert self.navigator is not None
 
@@ -104,7 +105,8 @@ class ScreenManager(App):
             self.menu_bar_widget.set_images_button_visibility(not is_connection_screen)
 
         self.navigator.navigate_to(screen_name)
-
+    
+    @mainthread
     def toggle_menu_bar_visibility(self, visible: bool):
         if self.menu_bar_widget:
             self.menu_bar_widget.opacity = 1 if visible else 0
