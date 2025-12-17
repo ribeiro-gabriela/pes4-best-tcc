@@ -22,7 +22,7 @@ typedef struct {
     socklen_t addrLen;
 } TftpSessionConfig_t;
 
-void tftp_session_task(void *pvParameters);
+void tftpSessionTask(void *pvParameters);
 void tftpDecoderTask(void* params);
 int8_t initDecoderTask(void);
 void deinitTftpDecoderTask(void);

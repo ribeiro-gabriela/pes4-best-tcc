@@ -46,7 +46,7 @@ static void dispatch_session_task(UdpPacket_t *packet, uint16_t opcode)
 
     ESP_LOGI(TAG, "starting session: %s (Opcode: %d)", session_config->filename, opcode);
 
-    BaseType_t res = xTaskCreate(tftp_session_task, 
+    BaseType_t res = xTaskCreate(tftpSessionTask, 
                                  "tftp_worker", 
                                  2 * TFTP_SESSION_STACK_SIZE, 
                                  (void *)session_config, 

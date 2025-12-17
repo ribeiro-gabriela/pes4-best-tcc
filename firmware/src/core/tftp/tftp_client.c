@@ -1,4 +1,5 @@
 #include "tftp_client.h"
+#include "arinc_core.h"
 #include "cc.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/idf_additions.h"
@@ -6,7 +7,6 @@
 #include "portmacro.h"
 #include "tftp_core.h"
 #include "udp.h"
-#include "arinc_core.h"
 
 #include "esp_log.h"
 #include "esp_spiffs.h"
@@ -55,8 +55,8 @@ int tftpClientGet(const char* ip_addr, lurFilesDescriptionHeader_t fileInfo)
 
     // creating rrq
     char packet[516];
-    size_t req_len =
-        sprintf(packet + 2, "%s", fileInfo.loadPartNumberName) + 3 + 6; // +2 opcode, +1 null, +5 "octet", +1 null
+    size_t req_len = sprintf(packet + 2, "%s", fileInfo.loadPartNumberName) + 3 +
+                     6; // +2 opcode, +1 null, +5 "octet", +1 null
     *(uint16_t*)packet = htons(TFTP_OP_RRQ);
     strcpy(packet + 2 + strlen(fileInfo.loadPartNumberName) + 1, "octet");
 
@@ -84,10 +84,10 @@ int tftpClientGet(const char* ip_addr, lurFilesDescriptionHeader_t fileInfo)
             uint16_t opcode = ntohs(*(uint16_t*)packet);
             uint16_t block = ntohs(*(uint16_t*)(packet + 2));
 
-	    if (opcode == TFTP_OP_DATA && block == expected_block)
-	    {
-		uint8_t* data_ptr = (uint8_t*)packet + 4;
-		size_t data_len = len - 4;
+            if (opcode == TFTP_OP_DATA && block == expected_block)
+            {
+                uint8_t* data_ptr = (uint8_t*)packet + 4;
+                size_t data_len = len - 4;
 
                 uint32_t written = fwrite(data_ptr, sizeof(uint8_t), data_len, f);
                 if (written < data_len)
@@ -128,7 +128,7 @@ int tftpClientGet(const char* ip_addr, lurFilesDescriptionHeader_t fileInfo)
                                        fileInfo.headerFileNameLength,
                                        fileInfo.headerFileName,
                                        fileInfo.loadPartNumberNameLength,
-				       fileInfo.loadPartNumberName);
+                                       fileInfo.loadPartNumberName);
 
                     ESP_LOGI(TAG, " received block: %d", block);
                 }
@@ -168,7 +168,7 @@ int tftpClientGet(const char* ip_addr, lurFilesDescriptionHeader_t fileInfo)
             }
             else
             {
-	      ESP_LOGW(TAG, "non expected block. resending ack for block %u", block);
+                ESP_LOGW(TAG, "non expected block. resending ack for block %u", block);
 
                 // ack
                 uint16_t ack_pkt[2] = {htons(TFTP_OP_ACK), htons(block)};
@@ -449,26 +449,25 @@ void taskArincSendLus(void* params)
 
         if (bytesReceived > 0)
         {
-            tftpClientPut("192.168.4.2", "EMB-HW-002-021-003_UNDEF.LUS", receivedBuffer, bytesReceived);
+            tftpClientPut(
+                "192.168.4.2", "EMB-HW-002-021-003_UNDEF.LUS", receivedBuffer, bytesReceived);
         }
 
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
 }
 
-
 int8_t sendMessageToTftpClientBuffer(uint8_t* buf, uint32_t bufLen)
 {
-    size_t bytesSent =
-        xMessageBufferSend(messageBufferHandle, buf, bufLen, portMAX_DELAY);
+    size_t bytesSent = xMessageBufferSend(messageBufferHandle, buf, bufLen, portMAX_DELAY);
 
     if (bytesSent < bufLen)
     {
-	ESP_LOGE(TAG, "could not send message to buffer");
-	return -1;
+        ESP_LOGE(TAG, "could not send message to buffer");
+        return -1;
     }
     return 0;
-}    
+}
 
 void initTaskSendLus(void)
 {
@@ -515,4 +514,3 @@ void getImageFileName(char* out)
     strncpy(out, imageFilename, MAX_FILENAME_LEN - 1);
     out[MAX_FILENAME_LEN - 1] = '\0';
 }
-

@@ -32,7 +32,7 @@ sendAck(int sock, struct sockaddr_storage* destAddr, socklen_t addrLen, uint16_t
     return sendto(sock, packet, 4, 0, (struct sockaddr*)destAddr, addrLen);
 }
 
-static void send_error(int sock,
+static void sendError(int sock,
                        struct sockaddr_storage* destAddr,
                        socklen_t addrLen,
                        uint16_t errorCode,
@@ -50,7 +50,7 @@ static void send_error(int sock,
     sendto(sock, packet, len, 0, (struct sockaddr*)destAddr, addrLen);
 }
 
-static int send_data(int sock,
+static int sendData(int sock,
                      struct sockaddr_storage* destAddr,
                      socklen_t addrLen,
                      uint16_t blockNumber,
@@ -78,11 +78,11 @@ static int send_data(int sock,
     return 0;
 }
 
-void tftp_session_task(void* pvParameters)
+void tftpSessionTask(void* pvParameters)
 {
     TftpSessionConfig_t* config = (TftpSessionConfig_t*)pvParameters;
 
-    ESP_LOGI(TAG, "Sessão iniciada para arquivo: %s", config->filename);
+    ESP_LOGI(TAG, "Session started for file: %s", config->filename);
 
     int session_socket = -1;
     struct sockaddr_in my_addr;
@@ -91,14 +91,14 @@ void tftp_session_task(void* pvParameters)
     packet_buffer = (uint8_t*)malloc(TFTP_PACKET_BUFFER_SIZE);
     if (packet_buffer == NULL)
     {
-        ESP_LOGE(TAG, "Falha de memória no buffer de sessão");
+        ESP_LOGE(TAG, "session buffer mem fail");
         goto cleanup;
     }
 
     session_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
     if (session_socket < 0)
     {
-        ESP_LOGE(TAG, "Falha ao criar socket de sessão");
+        ESP_LOGE(TAG, "failed to create session socket");
         goto cleanup;
     }
 
@@ -109,7 +109,7 @@ void tftp_session_task(void* pvParameters)
 
     if (bind(session_socket, (struct sockaddr*)&my_addr, sizeof(my_addr)) < 0)
     {
-        ESP_LOGE(TAG, "Falha no bind da sessão");
+        ESP_LOGE(TAG, "session bind failed");
         goto cleanup;
     }
 
@@ -163,7 +163,7 @@ void tftp_session_task(void* pvParameters)
 
                         if (writeRes != ARINC_ERR_OK)
                         {
-                            send_error(session_socket,
+                            sendError(session_socket,
                                        &config->clientAddr,
                                        config->addrLen,
                                        3,
@@ -171,7 +171,7 @@ void tftp_session_task(void* pvParameters)
                             break; // Aborta a transferência
                         }
 
-                        ESP_LOGD(TAG, "Recebido Bloco %d (%d bytes)", recv_block, (int)data_len);
+                        ESP_LOGD(TAG, "received block %d (%d bytes)", recv_block, (int)data_len);
 
                         // Confirma recebimento
                         sendAck(session_socket, &config->clientAddr, config->addrLen, recv_block);
@@ -265,7 +265,6 @@ void tftp_session_task(void* pvParameters)
         }
         else
         {
-            ESP_LOGE(TAG, "o arinc não deu certo");
             loadUploadingInitialization(ARINC_OPERATION_NOT_ACCEPTED,
                                         (uint8_t*)"invalid file name",
                                         generatedLuiFile,
@@ -286,7 +285,7 @@ void tftp_session_task(void* pvParameters)
             }
 
             // 3. Enviar o pacote DATA
-            int res = send_data(session_socket,
+            int res = sendData(session_socket,
                                 &config->clientAddr,
                                 config->addrLen,
                                 block_number,
@@ -327,7 +326,7 @@ void tftp_session_task(void* pvParameters)
                 }
                 else
                 {
-                    send_error(
+                    sendError(
                         session_socket, &config->clientAddr, config->addrLen, 0, "invalid package");
                 }
 
@@ -363,6 +362,6 @@ cleanup:
     if (config != NULL)
         vPortFree(config);
 
-    ESP_LOGI(TAG, "task ended");
+    ESP_LOGI(TAG, "task ended: tftpSessionTask");
     vTaskDelete(NULL);
 }

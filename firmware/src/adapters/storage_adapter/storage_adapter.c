@@ -3,6 +3,13 @@
 
 static const char* TAG = "STORAGE";
 
+
+bool formatSpiffsData(void)
+{
+    esp_spiffs_format("storage");
+    return 0;
+}    
+
 void partitionSetup()
 {
     //Initialize NVS
@@ -57,7 +64,7 @@ char* readHWPNFromStorage()
 
 void initLogFile()
 {
-    FILE* f = fopen("/spiffs/log.txt", "a");
+    FILE* f = fopen("/logs/log.txt", "a");
     if (f == NULL)
     {
         ESP_LOGE(TAG, "Failed to open log file for appending");

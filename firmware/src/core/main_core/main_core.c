@@ -210,7 +210,12 @@ void* stateTransitionHandler()
                 {
                     setMntState(WAITING);
                     setConnState(NOT_SET_CONN);
+
                     ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+
+                    // [BST-402]
+		    formatDataPartition();
+                    
                     ESP_LOGI("Main Core", "MNT State changed to WAITING");
                 }
                 else
@@ -308,7 +313,7 @@ void* stateTransitionHandler()
 
                 imgReceived = false;
 
-                esp_spiffs_format("storage");
+		formatDataPartition();
 
                 if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
                     getConnState() == IMG_VERIFICATION)

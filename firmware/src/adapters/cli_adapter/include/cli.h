@@ -5,6 +5,6 @@
 #include "esp_console.h"
 
 esp_err_t initConsole();
-esp_err_t registerLog();
+/* esp_err_t registerLog(); */
 
 #endif

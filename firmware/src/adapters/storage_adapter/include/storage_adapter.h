@@ -6,6 +6,7 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 
+bool formatSpiffsData(void);
 void partitionSetup();
 void initLogFile();
 void appendLogMessage(char* message, int length);

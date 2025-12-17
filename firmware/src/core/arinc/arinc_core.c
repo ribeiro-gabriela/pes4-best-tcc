@@ -307,7 +307,7 @@ arincErr_t arinc_append_data(const uint8_t* data, size_t len)
         if ((arincDataBufferOffset + len) > MAX_BUFFER_LEN)
         {
             ESP_LOGE(TAG,
-                     "Buffer ARINC cheio! Cursor: %d, Novo dado: %d",
+                     "ARINC buffer full! Cursor: %d, new data: %d",
                      (int)arincDataBufferOffset,
                      (int)len);
             ret = ARINC_ERR_NO_MEM;

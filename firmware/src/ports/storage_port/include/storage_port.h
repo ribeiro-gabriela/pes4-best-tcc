@@ -4,5 +4,6 @@
 #include "storage_adapter.h"
 
 void storageInit();
+void formatDataPartition();
 
 #endif
