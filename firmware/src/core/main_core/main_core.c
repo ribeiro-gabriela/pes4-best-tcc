@@ -47,7 +47,7 @@ void initSensorPolling()
 void* sensorPolling()
 {
     sensorData_t prevValues = sensors;
-    QueueMessage_t* msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+    QueueMessage_t* msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
 
     while (1)
     {
@@ -59,12 +59,14 @@ void* sensorPolling()
             {
                 if (getBCState() != MNT_MODE)
                 {
-                    ESP_LOGI("Sensors", "All conditions met for maintenance mode. Enabling maintenance mode.");
-                    
-                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                    sprintf((char*)msg->logMessage, "(Sensors) Maintenance mode enabled via sensor conditions");
+                    ESP_LOGI("Sensors",
+                             "All conditions met for maintenance mode. Enabling maintenance mode.");
 
-                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                    sprintf((char*)msg->logMessage,
+                            "(Sensors) Maintenance mode enabled via sensor conditions");
+
+                    if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
                     {
                         ESP_LOGE("Sensors", "Failed to send message to BCQueue");
                     }
@@ -74,18 +76,21 @@ void* sensorPolling()
             {
                 if (getBCState() != OP_MODE)
                 {
-                    ESP_LOGI("Sensors", "Conditions not met for maintenance mode. Disabling maintenance mode.");
+                    ESP_LOGI(
+                        "Sensors",
+                        "Conditions not met for maintenance mode. Disabling maintenance mode.");
 
                     msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-                    sprintf((char*)msg->logMessage, "(Sensors) Maintenance mode disabled via sensor conditions");
+                    sprintf((char*)msg->logMessage,
+                            "(Sensors) Maintenance mode disabled via sensor conditions");
 
-                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                    if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
                     {
                         ESP_LOGE("Sensors", "Failed to send message to BCQueue");
                     }
                 }
             }
-            
+
             prevValues = sensors;
         }
 
@@ -98,7 +103,12 @@ void initializeQueue()
     if (getBCState() != MNT_MODE)
     {
         // Task para tratar transições de estado e consumir mensagens da fila
-        xTaskCreate((void*)stateTransitionHandler, "stateTransitionHandler", 4096, NULL, 5, &stateTransitionHandle);
+        xTaskCreate((void*)stateTransitionHandler,
+                    "stateTransitionHandler",
+                    4096,
+                    NULL,
+                    5,
+                    &stateTransitionHandle);
     }
 }
 
@@ -142,8 +152,8 @@ void* stateTransitionHandler()
         {
             if (receivedMessage.eventID == EVENT_ENTER_MAINTENANCE_REQUEST)
             {
-                if (getBCState() != MNT_MODE && sensors.mntSignal && 
-                    sensors.parkingBrake && sensors.weightOnWheels)
+                if (getBCState() != MNT_MODE && sensors.mntSignal && sensors.parkingBrake &&
+                    sensors.weightOnWheels)
                 {
                     imgReceived = false;
                     setBCState(MNT_MODE);
@@ -152,14 +162,28 @@ void* stateTransitionHandler()
                     ESP_LOGI("Main Core", "BC State changed to MNT_MODE");
                     initializeMaintenanceMode();
                 }
-                else if (getBCState() != MNT_MODE && (!sensors.mntSignal || 
-                         !sensors.parkingBrake || !sensors.weightOnWheels))
+                else if (getBCState() != MNT_MODE &&
+                         (!sensors.mntSignal || !sensors.parkingBrake || !sensors.weightOnWheels))
                 {
                     ESP_LOGW("Main Core", "Conditions not met for maintenance mode");
                 }
                 else
                 {
-                    ESP_LOGW("Main Core", "Received EVENT_ENTER_MAINTENANCE_REQUEST event in unexpected state, ignoring");
+                    ESP_LOGW("Main Core",
+                             "Received EVENT_ENTER_MAINTENANCE_REQUEST event in unexpected state, "
+                             "ignoring");
+
+                    msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                    if (msg != NULL)
+                    {
+                        msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                        sprintf((char*)msg->logMessage, "EVENT_ENTER_MAINTENANCE_REQUEST");
+                        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                        {
+                            ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                        }
+                        free(msg);
+                    }
                 }
             }
             // BST-474
@@ -176,291 +200,442 @@ void* stateTransitionHandler()
                 }
                 else
                 {
-                    ESP_LOGW("Main Core", "Received EVENT_ABORT_MAINTENANCE_IMMEDIATE event in unexpected state, ignoring");
-                }
-            }
-            else if (receivedMessage.eventID == WIFI_CLIENT_CONNECTED)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == WAITING)
-                {   
-                    if (!imgReceived)
-                    {
-                        setMntState(CONNECTED);
-                        setConnState(WAITING_REQUEST);
-                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                        ESP_LOGI("Main Core", "MNT State changed to CONNECTED and Conn State changed to WAITING_REQUEST");
-                    }
-                    else
-                    {
-                        setMntState(WAITING_AUTHORIZATION);
-                        setConnState(NOT_SET_CONN);
-                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                        ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
-                    }
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received WIFI_CLIENT_CONNECTED event in unexpected state, ignoring");
-                }
-            }
-            else if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED ||
-                     receivedMessage.eventID == COMM_AUTH_FAILURE)
-            {
-                if (getBCState() == MNT_MODE)
-                {
-                    setMntState(WAITING);
-                    setConnState(NOT_SET_CONN);
+                    ESP_LOGW("Main Core",
+                             "Received EVENT_ABORT_MAINTENANCE_IMMEDIATE event in unexpected "
+                             "state, ignoring");
 
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-
-                    // [BST-402]
-		    formatDataPartition();
-                    
-                    ESP_LOGI("Main Core", "MNT State changed to WAITING");
-                }
-                else
-                {
-                    if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED)
-                    {
-                        ESP_LOGW("Main Core", "Received WIFI_CLIENT_DISCONNECTED event in unexpected state, ignoring");
-                    }
-                    else if (receivedMessage.eventID == COMM_AUTH_FAILURE)
-                    {
-                        ESP_LOGW("Main Core", "Received COMM_AUTH_FAILURE event in unexpected state, ignoring");
-                    }
-                }
-            }
-            else if (receivedMessage.eventID == LOAD_REQUEST)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                    getConnState() == WAITING_REQUEST)
-                {
-                    setConnState(RECEIVING_PKTS);
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received LOAD_REQUEST event in unexpected state, ignoring");
-                }
-            }
-            // else if (receivedMessage.eventID == SEC_GSE_AUTH_SUCCESS)
-            // {
-            //     if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-            //         getConnState() == CRED_EXCHANGE)
-            //     {
-            //         setConnState(RECEIVING_PKTS);
-            //         printf("Log Message: %s\n", receivedMessage.logMessage);
-            //         ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
-            //     }
-            // }
-            else if (receivedMessage.eventID == COMM_TRANSFER_COMPLETE)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                    getConnState() == RECEIVING_PKTS)
-                {
-                    setConnState(IMG_VERIFICATION);
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
-
-                    verify();
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received COMM_TRANSFER_COMPLETE event in unexpected state, ignoring");
-                }
-            }
-            // BST-469
-            else if (receivedMessage.eventID == SEC_IMG_HASH_OK ||
-                     receivedMessage.eventID == SEC_IMG_PN_OK)
-            {
-                if (receivedMessage.eventID == SEC_IMG_HASH_OK && !verificationHash)
-                {
-                    verificationHash = true;
-                }
-                else if (receivedMessage.eventID == SEC_IMG_PN_OK && !verificationPN)
-                {
-                    verificationPN = true;
-                }
-
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-
-                if (verificationHash && verificationPN)
-                {
-                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                        getConnState() == IMG_VERIFICATION)
-                    {   
-                        imgReceived = true;
-                        setMntState(WAITING_AUTHORIZATION);
-                        setConnState(NOT_SET_CONN);
-                        ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
-                    }
-                    else
-                    {
-                        ESP_LOGW("Main Core", "Received image verification success events in unexpected state, ignoring");
-                    }
-
-                    verificationHash = false;
-                    verificationPN = false;
-                }
-            }
-            else if (receivedMessage.eventID == SEC_ERR_IMG_HASH_MISMATCH ||
-                     receivedMessage.eventID == SEC_ERR_IMG_PN_MISMATCH)
-            {
-                // Reset verification flags on any error
-                verificationHash = false;
-                verificationPN = false;
-
-                imgReceived = false;
-
-		formatDataPartition();
-
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED && 
-                    getConnState() == IMG_VERIFICATION)
-                {
-                    // Send message according to mismatch to UDP server about verification failure so it can notify GSE
-
-                    setConnState(RECEIVING_PKTS);
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGE("Main Core", "Conn State reverted to RECEIVING_PKTS");
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received image verification error event in unexpected state, ignoring");
-                }
-            }
-            else if (receivedMessage.eventID == COMM_AUTH_FAILURE ||
-                     receivedMessage.eventID == COMM_TIMEOUT)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == CONNECTED)
-                {
-                    setMntState(WAITING);
-                    setConnState(NOT_SET_CONN);
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGI("Main Core", "MNT State changed to WAITING");
-                }
-                else
-                {
-                    if (receivedMessage.eventID == COMM_AUTH_FAILURE)
-                    {
-                        ESP_LOGW("Main Core", "Received COMM_AUTH_FAILURE event in unexpected state, ignoring");
-                    }
-                    else
-                    {
-                        ESP_LOGW("Main Core", "Received COMM_TIMEOUT event in unexpected state, ignoring");
-                    }
-                }
-            }
-            else if (receivedMessage.eventID == CORE_WARN_UNEXPECTED_EVENT)
-            {
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                ESP_LOGW("Main Core", "Received unexpected event");
-            }
-            else if (receivedMessage.eventID == LOG_INFO)
-            {
-                ESP_LOGI("Main Core", "Info log received");
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-            }
-            else if (receivedMessage.eventID == ERR_GSE_PROBE_TIMEOUT)
-            {
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                ESP_LOGE("Main Core", "GSE probe timeout exceeded, aborting maintenance mode");
-                setBCState(OP_MODE);
-                setMntState(NOT_SET_MNT);
-                setConnState(NOT_SET_CONN);
-                deinitMaintenanceMode();
-            }
-            else if (receivedMessage.eventID == ERR_AP_INIT_FAILED)
-            {
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                ESP_LOGE("Main Core", "Access Point initialization failed, reinitializing Maintenance Mode");
-                setBCState(OP_MODE);
-                setMntState(NOT_SET_MNT);
-                setConnState(NOT_SET_CONN);
-                deinitMaintenanceMode();
-                msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
-                if (msg != NULL)
-                {
-                    msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                    sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
-                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
-                    {
-                        ESP_LOGE("Main Core", "Failed to send message to BCQueue");
-                    }
-                    free(msg);
-                }
-            }
-            else if (receivedMessage.eventID == EVENT_SENSORS_LINK_DOWN)
-            {
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                ESP_LOGE("Main Core", "Sensors link down event");
-                
-                msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
-                if (msg != NULL)
-                {
-                    msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
-                    sprintf((char*)msg->logMessage, "(Main Core) Aborting maintenance mode");
-                    if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
-                    {
-                        ESP_LOGE("Main Core", "Failed to send message to BCQueue");
-                    }
-                    free(msg);
-                }
-            }
-            else if (receivedMessage.eventID == SEC_ERR_GSE_AUTH_FAILED)
-            {
-                ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                ESP_LOGE("Main Core", "GSE authentication failed");
-                if (getBCState() == MNT_MODE)
-                {
-                    setMntState(WAITING);
-                    setConnState(NOT_SET_CONN);
-                    ESP_LOGI("Main Core", "MNT State changed to WAITING due to GSE auth failure");
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received SEC_ERR_GSE_AUTH_FAILED event in unexpected state, ignoring");
-                }
-            }
-            else if (receivedMessage.eventID == WIFI_AP_STARTED_OK)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == WAITING)
-                {
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                }
-                else
-                {
-                    ESP_LOGW("Main Core", "Received WIFI_AP_STARTED_OK event in unexpected state, ignoring");
-                }
-            }
-            else if (receivedMessage.eventID == WIFI_AP_START_FAILURE_EVENT)
-            {
-                if (getBCState() == MNT_MODE && getMntState() == WAITING)
-                {
-                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
-                    ESP_LOGE("Main Core", "WiFi AP failed to start, reinitializing Maintenance Mode");
-                    setBCState(OP_MODE);
-                    setMntState(NOT_SET_MNT);
-                    setConnState(NOT_SET_CONN);
-                    deinitMaintenanceMode();
-                    msg = (QueueMessage_t*) malloc(sizeof(QueueMessage_t));
+                    msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
                     if (msg != NULL)
                     {
-                        msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
-                        sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
-                        if (xQueueSend(BCQueue, (void*) msg, portMAX_DELAY) != pdPASS)
+                        msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                        sprintf((char*)msg->logMessage, "EVENT_ABORT_MAINTENANCE_IMMEDIATE");
+                        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
                         {
                             ESP_LOGE("Main Core", "Failed to send message to BCQueue");
                         }
                         free(msg);
                     }
                 }
+            }
+            else if (receivedMessage.eventID == WIFI_CLIENT_CONNECTED)
+            {
+                if (getBCState() == MNT_MODE && getMntState() == WAITING)
+                {
+                    if (!imgReceived)
+                    {
+                        setMntState(CONNECTED);
+                        setConnState(WAITING_REQUEST);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core",
+                                 "MNT State changed to CONNECTED and Conn State changed to "
+                                 "WAITING_REQUEST");
+                    }
+                    else
+                    {
+                        setMntState(WAITING_AUTHORIZATION);
+                        setConnState(NOT_SET_CONN);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
+                    }
+                }
                 else
                 {
-                    ESP_LOGW("Main Core", "Received WIFI_AP_START_FAILURE_EVENT event in unexpected state, ignoring");
+                    ESP_LOGW("Main Core",
+                             "Received WIFI_CLIENT_CONNECTED event in unexpected state, ignoring");
+
+                    msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                    if (msg != NULL)
+                    {
+                        msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                        sprintf((char*)msg->logMessage, "WIFI_CLIENT_CONNECTED");
+                        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                        {
+                            ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                        }
+                        free(msg);
+                    }
+                }
+	    }
+            else if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED ||
+                         receivedMessage.eventID == COMM_AUTH_FAILURE)
+                {
+                    if (getBCState() == MNT_MODE)
+                    {
+                        setMntState(WAITING);
+                        setConnState(NOT_SET_CONN);
+
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+
+                        // [BST-402]
+                        formatDataPartition();
+
+                        ESP_LOGI("Main Core", "MNT State changed to WAITING");
+                    }
+                    else
+                    {
+                        if (receivedMessage.eventID == WIFI_CLIENT_DISCONNECTED)
+                        {
+                            ESP_LOGW("Main Core",
+                                     "Received WIFI_CLIENT_DISCONNECTED event in unexpected state, "
+                                     "ignoring");
+                        }
+                        else if (receivedMessage.eventID == COMM_AUTH_FAILURE)
+                        {
+                            ESP_LOGW(
+                                "Main Core",
+                                "Received COMM_AUTH_FAILURE event in unexpected state, ignoring");
+
+                            msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                            if (msg != NULL)
+                            {
+                                msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                                sprintf((char*)msg->logMessage, "COMM_AUTH_FAILURE");
+                                if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                                {
+                                    ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                                }
+                                free(msg);
+                            }
+                        }
+                    }
+                }
+                else if (receivedMessage.eventID == LOAD_REQUEST)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED &&
+                        getConnState() == WAITING_REQUEST)
+                    {
+                        setConnState(RECEIVING_PKTS);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
+                    }
+                    else
+                    {
+                        ESP_LOGW("Main Core",
+                                 "Received LOAD_REQUEST event in unexpected state, ignoring");
+
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                        if (msg != NULL)
+                        {
+                            msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                            sprintf((char*)msg->logMessage, "LOAD_REQUEST");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
+                }
+                // else if (receivedMessage.eventID == SEC_GSE_AUTH_SUCCESS)
+                // {
+                //     if (getBCState() == MNT_MODE && getMntState() == CONNECTED &&
+                //         getConnState() == CRED_EXCHANGE)
+                //     {
+                //         setConnState(RECEIVING_PKTS);
+                //         printf("Log Message: %s\n", receivedMessage.logMessage);
+                //         ESP_LOGI("Main Core", "Conn State changed to RECEIVING_PKTS");
+                //     }
+                // }
+                else if (receivedMessage.eventID == COMM_TRANSFER_COMPLETE)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED &&
+                        getConnState() == RECEIVING_PKTS)
+                    {
+                        setConnState(IMG_VERIFICATION);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "Conn State changed to IMG_VERIFICATION");
+
+                        verify();
+                    }
+                    else
+                    {
+                        ESP_LOGW(
+                            "Main Core",
+                            "Received COMM_TRANSFER_COMPLETE event in unexpected state, ignoring");
+
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                        if (msg != NULL)
+                        {
+                            msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                            sprintf((char*)msg->logMessage, "COMM_TRANSFER_COMPLETE");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
+                }
+                // BST-469
+                else if (receivedMessage.eventID == SEC_IMG_HASH_OK ||
+                         receivedMessage.eventID == SEC_IMG_PN_OK)
+                {
+                    if (receivedMessage.eventID == SEC_IMG_HASH_OK && !verificationHash)
+                    {
+                        verificationHash = true;
+                    }
+                    else if (receivedMessage.eventID == SEC_IMG_PN_OK && !verificationPN)
+                    {
+                        verificationPN = true;
+                    }
+
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+
+                    if (verificationHash && verificationPN)
+                    {
+                        if (getBCState() == MNT_MODE && getMntState() == CONNECTED &&
+                            getConnState() == IMG_VERIFICATION)
+                        {
+                            imgReceived = true;
+                            setMntState(WAITING_AUTHORIZATION);
+                            setConnState(NOT_SET_CONN);
+                            ESP_LOGI("Main Core", "MNT State changed to WAITING_AUTHORIZATION");
+                        }
+                        else
+                        {
+                            ESP_LOGW("Main Core",
+                                     "Received image verification success events in unexpected "
+                                     "state, ignoring");
+
+                            msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                            if (msg != NULL)
+                            {
+                                msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                                sprintf((char*)msg->logMessage, "image verification success");
+                                if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                                {
+                                    ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                                }
+                                free(msg);
+                            }
+                        }
+
+                        verificationHash = false;
+                        verificationPN = false;
+                    }
+                }
+                else if (receivedMessage.eventID == SEC_ERR_IMG_HASH_MISMATCH ||
+                         receivedMessage.eventID == SEC_ERR_IMG_PN_MISMATCH)
+                {
+                    // Reset verification flags on any error
+                    verificationHash = false;
+                    verificationPN = false;
+
+                    imgReceived = false;
+
+                    formatDataPartition();
+
+                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED &&
+                        getConnState() == IMG_VERIFICATION)
+                    {
+                        // Send message according to mismatch to UDP server about verification
+                        // failure so it can notify GSE
+
+                        setConnState(RECEIVING_PKTS);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGE("Main Core", "Conn State reverted to RECEIVING_PKTS");
+                    }
+                    else
+                    {
+                        ESP_LOGW("Main Core",
+                                 "Received image verification error event in unexpected state, "
+                                 "ignoring");
+
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                        if (msg != NULL)
+                        {
+                            msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                            sprintf((char*)msg->logMessage, "image verification error");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
+                }
+                else if (receivedMessage.eventID == COMM_AUTH_FAILURE ||
+                         receivedMessage.eventID == COMM_TIMEOUT)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == CONNECTED)
+                    {
+                        setMntState(WAITING);
+                        setConnState(NOT_SET_CONN);
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGI("Main Core", "MNT State changed to WAITING");
+                    }
+                    else
+                    {
+                        if (receivedMessage.eventID == COMM_AUTH_FAILURE)
+                        {
+                            ESP_LOGW(
+                                "Main Core",
+                                "Received COMM_AUTH_FAILURE event in unexpected state, ignoring");
+
+                            msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+
+                            if (msg != NULL)
+                            {
+                                msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                                sprintf((char*)msg->logMessage, "COMM_AUTH_FAILURE");
+                                if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                                {
+                                    ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                                }
+                                free(msg);
+                            }
+                        }
+                        else
+                        {
+                            ESP_LOGW("Main Core",
+                                     "Received COMM_TIMEOUT event in unexpected state, ignoring");
+                        }
+                    }
+                }
+                else if (receivedMessage.eventID == CORE_WARN_UNEXPECTED_EVENT)
+                {
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    ESP_LOGW("Main Core", "Received unexpected event");
+                }
+                else if (receivedMessage.eventID == LOG_INFO)
+                {
+                    ESP_LOGI("Main Core", "Info log received");
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                }
+                else if (receivedMessage.eventID == ERR_GSE_PROBE_TIMEOUT)
+                {
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    ESP_LOGE("Main Core", "GSE probe timeout exceeded, aborting maintenance mode");
+                    setBCState(OP_MODE);
+                    setMntState(NOT_SET_MNT);
+                    setConnState(NOT_SET_CONN);
+                    deinitMaintenanceMode();
+                }
+                else if (receivedMessage.eventID == ERR_AP_INIT_FAILED)
+                {
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    ESP_LOGE("Main Core",
+                             "Access Point initialization failed, reinitializing Maintenance Mode");
+                    setBCState(OP_MODE);
+                    setMntState(NOT_SET_MNT);
+                    setConnState(NOT_SET_CONN);
+                    deinitMaintenanceMode();
+                    msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                    if (msg != NULL)
+                    {
+                        msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                        sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
+                        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                        {
+                            ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                        }
+                        free(msg);
+                    }
+                }
+                else if (receivedMessage.eventID == EVENT_SENSORS_LINK_DOWN)
+                {
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    ESP_LOGE("Main Core", "Sensors link down event");
+
+                    msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                    if (msg != NULL)
+                    {
+                        msg->eventID = EVENT_ABORT_MAINTENANCE_IMMEDIATE;
+                        sprintf((char*)msg->logMessage, "(Main Core) Aborting maintenance mode");
+                        if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                        {
+                            ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                        }
+                        free(msg);
+                    }
+                }
+                else if (receivedMessage.eventID == SEC_ERR_GSE_AUTH_FAILED)
+                {
+                    ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    ESP_LOGE("Main Core", "GSE authentication failed");
+                    if (getBCState() == MNT_MODE)
+                    {
+                        setMntState(WAITING);
+                        setConnState(NOT_SET_CONN);
+                        ESP_LOGI("Main Core",
+                                 "MNT State changed to WAITING due to GSE auth failure");
+                    }
+                    else
+                    {
+                        ESP_LOGW(
+                            "Main Core",
+                            "Received SEC_ERR_GSE_AUTH_FAILED event in unexpected state, ignoring");
+                    }
+                }
+                else if (receivedMessage.eventID == WIFI_AP_STARTED_OK)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == WAITING)
+                    {
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                    }
+                    else
+                    {
+                        ESP_LOGW("Main Core",
+                                 "Received WIFI_AP_STARTED_OK event in unexpected state, ignoring");
+
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+
+                        if (msg != NULL)
+                        {
+                            msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                            sprintf((char*)msg->logMessage, "WIFI_AP_STARTED_OK");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
+                }
+                else if (receivedMessage.eventID == WIFI_AP_START_FAILURE_EVENT)
+                {
+                    if (getBCState() == MNT_MODE && getMntState() == WAITING)
+                    {
+                        ESP_LOGI("LOG_INFO", "%s", receivedMessage.logMessage);
+                        ESP_LOGE("Main Core",
+                                 "WiFi AP failed to start, reinitializing Maintenance Mode");
+                        setBCState(OP_MODE);
+                        setMntState(NOT_SET_MNT);
+                        setConnState(NOT_SET_CONN);
+                        deinitMaintenanceMode();
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+                        if (msg != NULL)
+                        {
+                            msg->eventID = EVENT_ENTER_MAINTENANCE_REQUEST;
+                            sprintf((char*)msg->logMessage, "(Main Core) Reinitializing");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
+                    else
+                    {
+                        ESP_LOGW("Main Core",
+                                 "Received WIFI_AP_START_FAILURE_EVENT event in unexpected state, "
+                                 "ignoring");
+
+                        msg = (QueueMessage_t*)malloc(sizeof(QueueMessage_t));
+
+                        if (msg != NULL)
+                        {
+                            msg->eventID = CORE_WARN_UNEXPECTED_EVENT;
+                            sprintf((char*)msg->logMessage, "WIFI_AP_START_FAILURE_EVENT");
+                            if (xQueueSend(BCQueue, (void*)msg, portMAX_DELAY) != pdPASS)
+                            {
+                                ESP_LOGE("Main Core", "Failed to send message to BCQueue");
+                            }
+                            free(msg);
+                        }
+                    }
                 }
             }
+            // vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-}
