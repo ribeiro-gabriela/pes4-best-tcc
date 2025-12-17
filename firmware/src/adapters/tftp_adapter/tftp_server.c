@@ -72,7 +72,7 @@ static int sendData(int sock,
 
     if (err < 0)
     {
-        ESP_LOGE(TAG, "Erro durante envio DATA Bloco %d: errno %d", blockNumber, errno);
+        ESP_LOGE(TAG, "Error during DATA block send %d: errno %d", blockNumber, errno);
         return -1;
     }
     return 0;
@@ -120,7 +120,7 @@ void tftpSessionTask(void* pvParameters)
 
     if (config->opcode == TFTP_OP_WRQ)
     {
-        ESP_LOGI(TAG, "ok I received a write req");
+        ESP_LOGI(TAG, "received write request");
 
         sendAck(session_socket, &config->clientAddr, config->addrLen, 0);
 

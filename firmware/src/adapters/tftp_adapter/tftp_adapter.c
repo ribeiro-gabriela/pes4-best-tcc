@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOSConfig_arch.h"
 #include "freertos/idf_additions.h"
 #include "fsm.h"
+#include "arinc_adapter.h"
 #include "portmacro.h"
 #include "esp_log.h"
 #include "lwip/def.h"
@@ -67,6 +68,8 @@ void tftpDecoderTask(void* params)
 
     size_t received;
 
+    char* msg;
+
     for (;;) {
         received = udpAdapterReceivePacket(&currentPacket, portMAX_DELAY);
 
@@ -95,6 +98,14 @@ void tftpDecoderTask(void* params)
             } else {
                 ESP_LOGW(TAG, "packet too short");
             }
+        }
+        else
+        {
+            msg = (char*) malloc(43);
+            strcpy(msg, "No packet received or not in correct state");
+            sendStatusToClient(0, ARINC_OP_ABORTED_BY_TARGET, strlen(msg), msg, 0, 0, NULL, 0, NULL);
+            ESP_LOGW(TAG, "No packet received or not in correct state");
+            free(msg);
         }
 	    vTaskDelay( 10 / portTICK_PERIOD_MS);
     }
