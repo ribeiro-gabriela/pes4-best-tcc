@@ -1,8 +1,8 @@
 #include "comm_port.h"
-#include "arinc_core.h"
+#include "arinc_adapter.h"
 #include "tftp_client.h"
-#include "tftp_core.h"
-#include "udp.h"
+#include "tftp_adapter.h"
+#include "udp_adapter.h"
 
 
 struct tftp_server* server;

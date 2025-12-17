@@ -3,12 +3,12 @@
 #include "fsm.h"
 #include "lwip/sockets.h"
 #include "portmacro.h"
-#include "tftp_core.h"
+#include "tftp_adapter.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "arinc_core.h"
+#include "arinc_adapter.h"
 #include "main_core.h"
 #include "tftp_client.h"
 

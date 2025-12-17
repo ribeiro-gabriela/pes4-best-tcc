@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "arinc_core.h"
+#include "arinc_adapter.h"
 
 #define MAX_PROTOCOL_FIELD_LENGTH 2040
 

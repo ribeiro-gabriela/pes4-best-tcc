@@ -1,4 +1,4 @@
-#include "arinc_core.h"
+#include "arinc_adapter.h"
 #include "cc.h"
 #include "esp_log.h"
 #include "freertos/idf_additions.h"

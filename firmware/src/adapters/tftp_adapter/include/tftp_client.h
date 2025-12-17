@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 
-#include "arinc_core.h"
+#include "arinc_adapter.h"
 
 int tftpClientGet(const char* ip_addr, lurFilesDescriptionHeader_t fileInfo);
 int tftpClientPut(const char* ip_addr, const char* filename, uint8_t* payload, size_t payload_size);

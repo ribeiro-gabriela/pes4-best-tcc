@@ -1,10 +1,9 @@
-#include "tftp_core.h"
+#include "tftp_adapter.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/FreeRTOSConfig_arch.h"
 #include "freertos/idf_additions.h"
 #include "fsm.h"
 #include "portmacro.h"
-#include "udp.h"
 #include "esp_log.h"
 #include "lwip/def.h"
 #include <stdint.h>

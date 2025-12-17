@@ -43,10 +43,6 @@ void partitionSetup()
         ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
         return;
     }
-    else
-    {
-        ESP_LOGI(TAG, "created %s partition", logs.base_path);
-    }
 
     esp_vfs_spiffs_conf_t pn_conf = {.base_path = "/pn",
                                      .partition_label = "pn",

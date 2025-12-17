@@ -1,4 +1,4 @@
-#include "udp.h"
+#include "udp_adapter.h"
 
 #include "esp_log.h"
 #include "freertos/idf_additions.h"
@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 
-static const char* TAG = "udp_adapter";
+static const char* TAG = "UDP";
 
 static int serverSocket = -1;
 

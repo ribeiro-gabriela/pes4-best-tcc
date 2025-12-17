@@ -3,7 +3,7 @@
 #define TFTP_PROTOCOL_H
 
 #include <stdint.h>
-#include "udp.h" // Para ter acesso a UdpPacket_t
+#include "udp_adapter.h" // Para ter acesso a UdpPacket_t
 
 // Opcodes TFTP (RFC 1350)
 #define TFTP_OP_RRQ   1
